@@ -1,0 +1,17 @@
+---
+output: github_document
+---
+
+[![Travis-CI Build Status](https://travis-ci.org/.svg?branch=master)](https://travis-ci.org/)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/USCBiostats/<REPO>?branch=master&svg=true)](https://ci.appveyor.com/project/USCBiostats/<REPO>)
+[![Coverage Status](https://img.shields.io/codecov/c/github//master.svg)](https://codecov.io/github/?branch=master)
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```

@@ -1,0 +1,242 @@
+---
+title: "Yet Another 'Writing R packages' tutorial"
+author: "George G. Vega Yon"
+date: "January 24, 2017"
+output: slidy_presentation
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(out.width = "600px", fig.align = "center")
+```
+
+
+# Intro
+
+*   How do I write R packages
+*   We will skip all the "Code Complete" part of it (so we assume that the design is already there)
+*   I'll assume that the user already knows the basics of git(hub): Creating a repo online, and start using it locally.
+*   We'll review some practices and tools that I consider useful
+
+# Why an R Package
+
+1.  Easiest way to share code (to the world)
+
+2.  Already standarized, so you don't need to think about how to structure it
+
+3.  Provides a way of thinking
+
+4.  Looks nice
+
+1-3 can be summarized as the same.
+
+
+
+# How to write an R package
+
+*   You have several methods: package.skeleton(), Rstudio's "New Project", etc.
+
+*   I kind of do it from scratch...:
+
+# Step 0: Create the necesary files
+
+1.  Create the package dir, say `funnypkg`
+2.  Create the `R` dir
+3.  Create the `DESCRIPTION` file:
+
+```
+Package: funnypkg
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Author: Who wrote it
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: MIT + file
+Encoding: UTF-8
+LazyData: true
+```
+
+3.  From RStudio, create a new project pointing to the package
+    folder.
+
+----
+
+And, using the `devtools` package, we can add some extras
+
+```r
+# Creating a README for the project
+devtools::use_readme_rmd()
+
+# Infrastructure for testing
+devtools::use_testthat()
+
+# Infrastructure for Code Coverage
+devtools::use_coverage(type = "codecov") # This creates the .travis.yml
+devtools::use_appveyor()
+
+# A LICENSE file (required by CRAN)
+# The line "license: MIT + file" in the DESCRIPTION file
+devtools::use_mit_license(copyright_holder = "George G. Vega Yon") 
+```
+
+    
+# Step 1: Write a function [`roxygen2`](https://cran.r-project.org/web/packages/roxygen2/index.html)
+
+
+    
+```{r}
+#' The title of -foo-
+#'
+#' @param a Numeric scalar. A brief description.
+#' @param b Numeric scalar. A brief description.
+#' 
+#' @details Computes the sum of \code{x} and \code{y}.
+#' @returns A list of class \code{funnypkg_foo}:
+#' \item{a}{Numeric scalar.}
+#' \item{b}{Numeric scalar.}
+#' \item{ab}{Numeric scalar. the sum of \code{a} and \code{b}}
+#' @examples
+#' foo(1, 2)
+#' 
+#' @export
+foo <- function(a, b) {
+  ans <- a + b
+  structure(list(a = a, b = b, ab = ans)
+  , class = "funnypkg_foo")
+}
+
+```
+
+Press Ctrl + Shift + D (RStudio will: create the manual, and the NAMESPACE)
+    
+# Step 2: Extend it
+
+```{r}
+#' @rdname foo
+#' @export
+#' @params x An object of class \code{funnypkg_foo}.
+#' @params y Ignored.
+#' @params ... Further arguments passed to
+#' \code{\link[graphics:plot.window]{plot.window}}.
+plot.funnypkg_foo <- function(x, y = NULL, ...) {
+  plot.new()
+  plot.window(xlim = range(unlist(c(0,x))), ylim = c(-.5,1))
+  axis(1)
+  with(x, segments(0, 1, ab, col = "blue", lwd=3))
+  with(x, segments(0, 0, a, col = "green", lwd=3))
+  with(x, segments(a, .5, a + b, col = "red", lwd=3))
+  legend("bottom", col = c("blue", "green", "red"), 
+         legend = c("a+b", "a", "b"), bty = "n", 
+         ncol = 3, lty = 1, lwd=3)
+}
+
+```
+  
+You'll need to update the `man/*Rd` everytime that you add new roxygen content.
+Just press Ctrl + Shift + D and RStudio will do it for you
+
+----
+
+*   Notice that we are using the functions `plot.new`, `plot.window`,
+    `axis`, and `legend` from the `graphics` package, which 
+    `R CMD check` will notice. You'll need to add it in the NAMESPACE
+    via roxygen2, for which I recommend using a file called `funnypkg.r`
+
+    ```r
+    #' @importFrom graphics plot.new plot.window axis legend
+    NULL
+    
+    #' funnypkg
+    #'
+    #' A (not so) funny collection of functions
+    #'
+    #' @description We add stuff up... You can access to the project
+    #' website at \url{http://github.com/USCBiostats/funnypkg}
+    #'
+    #' @docType package
+    #' @name funnypkg
+    #'
+    #' @author George G. Vega Yon
+    NULL
+    ```
+    
+    Notice that the description of the file is also here.
+    
+-----
+
+*   And in the `DESCRIPTION` file:
+
+    ```
+    Package: funnypkg
+    Type: Package
+    Title: What the Package Does (Title Case)
+    Version: 0.1.0
+    Author: Who wrote it
+    Maintainer: The package maintainer <yourself@somewhere.net>
+    Description: More about what it does (maybe more than one line)
+        Use four spaces when indenting paragraphs within the Description.
+    License: What license is it under?
+    Encoding: UTF-8
+    LazyData: true
+    Imports: graphics
+    ```
+
+# Step 3: Add some tests
+
+In the `tests/testthat/` dir, add/edit a source file with tests, e.g. `test-basic.r`
+
+```r
+context("Basic set of tests")
+test_that("foo(a, b) = a+b", {
+  # Preparing the test
+  a <- 1
+  b <- -2
+  
+  # Calling the function
+  ans0 <- a+b
+  ans1 <- foo(a, b)
+  
+  # Are these equal?
+  expect_equal(ans0, ans1$ab)
+})
+
+test_that("Plot returns -funnypkg_foo-", {
+  expect_s3_class(plot(foo(1,2)), "funnypkg_foo")
+})
+```
+
+You can run the tests using Ctrl + Shift + t
+
+# Step 4: Checking the package
+
+1.  If you don't have C/C++  code Just press Ctrl + Shift + E
+
+2.  If you have C/C++ code, use `R CMD Check` with valgrind (check for segfaults)
+
+    ```shell
+    $ R CMD build funnypkg
+    $ R CMD check --as-cran --use-valgrind funnypkg*.tar.gz
+    ```
+
+    You can ask RStudio to use valgrind too.
+
+
+# Step 5: Commit your Changes
+
+*   If after adding/changing the code nothing breaks, then you are good to go with your changes!
+    
+    ```shell
+    $ git commit -a -m "Adding function abc"
+    $ git pull
+    $ git push
+    ```
+
+*   Ideally, you'll want to track changes using `ChangeLog` and `NEWS.md` files.
+
+# References
+
+Mostly from experience, and
+
+*   Hadley's R-pkgs
+*   Writing R Extensions
