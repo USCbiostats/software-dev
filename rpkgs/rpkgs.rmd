@@ -92,7 +92,7 @@ devtools::use_mit_license(copyright_holder = "George G. Vega Yon")
 #' @param b Numeric scalar. A brief description.
 #' 
 #' @details Computes the sum of \code{x} and \code{y}.
-#' @returns A list of class \code{funnypkg_foo}:
+#' @return A list of class \code{funnypkg_foo}:
 #' \item{a}{Numeric scalar.}
 #' \item{b}{Numeric scalar.}
 #' \item{ab}{Numeric scalar. the sum of \code{a} and \code{b}}
@@ -108,25 +108,25 @@ foo <- function(a, b) {
 
 ```
 
-Press Ctrl + Shift + D (RStudio will: create the manual, and the NAMESPACE)
+Press Ctrl + Shift + D (RStudio will: create the manual, and the NAMESPACE). Make sure you activate this option in RStudio (not the default)
     
 # Step 2: Extend it
 
 ```{r}
 #' @rdname foo
 #' @export
-#' @params x An object of class \code{funnypkg_foo}.
-#' @params y Ignored.
-#' @params ... Further arguments passed to
+#' @param x An object of class \code{funnypkg_foo}.
+#' @param y Ignored.
+#' @param ... Further arguments passed to
 #' \code{\link[graphics:plot.window]{plot.window}}.
 plot.funnypkg_foo <- function(x, y = NULL, ...) {
-  plot.new()
-  plot.window(xlim = range(unlist(c(0,x))), ylim = c(-.5,1))
-  axis(1)
-  with(x, segments(0, 1, ab, col = "blue", lwd=3))
-  with(x, segments(0, 0, a, col = "green", lwd=3))
-  with(x, segments(a, .5, a + b, col = "red", lwd=3))
-  legend("bottom", col = c("blue", "green", "red"), 
+  graphics::plot.new()
+  graphics::plot.window(xlim = range(unlist(c(0,x))), ylim = c(-.5,1))
+  graphics::axis(1)
+  with(x, graphics::segments(0, 1, ab, col = "blue", lwd=3))
+  with(x, graphics::segments(0, 0, a, col = "green", lwd=3))
+  with(x, graphics::segments(a, .5, a + b, col = "red", lwd=3))
+  graphics::legend("bottom", col = c("blue", "green", "red"), 
          legend = c("a+b", "a", "b"), bty = "n", 
          ncol = 3, lty = 1, lwd=3)
 }
@@ -141,7 +141,7 @@ Just press Ctrl + Shift + D and RStudio will do it for you
 *   Notice that we are using the functions `plot.new`, `plot.window`,
     `axis`, and `legend` from the `graphics` package, which 
     `R CMD check` will notice. You'll need to add it in the NAMESPACE
-    via roxygen2, for which I recommend using a file called `funnypkg.r`
+    via roxygen2, for which I recommend using a file called `funnypkg-pkg.r`
 
     ```r
     #' @importFrom graphics plot.new plot.window axis legend

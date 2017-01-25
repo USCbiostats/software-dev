@@ -1,0 +1,6 @@
+# funnypkg 0.1.999
+
+* Added a `NEWS.md` file to track changes to the package.
+
+
+

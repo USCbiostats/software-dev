@@ -9,6 +9,9 @@ init:
 
 install:
   ps: Bootstrap
+  
+before_build:
+  cmd: cd rpkgs\funnypkg
 
 # Adapt as necessary starting from here
 

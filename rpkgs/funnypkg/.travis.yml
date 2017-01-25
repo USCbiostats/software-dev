@@ -3,3 +3,7 @@
 language: R
 sudo: false
 cache: packages
+
+# Since the project is not in the main folder of the repo, we need to add this
+# line
+before_script: cd rpkgs/funnypkg
