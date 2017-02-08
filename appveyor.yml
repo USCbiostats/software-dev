@@ -12,7 +12,7 @@ install:
 
 # See https://github.com/krlmlr/r-appveyor/issues/34#issuecomment-152554676
 before_build:
-  - cp ../travis-tool.sh ./travis-tool.sh
+  - cp ..\travis-tool.sh .\travis-tool.sh
   - cp travis-tool.sh.cmd rpkgs\funnypkg\travis-tool.sh.cmd
   - cd rpkgs\funnypkg
   - bash -c "echo '^travis-tool\.sh\.cmd$' >> .Rbuildignore"

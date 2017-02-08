@@ -19,10 +19,19 @@ knitr::opts_chunk$set(out.width = "600px", fig.align = "center")
 
 # Today
 
-*   Have a look at some R-package-dev practices based mostly on my own experience (so the product is sold AS-IS)
-*   We won't discuss either Rcpp or coding R itself.
-*   We won't discuss github in depth. I'll assume that the user already knows the basics of git(hub): Creating a repo online, and start using it locally.
-*   We won't talk about software engineering/design, rather we'll take a look at some tools and dev cycle.
+*   Have a look at some R-package-dev practices based mostly on my own experience
+    (so the product is sold AS-IS)
+    
+*   We won't discuss either Rcpp or coding R itself. (for that I
+    recommend ["Advance R"](http://adv-r.had.co.nz/Rcpp.html))
+
+*   We won't discuss github in depth. I'll assume that the user already knows the
+    basics of git(hub): Creating a repo online, and start using it locally.
+    (A good reference is ["Pro Git"](https://git-scm.com/book/en/v2))
+    
+*   We won't talk about software engineering/design, rather we'll take a look at
+    some tools and dev cycle. (For that you have ["Code Complete"](http://cc2e.com/))
+    
 
 # What we'll be using today
 
@@ -42,7 +51,7 @@ c.  **valgrind**: (if you use C/C++ code) "a memory error detector" ([read more]
 
 To name a few:
 
-1.  Easiest way to share code: Just type `install.packages` and voilà!
+1.  Easy way to share code: Just type `install.packages` and voilà!
 
 2.  Already standarized: So you don't need to think about how to structure it.
 
@@ -59,6 +68,43 @@ According to Hadley Wickham's ["R packages"](http://r-pkgs.had.co.nz/)
 **reusable R functions**, the **documentation** that describes how to use them, and
 **sample data**.
 
+```{r What it has, echo=FALSE}
+words <- c("R/", "tests/","vignettes/", "data/", "man/",
+           "DESCRIPTION", "NAMESPACE")
+freqs <- 7:1
+# oldpar <- par(no.readonly = TRUE)
+# par(mar = rep(0,4))
+# wordcloud::wordcloud(words, colors = c(blues9[5:9], gray(c(.8, .6)))[7:1],
+#                      freqs, min.freq = 1)
+# par(oldpar)
+
+library(d3wordcloud)
+d3wordcloud(words, freqs, colors = c(blues9[5:9], gray(c(.8, .6))))
+```
+
+# What's an R package, anyway? (cont.)
+
+Folders
+
+*   **R** Where the R scripts live, e.g. `addnums.r`, `funny-pkg.r`.
+
+*   **tests** Where the tests live, e.g. `testthat/test-addnums.r` (using testthat).
+
+*   **vignettes** Where vignettes live, e.g. `vignettes/mode_details_on_addnums.rmd`.
+
+*   **data** Where the data lives, e.g. `fakedata.rda`, `aneattable.csv`.
+
+*   **man** Where the manuals live, e.g. `addnums.Rd`, `funnypkg.Rd`.
+
+And files
+
+*   **DESCRIPTION** The metadata of the package: name, description, version, author(s),
+    dependencies, etc.
+
+*   **NAMESPACE** Declares the name of the objects (functions mostly) that will
+    be part of the package (and will be visible to the user)
+
+More info [here](http://r-pkgs.had.co.nz/package.html) and [here](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-structure)
 
 
 # Dev cycle
@@ -78,14 +124,17 @@ Writing R packages is an iterative process
     
     4.  `R CMD Check`: Will CRAN, and the rest of the functions, 'like' it?
     
-    5.  Commit your changes!: Update `ChangeLog`+`news.md`, and commit the changes!
+    5.  Commit your changes!: Update `ChangeLog`+`news.md`, and commit
+        (so travis and friends run)!
     
     6.  next `f`
+    
+3.  Submit your package to CRAN/Bioconductor (read [more](http://r-pkgs.had.co.nz/release.html#release-submission))
 
 
 # Step 1: Set up the structure
 
-You have several methods: package.skeleton(), Rstudio's "New Project", etc. I
+You have several methods: `package.skeleton()`, Rstudio's "New Project", `devtools::new()`, etc. I
 personally do it from scratch (including the code):
 
 1.  Create the package dir, say `funnypkg`
@@ -226,8 +275,10 @@ What did just happen?
 *   You'll need to update the `man/*Rd` everytime that you add new roxygen content.
     Just press Ctrl + Shift + D and RStudio will do it for you.
     
-*   Notice that functions from foreign packages are called using the :: operator
-    ([read more](https://stat.ethz.ch/R-manual/R-devel/library/base/html/ns-dblcolon.html)). Not a requirement, but makes the code easier to maintain.
+*   Notice that functions from foreign packages are called using the `::` operator
+    (read more [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/ns-dblcolon.html)
+    and [here](http://r-pkgs.had.co.nz/namespace.html)). Not a requirement, but
+    makes the code easier to maintain (and less error-prone... because of R's scoping rules).
 
 ---
 
@@ -247,7 +298,7 @@ to the DESCRIPTION files:
     #' A (not so) funny collection of functions
     #'
     #' @description We add stuff up... You can access to the project
-    #' website at \url{http://github.com/USCBiostats/funnypkg}
+    #' website at \url{https://github.com/USCbiostats/software-dev/tree/master/rpkgs/funnypkg}
     #'
     #' @docType package
     #' @name funnypkg
@@ -273,61 +324,224 @@ to the DESCRIPTION files:
     Imports: graphics
     ```
 
-# Step 3: Add some tests
+# Step 2.3: Add some tests
 
-In the `tests/testthat/` dir, add/edit a source file with tests, e.g. `test-basic.r`
+Test are run every time that you run R CMD check
 
-```r
-context("Basic set of tests")
-test_that("foo(a, b) = a+b", {
-  # Preparing the test
-  a <- 1
-  b <- -2
-  
-  # Calling the function
-  ans0 <- a+b
-  ans1 <- foo(a, b)
-  
-  # Are these equal?
-  expect_equal(ans0, ans1$ab)
-})
-
-test_that("Plot returns -funnypkg_foo-", {
-  expect_s3_class(plot(foo(1,2)), "funnypkg_foo")
-})
-```
-
-You can run the tests using Ctrl + Shift + t
-
-# Step 4: Checking the package
-
-1.  If you don't have C/C++  code Just press Ctrl + Shift + E
-
-2.  If you have C/C++ code, use `R CMD Check` with valgrind (check for segfaults)
-
-    ```shell
-    $ R CMD build funnypkg
-    $ R CMD check --as-cran --use-valgrind funnypkg*.tar.gz
+*   In the `tests/testthat/` dir, add/edit a source file with tests, e.g. `test-basic.r`
+    
+    ```r
+    context("Basic set of tests")
+    test_that("addnums(a, b) = a+b", {
+      # Preparing the test
+      a <- 1
+      b <- -2
+      
+      # Calling the function
+      ans0 <- a+b
+      ans1 <- addnums(a, b)
+      
+      # Are these equal?
+      expect_equal(ans0, ans1$ab)
+    })
+    
+    test_that("Plot returns -funnypkg_foo-", {
+      expect_s3_class(plot(addnums(1,2)), "funnypkg_foo")
+    })
     ```
+    
+*   You can run the tests using Ctrl + Shift + t
 
-    You can ask RStudio to use valgrind too.
+*   Furthermore, tests are use to evaluate code coverage.
 
+# Step 2.4: R CMD check
 
-# Step 5: Commit your Changes
+Running `R CMD check` is easy with RStudio
 
-*   If after adding/changing the code nothing breaks, then you are good to go with your changes!
+*   If you don't have C/C++  code Just press Ctrl + Shift + E
+
+*   If you have C/C++ code, use `R CMD Check` with valgrind (check for segfaults)
     
     ```shell
-    $ git commit -a -m "Adding function abc"
-    $ git pull
+    $ R CMD build funnypkg/
+    $ R CMD check --as-cran --use-valgrind funnypkg*.tar.gz
+    ```
+    
+    You can ask RStudio to use valgrind too.
+
+For an extensive list of the checks, see the section
+[1.3.1 Checking packages](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Checking-packages)
+in the "Writing R extensions" manual.
+
+---
+
+How does the output of `R CMD check` looks like?
+
+```shell
+==> devtools::check()
+
+Updating funnypkg documentation
+Loading funnypkg
+Setting env vars ---------------------------------------------------------------
+CFLAGS  : -Wall -pedantic
+CXXFLAGS: -Wall -pedantic
+Building funnypkg --------------------------------------------------------------
+'/usr/lib/R/bin/R' --no-site-file --no-environ --no-save --no-restore --quiet  \
+  CMD build  \
+  '/home/vegayon/Dropbox/usc/core_project/CodingStandards/rpkgs/funnypkg'  \
+  --no-resave-data --no-manual 
+
+* checking for file ‘/home/vegayon/Dropbox/usc/core_project/CodingStandards/rpkgs/funnypkg/DESCRIPTION’ ... OK
+* preparing ‘funnypkg’:
+* checking DESCRIPTION meta-information ... OK
+* checking for LF line-endings in source and make files
+* checking for empty or unneeded directories
+* building ‘funnypkg_0.1.999.tar.gz’
+
+Setting env vars ---------------------------------------------------------------
+_R_CHECK_CRAN_INCOMING_USE_ASPELL_: TRUE
+_R_CHECK_CRAN_INCOMING_           : FALSE
+_R_CHECK_FORCE_SUGGESTS_          : FALSE
+Checking funnypkg --------------------------------------------------------------
+'/usr/lib/R/bin/R' --no-site-file --no-environ --no-save --no-restore --quiet  \
+  CMD check '/tmp/RtmpBYGSto/funnypkg_0.1.999.tar.gz' --as-cran --timings  \
+  --no-manual 
+
+* using log directory ‘/home/vegayon/Dropbox/usc/core_project/CodingStandards/rpkgs/funnypkg.Rcheck’
+* using R version 3.3.2 (2016-10-31)
+* using platform: x86_64-pc-linux-gnu (64-bit)
+* using session charset: UTF-8
+* using options ‘--no-manual --as-cran’
+* checking for file ‘funnypkg/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘funnypkg’ version ‘0.1.999’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘funnypkg’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... OK
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking examples ... OK
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ...
+  Running ‘testthat.R’ OK
+* DONE
+Status: OK
+
+
+
+
+R CMD check results
+0 errors | 0 warnings | 0 notes
+
+R CMD check succeeded
+```
+
+# Step 2.5: Commit your changes
+
+Once you have run R CMD checks and no erros or unexpected issues are detected,
+you should commit your changes and push them to Github.
+
+1.  Edit the [`NEWS.md`](https://github.com/hadley/dplyr/blob/master/NEWS.md) file and the
+    [`ChangeLog`](https://github.com/RcppCore/RcppArmadillo/blob/master/ChangeLog) (if you have one).
+
+2.  Add the new files to the tree, commit your changes, and push them to Github
+    
+    ```shell
+    $ git add R/newfile.r man/newfile.Rd
+    $ git commit -a -m "Adding new function"
     $ git push
     ```
+    
+Once uploaded, I recommend checking Travis and AppVeyor to see if everything
+went well.
 
-*   Ideally, you'll want to track changes using `ChangeLog` and `NEWS.md` files.
+# Step 3: Submit your package to CRAN/Bioconductor
 
-# References
+*   You can release your package using `devtools::release()` function.
 
-Mostly from experience, and
+*   The devtools package was built to make life easier. Such is it's creator's
+    confidance on the `release` function that it comes with a warranty!
+    
+    > If a devtools bug causes one of the CRAN maintainers to **treat you
+      impolitely**, I will personally send you a handwritten apology note. Please
+      forward me the email and your address, and I'll get a card in the mail.
 
-*   Hadley's R-pkgs
-*   Writing R Extensions
+# Dev Cycle (once again!)
+
+The most important step
+
+2.  **Code!** For `f` in `F` do
+    
+    1.  Write `f`
+    
+    2.  Document `f`: what it does, what the inputs are, what it returns, examples.
+    
+    3.  Add some tests: is it doing what is supposed to do?
+    
+    4.  `R CMD Check`: Will CRAN, and the rest of the functions, 'like' it?
+    
+    5.  Commit your changes!: Update `ChangeLog`+`news.md`, and commit
+        (so travis and friends run)!
+    
+    6.  next `f`
+    
+
+
+# Yet Another 'Writing R packages' tutorial
+
+<body>
+<p align="center" style="font-size:50px"><b>Thanks!</b></pr><br>
+<p align="center">George G. Vega Yon<br><a href="http://cana.usc.edu/vegayon">cana.usc.edu/vegayon</a><br><a href="mailto:vegayon@usc.edu">vegayon@usc.edu</a></p>
+</body>
+
+## More resources
+
+*   ["Writing R extensions"](https://cran.r-project.org/doc/manuals/r-release/R-exts.html)
+    (R Core Team)
+
+*   ["R packages"](http://r-pkgs.had.co.nz/) (Hadley Wickham)
+
+*   ["Developing Packages with RStudio"](https://support.rstudio.com/hc/en-us/articles/200486488-Developing-Packages-with-RStudio)
+    (Josh Paulson)
+
+*   ["R package primer: a minimal tutorial"](http://kbroman.org/pkg_primer/) (Karl Broman)
+
+*   ["Writing an R package from scratch"](https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/)
+    (Hilary Parker)
+
+*   ["Instructions for Creating Your Own R Package"](http://web.mit.edu/insong/www/pdf/rpackage_instructions.pdf)
+    (Kim _et al._)

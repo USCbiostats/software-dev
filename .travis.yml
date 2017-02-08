@@ -8,6 +8,5 @@ cache: packages
 # line
 before_install: cd rpkgs/funnypkg
 
-* Add to `.travis.yml`:
 after_success:
   - Rscript -e 'covr::codecov()'

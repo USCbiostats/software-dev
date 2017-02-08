@@ -1,8 +1,4 @@
 body {
-  font-family:  Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
-  width: 80%;
-  max-width: 800px;
-  margin: auto;
   background: url("red_pequena.png") no-repeat top right;
 }
 
@@ -18,19 +14,3 @@ nav a:hover, a:hover {color: white; text-shadow: 0 2px 1px black;text-decoration
 /* selected link */
 nav a:active {color: black;text-decoration: none}
 
-/* Header style */
-h2 {color:#1e1e1e; font-weight:lighter;}
-h3 {color:#1e1e1e; font-weight:lighter;}
-h4 {color:#1e1e1e; font-weight:lighter;}
-
-img { /*iframe*/
-  display: block;
-  width: auto;
-  max-width: 80%;
-  margin: auto;
-  padding: 10px;
-}
-
-
-
-        
