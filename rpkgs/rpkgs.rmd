@@ -1,8 +1,15 @@
 ---
 title: "Yet Another 'Writing R packages' tutorial"
-author: "George G. Vega Yon"
+author: 'George G. Vega Yon<br><a href="http://cana.usc.edu/vegayon">cana.usc.edu/vegayon</a><br><a href="mailto:vegayon@usc.edu">vegayon@usc.edu</a>'
 date: "January 24, 2017"
-output: slidy_presentation
+output: 
+  slidy_presentation:
+    footer: vegayon@usc.edu
+    incremental: false
+    font_adjustment: -1
+    duration: 45
+    css: ggvy_style.css
+    slide_level: 1
 ---
 
 ```{r, echo = FALSE}
@@ -10,57 +17,103 @@ knitr::opts_chunk$set(out.width = "600px", fig.align = "center")
 ```
 
 
-# Intro
+# Today
 
-*   How do I write R packages
-*   We will skip all the "Code Complete" part of it (so we assume that the design is already there)
-*   I'll assume that the user already knows the basics of git(hub): Creating a repo online, and start using it locally.
-*   We'll review some practices and tools that I consider useful
+*   Have a look at some R-package-dev practices based mostly on my own experience (so the product is sold AS-IS)
+*   We won't discuss either Rcpp or coding R itself.
+*   We won't discuss github in depth. I'll assume that the user already knows the basics of git(hub): Creating a repo online, and start using it locally.
+*   We won't talk about software engineering/design, rather we'll take a look at some tools and dev cycle.
 
-# Why an R Package
+# What we'll be using today
 
-1.  Easiest way to share code (to the world)
+a.  **devtools**: "Package development tools for R" ([read more](https://cran.r-project.org/package=devtools)).
+    
+b.  **roxygen2**: "A 'Doxygen'-like in-source documentation system for Rd, collation, and 'NAMESPACE' files"
+    ([read more](https://cran.r-project.org/package=roxygen2)).
 
-2.  Already standarized, so you don't need to think about how to structure it
+c.  **covr**: (An R package for) "Test Coverage for Packages" ([read more](https://cran.r-project.org/package=covr)).
 
-3.  Provides a way of thinking
+d.  **RStudio**: "RStudio is an integrated development environment (IDE) for R" ([read more](https://cran.r-project.org/package=covr)).
 
-4.  Looks nice
-
-1-3 can be summarized as the same.
+c.  **valgrind**: (if you use C/C++ code) "a memory error detector" ([read more](http://valgrind.org/)).
 
 
+# Why 'spending' time writing an R package?
 
-# How to write an R package
+To name a few:
 
-*   You have several methods: package.skeleton(), Rstudio's "New Project", etc.
+1.  Easiest way to share code: Just type `install.packages` and voilà!
 
-*   I kind of do it from scratch...:
+2.  Already standarized: So you don't need to think about how to structure it.
 
-# Step 0: Create the necesary files
+3.  CRAN checks everything for you: Force yourself to code things right.
+
+4.  ...
+
+
+# What's an R package, anyway?
+
+According to Hadley Wickham's ["R packages"](http://r-pkgs.had.co.nz/)
+
+> Packages are **the fundamental units of reproducible R code**. They include
+**reusable R functions**, the **documentation** that describes how to use them, and
+**sample data**.
+
+
+
+# Dev cycle
+
+Writing R packages is an iterative process
+
+1.  **Set up the structure**: Create folders and files `R/`, `data/`, `src/`, `tests/`, `man/`,
+    `vignettes/`, `DESCRIPTION`, `NAMESPACE`(?)
+
+2.  **Code!** For `f` in `F` do
+    
+    1.  Write `f`
+    
+    2.  Document `f`: what it does, what the inputs are, what it returns, examples.
+    
+    3.  Add some tests: is it doing what is supposed to do?
+    
+    4.  `R CMD Check`: Will CRAN, and the rest of the functions, 'like' it?
+    
+    5.  Commit your changes!: Update `ChangeLog`+`news.md`, and commit the changes!
+    
+    6.  next `f`
+
+
+# Step 1: Set up the structure
+
+You have several methods: package.skeleton(), Rstudio's "New Project", etc. I
+personally do it from scratch (including the code):
 
 1.  Create the package dir, say `funnypkg`
+
 2.  Create the `R` dir
-3.  Create the `DESCRIPTION` file:
 
-```
-Package: funnypkg
-Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: MIT + file
-Encoding: UTF-8
-LazyData: true
-```
+3.  Create the `DESCRIPTION` file ([read more](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#The-DESCRIPTION-file)):
+    
+    ```
+    Package: funnypkg
+    Type: Package
+    Title: What the Package Does (Title Case)
+    Version: 0.1.0
+    Author: Who wrote it
+    Maintainer: The package maintainer <yourself@somewhere.net>
+    Description: More about what it does (maybe more than one line)
+        Use four spaces when indenting paragraphs within the Description.
+    License: MIT + file
+    Encoding: UTF-8
+    LazyData: true
+    ```
 
-3.  From RStudio, create a new project pointing to the package
+4.  From RStudio, create a new project pointing to the package
     folder.
 
 ----
+
+## Step 1: Set up the structure (cont. 1)
 
 And, using the `devtools` package, we can add some extras
 
@@ -77,72 +130,114 @@ devtools::use_appveyor()
 
 # A LICENSE file (required by CRAN)
 # The line "license: MIT + file" in the DESCRIPTION file
-devtools::use_mit_license(copyright_holder = "George G. Vega Yon") 
+devtools::use_mit_license(copyright_holder = "George G. Vega Yon")
+devtools::use_news_md()
 ```
-
-    
-# Step 1: Write a function [`roxygen2`](https://cran.r-project.org/web/packages/roxygen2/index.html)
-
-
-    
-```{r}
-#' The title of -foo-
-#'
-#' @param a Numeric scalar. A brief description.
-#' @param b Numeric scalar. A brief description.
-#' 
-#' @details Computes the sum of \code{x} and \code{y}.
-#' @return A list of class \code{funnypkg_foo}:
-#' \item{a}{Numeric scalar.}
-#' \item{b}{Numeric scalar.}
-#' \item{ab}{Numeric scalar. the sum of \code{a} and \code{b}}
-#' @examples
-#' foo(1, 2)
-#' 
-#' @export
-foo <- function(a, b) {
-  ans <- a + b
-  structure(list(a = a, b = b, ab = ans)
-  , class = "funnypkg_foo")
-}
-
-```
-
-Press Ctrl + Shift + D (RStudio will: create the manual, and the NAMESPACE). Make sure you activate this option in RStudio (not the default)
-    
-# Step 2: Extend it
-
-```{r}
-#' @rdname foo
-#' @export
-#' @param x An object of class \code{funnypkg_foo}.
-#' @param y Ignored.
-#' @param ... Further arguments passed to
-#' \code{\link[graphics:plot.window]{plot.window}}.
-plot.funnypkg_foo <- function(x, y = NULL, ...) {
-  graphics::plot.new()
-  graphics::plot.window(xlim = range(unlist(c(0,x))), ylim = c(-.5,1))
-  graphics::axis(1)
-  with(x, graphics::segments(0, 1, ab, col = "blue", lwd=3))
-  with(x, graphics::segments(0, 0, a, col = "green", lwd=3))
-  with(x, graphics::segments(a, .5, a + b, col = "red", lwd=3))
-  graphics::legend("bottom", col = c("blue", "green", "red"), 
-         legend = c("a+b", "a", "b"), bty = "n", 
-         ncol = 3, lty = 1, lwd=3)
-}
-
-```
-  
-You'll need to update the `man/*Rd` everytime that you add new roxygen content.
-Just press Ctrl + Shift + D and RStudio will do it for you
 
 ----
 
-*   Notice that we are using the functions `plot.new`, `plot.window`,
-    `axis`, and `legend` from the `graphics` package, which 
-    `R CMD check` will notice. You'll need to add it in the NAMESPACE
-    via roxygen2, for which I recommend using a file called `funnypkg-pkg.r`
+## Step 1: Set up the structure (cont. 2)
 
+What did just happen?
+
+1.  `use_readme_rmd()`: Creates a readme file that will be in the main folder
+    of the project. Think about it as the home page of your project.
+    
+2.  `use_testthat()`: Will create the basic infrastructure for package testing.
+
+3.  `use_coverage(type = "codecov")`: Creates the [.travis.yml file](https://en.wikipedia.org/wiki/Comparison_of_continuous_integration_software)
+    for Unix CI, and
+    sets it up for code coverage using [codecov.io](https://codecov.io/).
+    
+4.  `devtools::use_appveyor()`: Creates the [appveyor.yml](https://www.appveyor.com/)
+    for windows CI.
+    
+5.  `devtools::use_mit_license(copyright_holder = "George G. Vega Yon")`: Creates the----
+    `LICENSE` file and puts it under 'George G. Vega Yon'.
+
+6.  `devtools::use_news_md()`: Creates the `news.md` file which us used for
+    tracking changes, and communicating them to the users (e.g.
+    [netdiffuseR](https://github.com/USCCANA/netdiffuseR/blob/master/NEWS.md))
+
+
+# Step 2: Code!
+    
+## Step 2.1 and 2.2: Write `f` and Document it
+
+*   Using `roxygen2` is very straight forward
+        
+    ```{r}
+    #' The title of -addnums-
+    #'
+    #' Here is a brief description
+    #' 
+    #' @param a Numeric scalar. A brief description.
+    #' @param b Numeric scalar. A brief description.
+    #' 
+    #' @details Computes the sum of \code{x} and \code{y}.
+    #' @return A list of class \code{funnypkg_addnums}:
+    #' \item{a}{Numeric scalar.}
+    #' \item{b}{Numeric scalar.}
+    #' \item{ab}{Numeric scalar. the sum of \code{a} and \code{b}}
+    #' @examples
+    #' foo(1, 2)
+    #' 
+    #' @export
+    addnums <- function(a, b) {
+      ans <- a + b
+      structure(list(a = a, b = b, ab = ans)
+      , class = "funnypkg_addnums")
+    }
+    
+    ```
+
+*   Press Ctrl + Shift + D (RStudio will: create the manual, and the NAMESPACE).
+    Make sure you activate this option in RStudio (not the default).
+    
+*   Notice that the output is defined using S3-type objects ([read more](http://adv-r.had.co.nz/S3.html))
+
+---
+
+## Step 2.1 and 2.2: Write `f` and Document it (cont. 1)
+
+*   Here we are adding a function that is documented in `addnums`. The plot method
+    
+    ```{r}
+    #' @rdname addnums
+    #' @export
+    #' @param x An object of class \code{funnypkg_addnums}.
+    #' @param y Ignored.
+    #' @param ... Further arguments passed to
+    #' \code{\link[graphics:plot.window]{plot.window}}.
+    plot.funnypkg_addnums <- function(x, y = NULL, ...) {
+      graphics::plot.new()
+      graphics::plot.window(xlim = range(unlist(c(0,x))), ylim = c(-.5,1))
+      graphics::axis(1)
+      with(x, graphics::segments(0, 1, ab, col = "blue", lwd=3))
+      with(x, graphics::segments(0, 0, a, col = "green", lwd=3))
+      with(x, graphics::segments(a, .5, a + b, col = "red", lwd=3))
+      graphics::legend("bottom", col = c("blue", "green", "red"), 
+             legend = c("a+b", "a", "b"), bty = "n", 
+             ncol = 3, lty = 1, lwd=3)
+    }
+    
+    ```
+      
+*   You'll need to update the `man/*Rd` everytime that you add new roxygen content.
+    Just press Ctrl + Shift + D and RStudio will do it for you.
+    
+*   Notice that functions from foreign packages are called using the :: operator
+    ([read more](https://stat.ethz.ch/R-manual/R-devel/library/base/html/ns-dblcolon.html)). Not a requirement, but makes the code easier to maintain.
+
+---
+
+## Step 2.1 and 2.2: Write `f` and Document it (cont. 2)
+
+Since we added foreign functions, we need to add them to the NAMESPACE and
+to the DESCRIPTION files:
+
+*   For the NAMESPACE, we can use `roxygen` as follows:
+    
     ```r
     #' @importFrom graphics plot.new plot.window axis legend
     NULL
@@ -161,12 +256,8 @@ Just press Ctrl + Shift + D and RStudio will do it for you
     NULL
     ```
     
-    Notice that the description of the file is also here.
+*   Here is the DESCRIPTION updated
     
------
-
-*   And in the `DESCRIPTION` file:
-
     ```
     Package: funnypkg
     Type: Package

@@ -6,12 +6,12 @@ test_that("foo(a, b) = a+b", {
   
   # Calling the function
   ans0 <- a+b
-  ans1 <- foo(a, b)
+  ans1 <- addnums(a, b)
   
   # Are these equal?
   expect_equal(ans0, ans1$ab)
 })
 
-test_that("Plot returns -funnypkg_foo-", {
-  expect_s3_class(plot(foo(1,2)), "funnypkg_foo")
+test_that("Plot returns -funnypkg_addnums-", {
+  expect_s3_class(plot(addnums(1,2)), "funnypkg_addnums")
 })

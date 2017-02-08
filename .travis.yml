@@ -7,3 +7,7 @@ cache: packages
 # Since the project is not in the main folder of the repo, we need to add this
 # line
 before_install: cd rpkgs/funnypkg
+
+* Add to `.travis.yml`:
+after_success:
+  - Rscript -e 'covr::codecov()'
