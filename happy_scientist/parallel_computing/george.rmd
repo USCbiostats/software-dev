@@ -47,7 +47,7 @@ knitr::opts_chunk$set(echo = FALSE)
     
 4.  Stop the cluster with `clusterStop`
     
-## parallel example 1
+## parallel example 1: Parallel RNG
 
 ```{r parallel-ex1, echo=TRUE}
 # 1. CREATING A CLUSTER
@@ -98,45 +98,135 @@ ans0 - ans1 # A matrix of zeros
 stopCluster(cl)
 ```
 
-## parallel example 2
+## parallel example 2: Simulating pi
 
-Simulating pi: $\pi = \frac{\mbox{E}[a]}{r^2}$. Simulating
 
-*   We are approximating the area of a circle of radious 2 as the expected
-    value of the number of points that fall within 2
-    
+*   We know that $\pi = \frac{A}{r^2}$. We approximate it by randomly adding
+    points $x$ to a square of size 2 centered at the origin.
 
-Lets take a look at the R code
+*   So, we approximate $\pi$ as $\Pr\{\|x\| \leq 1\}\times 2^2$
+
+```{r, echo=FALSE, dev='jpeg', dev.args=list(quality=100), fig.width=6, fig.height=6, out.width='300px', out.height='300px'}
+set.seed(1231)
+p    <- matrix(runif(5e3*2, -1, 1), ncol=2)
+pcol <- ifelse(sqrt(rowSums(p^2)) <= 1, adjustcolor("blue", .7), adjustcolor("gray", .7))
+plot(p, col=pcol, pch=18)
+```
+
+The R code to do this
+
+```{r simpi, echo=TRUE}
+pisim <- function(i, nsim) {  # Notice we don't use the -i-
+  # Random points
+  ans  <- matrix(runif(nsim*2), ncol=2)
+  
+  # Distance to the origin
+  ans  <- sqrt(rowSums(ans^2))
+  
+  # Estimated pi
+  (sum(ans <= 1)*4)/nsim
+}
+```
+
 
 -----
 
 ```{r parallel-ex2, echo=TRUE, cache=TRUE}
 
 # Setup
-cl <- makePSOCKcluster(4)
+cl <- makePSOCKcluster(10)
 clusterSetRNGStream(cl, 123)
 
+# Number of simulations we want each time to run
 nsim <- 1e5
 
-# Parallel fashion
-system.time({
-  ans_par <- parSapply(cl, 1:100, function(..., nsim) {
-  ans  <- matrix(runif(nsim*2), ncol=2)
-  ans  <- apply(ans, 1, function(x) sqrt(sum(x^2)))
-  sum(ans <= 1)/nsim*4
-}, nsim=nsim)
-})
+# We need to make -nsim- and -pisim- available to the
+# cluster
+clusterExport(cl, c("nsim", "pisim"))
 
-# Serial fashion
-system.time({
-  ans_ser <- sapply(1:100, function(..., nsim) {
-  ans  <- matrix(runif(nsim*2), ncol=2)
-  ans  <- apply(ans, 1, function(x) sqrt(sum(x^2)))
-  sum(ans <= 1)/nsim*4
-}, nsim=nsim)
-})
+# Benchmarking: parSapply and sapply will run this simulation
+# a hundred times each, so at the end we have 1e5*100 points
+# to approximate pi
+rbenchmark::benchmark(
+  parallel = parSapply(cl, 1:100, pisim, nsim=nsim),
+  serial   = sapply(1:100, pisim, nsim=nsim), replications = 1
+)[,1:4]
 
-c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
+```
+
+```{r printing-and-stop, cache=TRUE}
+ans_par <- parSapply(cl, 1:100, pisim, nsim=nsim)
+ans_ser <- sapply(1:100, pisim, nsim=nsim)
 stopCluster(cl)
+```
+
+```{r, echo=FALSE}
+c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
+```
+
+## Rcpp(Armadillo) and OpenMP
+
+## RcppArmadillo + OpenMP example 1: Distance matrix
+
+```cpp
+#include <omp.h>
+#include <RcppArmadillo.h>
+
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::plugins(openmp)]]
+
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+arma::mat dist_par(arma::mat X, int cores = 1) {
+  // Some constants
+  int N = (int) X.n_rows;
+  int K = (int) X.n_cols;
+  
+  // Output
+  arma::mat D(N,N);
+  D.zeros(); // Filling with zeros
+  
+  // Setting the cores
+  omp_set_num_threads(cores);
+  
+#pragma omp parallel for shared(D, N, K, X) default(none)
+  for (int i=0; i<N; i++)
+    for (int j=0; j<i; j++) {
+      for (int k=0; k<K; k++) 
+        D.at(i,j) += pow(X.at(i,k) - X.at(j,k), 2.0);
+      
+      // Computing square root
+      D.at(i,j) = sqrt(D.at(i,j));
+    }
+      
+  
+  // My nice distance matrix
+  return D;
+}
+```
+
+----
+
+Let's see how it goes!
+
+```{r openmp-example1, cache=TRUE, echo=TRUE}
+# Compiling the function
+Rcpp::sourceCpp("dist.cpp")
+
+# Simulating data
+set.seed(1231)
+K <- 5000
+n <- 500
+x <- matrix(rnorm(n*K), ncol=K)
+
+# Benchmarking!
+rbenchmark::benchmark(
+  dist(x),                 # R's distance
+  dist_par(x, cores = 1),  # 1 core
+  dist_par(x, cores = 4),  # 4 cores
+  dist_par(x, cores = 10), # 10 cores
+  replications = 1, order="elapsed"
+)[,1:4]
 ```
 
