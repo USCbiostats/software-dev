@@ -1,0 +1,142 @@
+---
+output: slidy_presentation
+date: March 23, 2017
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## The `parallel` package
+
+*   A refurbished version of `snow`
+
+*   Shipped with R (part of R base)
+
+*   Very flexible
+
+## Parallel workflow
+
+1.  Create a cluster:
+
+    a.  PSOCK Cluster: `makePSOCKCluster`: Creates brand new R Sessions (so
+        nothing is inherited from the master), even in other computers!
+        
+    b.  Fork Cluster: `makeForkCluster`: Using OS
+        [Forking](https://en.wikipedia.org/wiki/Fork_(system_call)),
+        copies the current R session locally (so everything is inherited from
+        the master up to that point). Not available on Windows.
+    
+    c.  Other: `makeCluster` passed to **snow**
+    
+2.  Copy/prepare each R session:
+
+    a.  Copy objects with `clusterExport`
+
+    b.  Pass expressions with `clusterEvalQ`
+
+    c.  Set a seed
+    
+
+3.  Do your call:
+
+    a.  `mclapply`, `mcmapply` if you are using **Fork**
+
+    b.  `parApply`, `parLapply`, etc. if you are using **PSOCK**
+
+    
+4.  Stop the cluster with `clusterStop`
+    
+## parallel example 1
+
+```{r parallel-ex1, echo=TRUE}
+# 1. CREATING A CLUSTER
+library(parallel)
+cl <- makePSOCKcluster(2)    
+
+# 2. PREPARING THE CLUSTER
+clusterSetRNGStream(cl, 123) # Equivalent to `set.seed(123)`
+
+# 3. DO YOUR CALL
+ans <- parSapply(cl, 1:2, function(x) runif(1e3))
+(ans0 <- var(ans))
+
+# I want to get the same!
+clusterSetRNGStream(cl, 123)
+ans1 <- var(parSapply(cl, 1:2, function(x) runif(1e3)))
+
+ans0 - ans1 # A matrix of zeros
+
+# 4. STOP THE CLUSTER
+stopCluster(cl)
+```
+
+-----
+
+In the case of `makeForkCluster`
+
+```{r parallel-ex1-cont, echo=TRUE}
+# 1. CREATING A CLUSTER
+library(parallel)
+cl <- makeForkCluster(2)    
+
+# 2. PREPARING THE CLUSTER
+RNGkind("L'Ecuyer-CMRG")
+set.seed(123) 
+
+# 3. DO YOUR CALL
+ans <- do.call(cbind, mclapply(1:2, function(x) runif(1e3)))
+(ans0 <- var(ans))
+
+# I want to get the same!
+set.seed(123) 
+ans1 <- var(do.call(cbind, mclapply(1:2, function(x) runif(1e3))))
+
+ans0 - ans1 # A matrix of zeros
+
+# 4. STOP THE CLUSTER
+stopCluster(cl)
+```
+
+## parallel example 2
+
+Simulating pi: $\pi = \frac{\mbox{E}[a]}{r^2}$. Simulating
+
+*   We are approximating the area of a circle of radious 2 as the expected
+    value of the number of points that fall within 2
+    
+
+Lets take a look at the R code
+
+-----
+
+```{r parallel-ex2, echo=TRUE, cache=TRUE}
+
+# Setup
+cl <- makePSOCKcluster(4)
+clusterSetRNGStream(cl, 123)
+
+nsim <- 1e5
+
+# Parallel fashion
+system.time({
+  ans_par <- parSapply(cl, 1:100, function(..., nsim) {
+  ans  <- matrix(runif(nsim*2), ncol=2)
+  ans  <- apply(ans, 1, function(x) sqrt(sum(x^2)))
+  sum(ans <= 1)/nsim*4
+}, nsim=nsim)
+})
+
+# Serial fashion
+system.time({
+  ans_ser <- sapply(1:100, function(..., nsim) {
+  ans  <- matrix(runif(nsim*2), ncol=2)
+  ans  <- apply(ans, 1, function(x) sqrt(sum(x^2)))
+  sum(ans <= 1)/nsim*4
+}, nsim=nsim)
+})
+
+c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
+stopCluster(cl)
+```
+

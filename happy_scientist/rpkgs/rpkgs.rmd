@@ -1,7 +1,7 @@
 ---
-title: "Yet Another 'Writing R packages' tutorial"
+title: "Happy Scientist:<br>Yet Another 'Writing R packages' tutorial"
 author: 'George G. Vega Yon<br><a href="http://cana.usc.edu/vegayon">cana.usc.edu/vegayon</a><br><a href="mailto:vegayon@usc.edu">vegayon@usc.edu</a>'
-date: "January 24, 2017"
+date: "February 9, 2017"
 output: 
   slidy_presentation:
     footer: vegayon@usc.edu
@@ -9,7 +9,8 @@ output:
     font_adjustment: -1
     duration: 45
     css: ggvy_style.css
-    slide_level: 1
+    slide_level: 2
+    highlight: haddock
 ---
 
 ```{r, echo = FALSE}
@@ -23,7 +24,8 @@ knitr::opts_chunk$set(out.width = "600px", fig.align = "center")
     (so the product is sold AS-IS)
     
 *   We won't discuss either Rcpp or coding R itself. (for that I
-    recommend ["Advance R"](http://adv-r.had.co.nz/Rcpp.html))
+    recommend ["Advance R"](http://adv-r.had.co.nz/Rcpp.html), and there's also
+    Patrick Muchmore's ["A template for R packages using Rcpp and/or RcppArmadillo "](https://github.com/patrickmuchmore/RPackageTemplate))
 
 *   We won't discuss github in depth. I'll assume that the user already knows the
     basics of git(hub): Creating a repo online, and start using it locally.
@@ -57,7 +59,13 @@ To name a few:
 
 3.  CRAN checks everything for you: Force yourself to code things right.
 
-4.  ...
+4.  **Reproducible Research**
+    
+    *   Accessible Reproducible Research ([Mesirov, __Science__ 2010](http://science.sciencemag.org/content/327/5964/415))
+    
+    *   Again, and Again, and Again, ... ([Jasny et al., __Science__ 2011](http://science.sciencemag.org/content/334/6060/1225))
+        
+    *   Challenges in Irreproducible Research ([__nature__ topic](http://www.nature.com/news/reproducibility-1.17552))
 
 
 # What's an R package, anyway?
@@ -213,7 +221,8 @@ What did just happen?
     
 ## Step 2.1 and 2.2: Write `f` and Document it
 
-*   Using `roxygen2` is very straight forward
+*   Using `roxygen2` is very straight forward. For our fist pice of code, we create the
+    `R/addnums.r` file:
         
     ```{r}
     #' The title of -addnums-
@@ -240,7 +249,7 @@ What did just happen?
     
     ```
 
-*   Press Ctrl + Shift + D (RStudio will: create the manual, and the NAMESPACE).
+*   Type `devtools::document()`, or press Ctrl + Shift + D (RStudio will: create the manual, and the NAMESPACE).
     Make sure you activate this option in RStudio (not the default).
     
 *   Notice that the output is defined using S3-type objects ([read more](http://adv-r.had.co.nz/S3.html))
@@ -272,7 +281,7 @@ What did just happen?
     
     ```
       
-*   You'll need to update the `man/*Rd` everytime that you add new roxygen content.
+*   You'll need to update the `man/*Rd` every time that you add new roxygen content.
     Just press Ctrl + Shift + D and RStudio will do it for you.
     
 *   Notice that functions from foreign packages are called using the `::` operator
@@ -287,7 +296,7 @@ What did just happen?
 Since we added foreign functions, we need to add them to the NAMESPACE and
 to the DESCRIPTION files:
 
-*   For the NAMESPACE, we can use `roxygen` as follows:
+*   Here is the `R/funny-pkg.r` file:
     
     ```r
     #' @importFrom graphics plot.new plot.window axis legend
@@ -321,14 +330,20 @@ to the DESCRIPTION files:
     License: What license is it under?
     Encoding: UTF-8
     LazyData: true
+    Suggests:
+        testthat,
+        covr
+    RoxygenNote: 5.0.1
     Imports: graphics
     ```
+    
+*   The `Suggests` and `RoxygenNote` fields where added automagically by `devtools`.
 
 # Step 2.3: Add some tests
 
 Test are run every time that you run R CMD check
 
-*   In the `tests/testthat/` dir, add/edit a source file with tests, e.g. `test-basic.r`
+*   In the `tests/testthat/` dir, add/edit a source file with tests, e.g. `test-addnums.r`
     
     ```r
     context("Basic set of tests")
@@ -472,7 +487,7 @@ R CMD check succeeded
 
 # Step 2.5: Commit your changes
 
-Once you have run R CMD checks and no erros or unexpected issues are detected,
+Once you have run R CMD checks and no errors or unexpected issues are detected,
 you should commit your changes and push them to Github.
 
 1.  Edit the [`NEWS.md`](https://github.com/hadley/dplyr/blob/master/NEWS.md) file and the
@@ -494,7 +509,7 @@ went well.
 *   You can release your package using `devtools::release()` function.
 
 *   The devtools package was built to make life easier. Such is it's creator's
-    confidance on the `release` function that it comes with a warranty!
+    confidence on the `release` function that it comes with a warranty!
     
     > If a devtools bug causes one of the CRAN maintainers to **treat you
       impolitely**, I will personally send you a handwritten apology note. Please
@@ -519,8 +534,7 @@ The most important step
     
     6.  next `f`
     
-
-
+    
 # Yet Another 'Writing R packages' tutorial
 
 <body>
@@ -537,6 +551,9 @@ The most important step
 
 *   ["Developing Packages with RStudio"](https://support.rstudio.com/hc/en-us/articles/200486488-Developing-Packages-with-RStudio)
     (Josh Paulson)
+    
+*   ["A template for R packages using Rcpp and/or RcppArmadillo "](https://github.com/patrickmuchmore/RPackageTemplate)
+    (Patrick Muchmore)
 
 *   ["R package primer: a minimal tutorial"](http://kbroman.org/pkg_primer/) (Karl Broman)
 

@@ -1,0 +1,65 @@
+---
+title: "intro"
+output: slidy_presentation
+date: March 23, 2017
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Intro
+
+## HPC in R
+
+Out of the box parallel computing:
+
+*   foreach
+
+*   iterators
+
+*   parallel
+
+
+Not so out of the box parallel computing:
+
+*   Rcpp + OpenMP
+
+*   RcppParallel (uses intel's TBB)
+
+
+Others to mention:
+
+*   Hadoop + MapReduce
+
+*   Sparkr
+
+*   bigmem
+
+
+## When to 'parallel computing'
+
+
+*   Talk about vectorization (efficient code)? Garrett's example
+
+*   Is is possible to implement in a paralleel fashion?
+
+*   ...
+
+# Examples
+
+We can write the examples in different files...
+
+## Example 1: parallel
+
+## Example 2: parallel
+
+## Example 3: foreach + iterators
+
+## Example 4: foreach + iterators 
+
+## Example 5: Rcpp + OpenMP
+
+## Example 6: Rcpp + OpenMP
+
+
