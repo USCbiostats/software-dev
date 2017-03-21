@@ -1,27 +1,115 @@
 ---
+title: 'The Happy Scientist Semminar<br>A brief introduction to using R for high-performance computing'
+author: 'George Vega Yon<br>Garret Weaver'
 output: 
   slidy_presentation:
     theme: journal
     highlight: haddock
-date: March 23, 2017
+    duration: 45
+date: 'Department of Preventive Medicine<br>March 23, 2017'
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, fig.align='center'}
 knitr::opts_chunk$set(echo = FALSE, comment = "#")
 ```
 
-## The `parallel` package
+## Agenda
 
-*   A refurbished version of `snow`
+1.  High-Performance: An overview
+    
+2.  Parallel computing in R
+    
+3.  Examples:
+    
+    a.  parallel
+    b.  iterators+foreach
+    c.  RcppArmadillo + OpenMP
 
-*   Shipped with R (part of R base)
 
-*   Very flexible
+
+## High-Performance: An overview
+
+Loosely, from R's perspective, we can think of HPC in terms of two, maybe three things:
+
+1.  Big data: How to work with data that doesn't fit your computer
+
+2.  Parallel computing: How to take advantage of multiple core systems
+
+3.  Compiled code: Write your own low-level code (if R doesn't have it yet...)
+
+
+## Big Data
+
+*   Buy a bigger computer/RAM memory (not the best solution!)
+    
+*   Use out-of-memory storage, i.e., don't load all your data in the RAM. e.g.
+    The [bigmemory](https://CRAN.R-project.org/package=bigmemory),
+    [data.table](https://CRAN.R-project.org/package=data.table),
+    [HadoopStreaming](https://CRAN.R-project.org/package=HadoopStreaming) R packages
+
+*   Store it more efficiently, e.g.: Sparse Matrices (take a look at the `dgCMatrix` objects
+    from the [Matrix](https://CRAN.R-project.org/package=Matrix) R package)
+
+## Parallel computing
+
+```{r, echo=FALSE, fig.cap="Flynn's Classical Taxonomy ([Introduction to Parallel Computing, Blaise Barney, Lawrence Livermore National Laboratory](https://computing.llnl.gov/tutorials/parallel_comp/#Whatis))", fig.align='center'}
+knitr::include_graphics("flynnsTaxonomy.gif")
+```
+
+## GPU vs CPU
+
+```{r, echo=FALSE, fig.cap="[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)", fig.align='center'}
+knitr::include_graphics("cpuvsgpu.jpg")
+```
+
+**Why are we still using CPUs instead of GPUs?**
+
+> GPUs have far more processor cores than CPUs, but because each GPU core runs
+  significantly slower than a CPU core and do not have the features needed for
+  modern operating systems, they are not appropriate for performing most of the
+  processing in everyday computing. They are most suited to compute-intensive
+  operations such as video processing and physics simulations.
+  ([bwDraco at superuser](https://superuser.com/questions/308771/why-are-we-still-using-cpus-instead-of-gpus))
+
+## When is it a good idea?
+
+```{r, echo=FALSE, fig.cap="Ask yourself these questions before jumping into HPC!", fig.align='center'}
+knitr::include_graphics("when_to_parallel.svg")
+```
+
+
+## Parallel computing in R
+
+While there are several alternatives (just take a look at the
+[High-Performance Computing Task View](https://cran.r-project.org/web/views/HighPerformanceComputing.html)),
+we'll focus on the following R-packages/tools
+
+1.  R packages
+    
+    *   **parallel**: R package that provides '[s]upport for parallel computation,
+        including random-number generation'.
+    
+    *   **foreach**: '[A] new looping construct for executing R code repeatedly
+        [...] that supports parallel execution.'
+    
+    *   **iterators**: 'tools for iterating over various R data structures'
+    
+2.  RcppArmadillo + OpenMP
+    
+    *   **RcppArmadillo**: 'Armadillo is a C++ linear algebra library, aiming
+        towards a good balance between speed and ease of use.' '[RcppArmadillo]
+        brings the power of Armadillo to R.'
+        
+    *  **OpenMP**: 'Open Multi-Processing is an application programming interface
+        (API) that supports multi-platform shared memory multiprocessing
+        programming in C, C++, and Fortran, on most platforms, processor
+        architectures and operating systems, including Solaris, AIX, HP-UX,
+        Linux, macOS, and Windows.' ([Wiki](https://en.wikipedia.org/wiki/OpenMP))
 
 ## Parallel workflow
 
 1.  Create a cluster:
-
+    
     a.  PSOCK Cluster: `makePSOCKCluster`: Creates brand new R Sessions (so
         nothing is inherited from the master), even in other computers!
         
@@ -74,7 +162,7 @@ ans0 - ans1 # A matrix of zeros
 stopCluster(cl)
 ```
 
------
+## parallel example 1: Parallel RNG (cont.)
 
 In the case of `makeForkCluster`
 
@@ -138,8 +226,7 @@ pisim <- function(i, nsim) {  # Notice we don't use the -i-
 }
 ```
 
-
------
+## parallel example 2: Simulating $\pi$ (cont.)
 
 ```{r parallel-ex2, echo=TRUE, cache=TRUE}
 
@@ -234,9 +321,7 @@ arma::mat dist_par(arma::mat X, int cores = 1) {
 }
 ```
 
-----
-
-Let's see how it goes!
+## RcppArmadillo + OpenMP example 1: Distance matrix (cont.)
 
 ```{r openmp-example1, cache=TRUE, echo=TRUE}
 # Compiling the function
@@ -318,7 +403,7 @@ double sim_pi(int m, int cores = 1) {
 }
 ```
 
-------
+## RcppArmadillo + OpenMP example 2: Simulating $\pi$ (cont.)
 
 ```{r pi-cpp, cache=TRUE, echo=TRUE}
 # Compiling c++
@@ -355,5 +440,7 @@ benchmark(
 devtools::session_info()
 ```
 
+## References
 
+For more, checkout the [CRAN Task View](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
 
