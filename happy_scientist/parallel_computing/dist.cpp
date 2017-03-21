@@ -27,6 +27,7 @@ arma::mat dist_par(arma::mat X, int cores = 1) {
       
       // Computing square root
       D.at(i,j) = sqrt(D.at(i,j));
+      D.at(j,i) = D.at(i,j);
     }
       
   
@@ -36,7 +37,7 @@ arma::mat dist_par(arma::mat X, int cores = 1) {
 
 /* **R
 set.seed(1231)
-K <- 5000
+K <- 500
 n <- 500
 x <- matrix(rnorm(n*K), ncol=K)
 

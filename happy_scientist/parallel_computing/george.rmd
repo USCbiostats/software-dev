@@ -1,10 +1,13 @@
 ---
-output: slidy_presentation
+output: 
+  slidy_presentation:
+    theme: journal
+    highlight: haddock
 date: March 23, 2017
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, comment = "#")
 ```
 
 ## The `parallel` package
@@ -78,19 +81,26 @@ In the case of `makeForkCluster`
 ```{r parallel-ex1-cont, echo=TRUE}
 # 1. CREATING A CLUSTER
 library(parallel)
-cl <- makeForkCluster(2)    
+
+# The fork cluster will copy the -nsims- object
+nsims <- 1e3
+cl    <- makeForkCluster(2)    
 
 # 2. PREPARING THE CLUSTER
 RNGkind("L'Ecuyer-CMRG")
 set.seed(123) 
 
 # 3. DO YOUR CALL
-ans <- do.call(cbind, mclapply(1:2, function(x) runif(1e3)))
+ans <- do.call(cbind, mclapply(1:2, function(x) {
+  runif(nsims) # Look! we use the nsims object!
+               # This would have fail in makePSOCKCluster
+               # if we didn't copy -nsims- first.
+  }))
 (ans0 <- var(ans))
 
-# I want to get the same!
+# Same sequence with same seed
 set.seed(123) 
-ans1 <- var(do.call(cbind, mclapply(1:2, function(x) runif(1e3))))
+ans1 <- var(do.call(cbind, mclapply(1:2, function(x) runif(nsims))))
 
 ans0 - ans1 # A matrix of zeros
 
@@ -98,7 +108,7 @@ ans0 - ans1 # A matrix of zeros
 stopCluster(cl)
 ```
 
-## parallel example 2: Simulating pi
+## parallel example 2: Simulating $\pi$
 
 
 *   We know that $\pi = \frac{A}{r^2}$. We approximate it by randomly adding
@@ -164,7 +174,24 @@ stopCluster(cl)
 c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
 ```
 
-## Rcpp(Armadillo) and OpenMP
+## RcppArmadillo and OpenMP
+
+*   Must run only 'Thread-safe' calls, so calling R within parallel blocks can cause
+    problems (almost all the time).
+    
+*   Use `arma` objects, e.g. `arma::mat`, `arma::vec`, etc. Or, if you are used to them
+    `std::vector` objects as these are thread safe.
+
+*   Pseudo Random Number Generation is not very straight forward.
+
+*   
+
+*   Data directives: Tell the compiler how to treat data. (By default `shared`).
+    
+    *   `shared`: Default, all threads access the same copy.
+    *   `private`: Each thread has its own copy (although not initialized).
+    *   `firstprivate` Each thread has its own copy initialized.
+    *   `lastprivate` Each thread has its own copy. The last value is the one stored in the main program.
 
 ## RcppArmadillo + OpenMP example 1: Distance matrix
 
@@ -198,6 +225,7 @@ arma::mat dist_par(arma::mat X, int cores = 1) {
       
       // Computing square root
       D.at(i,j) = sqrt(D.at(i,j));
+      D.at(j,i) = D.at(i,j);
     }
       
   
@@ -220,13 +248,112 @@ K <- 5000
 n <- 500
 x <- matrix(rnorm(n*K), ncol=K)
 
+# Are we getting the same?
+table(as.matrix(dist(x)) - dist_par(x, 10)) # Only zeros
+
 # Benchmarking!
 rbenchmark::benchmark(
-  dist(x),                 # R's distance
+  dist(x),                 # stats::dist
   dist_par(x, cores = 1),  # 1 core
   dist_par(x, cores = 4),  # 4 cores
   dist_par(x, cores = 10), # 10 cores
   replications = 1, order="elapsed"
 )[,1:4]
 ```
+
+
+## RcppArmadillo + OpenMP example 2: Simulating $\pi$
+
+```cpp
+#include <omp.h>
+#include <RcppArmadillo.h>
+using namespace Rcpp;
+
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::plugins(openmp)]]
+
+// [[Rcpp::export]]
+double sim_pi(int m, int cores = 1) {
+  
+  // Setting the cores
+  omp_set_num_threads(cores);
+  int n = m / cores;
+  
+  double ans = 0.0, d;
+  double val = 4.0/m;
+  double piest;
+  int i;
+  
+  // Pseudo RNG is not easy in OMP
+  arma::mat points(m, 2);
+  for (i = 0;i< (int) points.n_rows; i++)
+    points.at(i, 0) = unif_rand()*2.0 - 1,
+      points.at(i, 1) = unif_rand()*2.0 - 1;
+  
+#pragma omp parallel default(none) shared(ans, cores, points) \
+  firstprivate(val, n, m) \
+  private(piest, i, d)
+{
+    
+  // Which core are we
+  int core_num = omp_get_thread_num();
+    
+  piest = 0.0;
+  for (i = n*core_num; i < (n + n*core_num); i++) {
+    
+    d = sqrt(pow(points.at(i, 0), 2.0) + pow(points.at(i, 1), 2.0));
+    
+    if (d <= 1.0)
+      piest += val;
+  }
+  
+  // This bit of code is executed one thread at a time.
+  // Instead of -atomic-, we could have use -critical-, but that has
+  // a higher overhead.
+#pragma omp atomic
+  ans += piest;
+}
+  
+  return ans;
+}
+```
+
+------
+
+```{r pi-cpp, cache=TRUE, echo=TRUE}
+# Compiling c++
+Rcpp::sourceCpp("simpi.cpp")
+
+# Running in 1 or 10 cores should be the same
+set.seed(1); sim_pi(1e5, 1)
+set.seed(1); sim_pi(1e5, 10)
+
+# Benchmarking
+nsim <- 1e8
+benchmark(
+  pi01 = sim_pi(nsim, 1),
+  pi04 = sim_pi(nsim, 4),
+  pi10 = sim_pi(nsim, 10),
+  replications = 1
+)[,1:4]
+
+```
+
+## Some thoughts on Rcpp + OpenMP
+
+*   Setting `default(none)` is a good practice. The programmer must define what's shared and what's not.
+
+*   Avoid **false sharing**: This happens when independent variables are written in the
+    same cache line, so threads make each other slow (what?). In other words, Thread A
+    is writing on element X[1] at the same time that Thread B wants to read X[2],
+    but X[1] and X[2] are in the same cache line, so A 'blocks' the line and forces B to create
+    a new copy of X[2], even when X[2] is not been used!
+    
+## Thanks!
+
+```{r session, echo=FALSE}
+devtools::session_info()
+```
+
+
 
