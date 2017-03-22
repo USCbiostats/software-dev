@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo = FALSE, comment = "#")
 
 
 
-## High-Performance: An overview
+## High-Performance Computing: An overview
 
 Loosely, from R's perspective, we can think of HPC in terms of two, maybe three things:
 
@@ -35,7 +35,7 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 
 2.  Parallel computing: How to take advantage of multiple core systems
 
-3.  Compiled code: Write your own low-level code (if R doesn't have it yet...)
+3.  Compiled code: Write your own low-level code (if R doesn't has it yet...)
 
 
 ## Big Data
@@ -82,7 +82,9 @@ knitr::include_graphics("when_to_parallel.svg")
 
 While there are several alternatives (just take a look at the
 [High-Performance Computing Task View](https://cran.r-project.org/web/views/HighPerformanceComputing.html)),
-we'll focus on the following R-packages/tools
+we'll focus on the following R-packages/tools for explicit parallelism:
+
+
 
 1.  R packages
     
@@ -105,6 +107,11 @@ we'll focus on the following R-packages/tools
         programming in C, C++, and Fortran, on most platforms, processor
         architectures and operating systems, including Solaris, AIX, HP-UX,
         Linux, macOS, and Windows.' ([Wiki](https://en.wikipedia.org/wiki/OpenMP))
+
+Implicit parallelism, on the other hand, are out-of-the-box tools that allow the
+programmer not to worry about parallelization, e.g. such as
+[**gpuR**](https://cran.r-project.org/package=gpuR) for Matrix manipulation using
+GPU.
 
 ## Parallel workflow
 
@@ -263,6 +270,9 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
 
 ## RcppArmadillo and OpenMP
 
+*   Friendlier than [**RcppParallel**](http://rcppcore.github.io/RcppParallel/)...
+    at least for 'I-use-Rcpp-but-don't-actually-know-much-about-C++' users (like myself!).
+
 *   Must run only 'Thread-safe' calls, so calling R within parallel blocks can cause
     problems (almost all the time).
     
@@ -271,14 +281,40 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
 
 *   Pseudo Random Number Generation is not very straight forward.
 
-*   
+*   Need to think about how processors work, cache memory, etc. Otherwise you could
+    get into trouble... if your code is slower when run in parallel, then you probably
+    are facing [false sharing](https://software.intel.com/en-us/articles/avoiding-and-identifying-false-sharing-among-threads)
 
-*   Data directives: Tell the compiler how to treat data. (By default `shared`).
+
+## RcppArmadillo and OpenMP workflow
+
+1.  Add the following to your C++ source code to use OpenMP, and tell Rcpp that
+    you need to include that in the compiler:
+    
+    ```cpp
+    #include <omp.h>
+    // [[Rcpp::plugins(openmp)]]
+    ```
+
+2.  Tell the compiler that you'll be running a block in parallel with openmp
+    
+    ```cpp
+    #pragma omp [directives] [options]
+    {
+      ...your neat parallel code...
+    }
+    ```
+    
+    You'll need to specify how OMP should handle the data:
     
     *   `shared`: Default, all threads access the same copy.
     *   `private`: Each thread has its own copy (although not initialized).
     *   `firstprivate` Each thread has its own copy initialized.
     *   `lastprivate` Each thread has its own copy. The last value is the one stored in the main program.
+    
+    Setting `default(none)` is a good practice.
+    
+3.  Compile!
 
 ## RcppArmadillo + OpenMP example 1: Distance matrix
 
@@ -424,16 +460,8 @@ benchmark(
 
 ```
 
-## Some thoughts on Rcpp + OpenMP
+No big speed gains... but at least you know how to use it now :)!
 
-*   Setting `default(none)` is a good practice. The programmer must define what's shared and what's not.
-
-*   Avoid **false sharing**: This happens when independent variables are written in the
-    same cache line, so threads make each other slow (what?). In other words, Thread A
-    is writing on element X[1] at the same time that Thread B wants to read X[2],
-    but X[1] and X[2] are in the same cache line, so A 'blocks' the line and forces B to create
-    a new copy of X[2], even when X[2] is not been used!
-    
 ## Thanks!
 
 ```{r session, echo=FALSE}

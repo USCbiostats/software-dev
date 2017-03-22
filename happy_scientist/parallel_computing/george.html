@@ -71,13 +71,13 @@ George Vega Yon<br>Garret Weaver
 </ol></li>
 </ol>
 </div>
-<div id="high-performance-an-overview" class="slide section level2">
-<h1>High-Performance: An overview</h1>
+<div id="high-performance-computing-an-overview" class="slide section level2">
+<h1>High-Performance Computing: An overview</h1>
 <p>Loosely, from R’s perspective, we can think of HPC in terms of two, maybe three things:</p>
 <ol style="list-style-type: decimal">
 <li><p>Big data: How to work with data that doesn’t fit your computer</p></li>
 <li><p>Parallel computing: How to take advantage of multiple core systems</p></li>
-<li><p>Compiled code: Write your own low-level code (if R doesn’t have it yet…)</p></li>
+<li><p>Compiled code: Write your own low-level code (if R doesn’t has it yet…)</p></li>
 </ol>
 </div>
 <div id="big-data" class="slide section level2">
@@ -121,7 +121,7 @@ Ask yourself these questions before jumping into HPC!
 </div>
 <div id="parallel-computing-in-r" class="slide section level2">
 <h1>Parallel computing in R</h1>
-<p>While there are several alternatives (just take a look at the <a href="https://cran.r-project.org/web/views/HighPerformanceComputing.html">High-Performance Computing Task View</a>), we’ll focus on the following R-packages/tools</p>
+<p>While there are several alternatives (just take a look at the <a href="https://cran.r-project.org/web/views/HighPerformanceComputing.html">High-Performance Computing Task View</a>), we’ll focus on the following R-packages/tools for explicit parallelism:</p>
 <ol style="list-style-type: decimal">
 <li><p>R packages</p>
 <ul>
@@ -135,6 +135,7 @@ Ask yourself these questions before jumping into HPC!
 <li><p><strong>OpenMP</strong>: ‘Open Multi-Processing is an application programming interface (API) that supports multi-platform shared memory multiprocessing programming in C, C++, and Fortran, on most platforms, processor architectures and operating systems, including Solaris, AIX, HP-UX, Linux, macOS, and Windows.’ (<a href="https://en.wikipedia.org/wiki/OpenMP">Wiki</a>)</p></li>
 </ul></li>
 </ol>
+<p>Implicit parallelism, on the other hand, are out-of-the-box tools that allow the programmer not to worry about parallelization, e.g. such as <a href="https://cran.r-project.org/package=gpuR"><strong>gpuR</strong></a> for Matrix manipulation using GPU.</p>
 </div>
 <div id="parallel-workflow" class="slide section level2">
 <h1>Parallel workflow</h1>
@@ -268,18 +269,34 @@ rbenchmark::<span class="kw">benchmark</span>(
 <div id="rcpparmadillo-and-openmp" class="slide section level2">
 <h1>RcppArmadillo and OpenMP</h1>
 <ul>
+<li><p>Friendlier than <a href="http://rcppcore.github.io/RcppParallel/"><strong>RcppParallel</strong></a>… at least for ‘I-use-Rcpp-but-don’t-actually-know-much-about-C++’ users (like myself!).</p></li>
 <li><p>Must run only ‘Thread-safe’ calls, so calling R within parallel blocks can cause problems (almost all the time).</p></li>
 <li><p>Use <code>arma</code> objects, e.g. <code>arma::mat</code>, <code>arma::vec</code>, etc. Or, if you are used to them <code>std::vector</code> objects as these are thread safe.</p></li>
 <li><p>Pseudo Random Number Generation is not very straight forward.</p></li>
-<li></li>
-<li><p>Data directives: Tell the compiler how to treat data. (By default <code>shared</code>).</p>
+<li><p>Need to think about how processors work, cache memory, etc. Otherwise you could get into trouble… if your code is slower when run in parallel, then you probably are facing <a href="https://software.intel.com/en-us/articles/avoiding-and-identifying-false-sharing-among-threads">false sharing</a></p></li>
+</ul>
+</div>
+<div id="rcpparmadillo-and-openmp-workflow" class="slide section level2">
+<h1>RcppArmadillo and OpenMP workflow</h1>
+<ol style="list-style-type: decimal">
+<li><p>Add the following to your C++ source code to use OpenMP, and tell Rcpp that you need to include that in the compiler:</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;omp.h&gt;</span>
+<span class="co">// [[Rcpp::plugins(openmp)]]</span></code></pre></div></li>
+<li><p>Tell the compiler that you’ll be running a block in parallel with openmp</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#pragma omp [directives] [options]</span>
+{
+  ...your neat parallel code...
+}</code></pre></div>
+<p>You’ll need to specify how OMP should handle the data:</p>
 <ul>
 <li><code>shared</code>: Default, all threads access the same copy.</li>
 <li><code>private</code>: Each thread has its own copy (although not initialized).</li>
 <li><code>firstprivate</code> Each thread has its own copy initialized.</li>
 <li><code>lastprivate</code> Each thread has its own copy. The last value is the one stored in the main program.</li>
-</ul></li>
 </ul>
+<p>Setting <code>default(none)</code> is a good practice.</p></li>
+<li><p>Compile!</p></li>
+</ol>
 </div>
 <div id="rcpparmadillo-openmp-example-1-distance-matrix" class="slide section level2">
 <h1>RcppArmadillo + OpenMP example 1: Distance matrix</h1>
@@ -426,13 +443,7 @@ nsim &lt;-<span class="st"> </span><span class="fl">1e8</span>
 # 1 pi01            1   4.530    1.112
 # 2 pi04            1   4.194    1.029
 # 3 pi10            1   4.074    1.000</code></pre>
-</div>
-<div id="some-thoughts-on-rcpp-openmp" class="slide section level2">
-<h1>Some thoughts on Rcpp + OpenMP</h1>
-<ul>
-<li><p>Setting <code>default(none)</code> is a good practice. The programmer must define what’s shared and what’s not.</p></li>
-<li><p>Avoid <strong>false sharing</strong>: This happens when independent variables are written in the same cache line, so threads make each other slow (what?). In other words, Thread A is writing on element X[1] at the same time that Thread B wants to read X[2], but X[1] and X[2] are in the same cache line, so A ‘blocks’ the line and forces B to create a new copy of X[2], even when X[2] is not been used!</p></li>
-</ul>
+<p>No big speed gains… but at least you know how to use it now :)!</p>
 </div>
 <div id="thanks" class="slide section level2">
 <h1>Thanks!</h1>
@@ -444,7 +455,7 @@ nsim &lt;-<span class="st"> </span><span class="fl">1e8</span>
 #  language (EN)                        
 #  collate  en_US.UTF-8                 
 #  tz       America/New_York            
-#  date     2017-03-21</code></pre>
+#  date     2017-03-22</code></pre>
 <pre><code># Packages ------------------------------------------------------------------</code></pre>
 <pre><code>#  package   * version date       source        
 #  backports   1.0.5   2017-01-18 CRAN (R 3.3.2)
