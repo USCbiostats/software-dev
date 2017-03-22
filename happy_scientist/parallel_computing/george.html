@@ -5,8 +5,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
-  <meta name="author" content="George Vega Yon Garret Weaver" />
-  <title>The Happy Scientist Semminar A brief introduction to using R for high-performance computing</title>
+  <meta name="author" content=" George Vega Yon   Garret Weaver" />
+  <title>The Happy Scientist Semminar Series #5 A brief introduction to using R for high-performance computing</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
 div.sourceCode { overflow-x: auto; }
@@ -52,11 +52,11 @@ code > span.in { color: #008000; } /* Information */
 </head>
 <body>
 <div class="slide titlepage">
-  <h1 class="title">The Happy Scientist Semminar<br>A brief introduction to using R for high-performance computing</h1>
+  <h1 class="title">The “Happy Scientist” Semminar Series #5<br>A brief introduction to using R for high-performance computing</h1>
   <p class="author">
-George Vega Yon<br>Garret Weaver
+<br>George Vega Yon   Garret Weaver
   </p>
-  <p class="date">Department of Preventive Medicine<br>March 23, 2017</p>
+  <p class="date"><br>Department of Preventive Medicine<br>March 23, 2017</p>
 </div>
 <div id="agenda" class="slide section level2">
 <h1>Agenda</h1>
@@ -274,6 +274,8 @@ rbenchmark::<span class="kw">benchmark</span>(
 <li><p>Use <code>arma</code> objects, e.g. <code>arma::mat</code>, <code>arma::vec</code>, etc. Or, if you are used to them <code>std::vector</code> objects as these are thread safe.</p></li>
 <li><p>Pseudo Random Number Generation is not very straight forward.</p></li>
 <li><p>Need to think about how processors work, cache memory, etc. Otherwise you could get into trouble… if your code is slower when run in parallel, then you probably are facing <a href="https://software.intel.com/en-us/articles/avoiding-and-identifying-false-sharing-among-threads">false sharing</a></p></li>
+<li><p>If R crashes… try running R with a debugger (see <a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Checking-memory-access">Section 4.3 in Writing R extensions</a>):</p>
+<pre class="shell"><code>~$ R --debugger=valgrind</code></pre></li>
 </ul>
 </div>
 <div id="rcpparmadillo-and-openmp-workflow" class="slide section level2">
@@ -447,37 +449,40 @@ nsim &lt;-<span class="st"> </span><span class="fl">1e8</span>
 </div>
 <div id="thanks" class="slide section level2">
 <h1>Thanks!</h1>
-<pre><code># Session info --------------------------------------------------------------</code></pre>
-<pre><code>#  setting  value                       
-#  version  R version 3.3.2 (2016-10-31)
-#  system   x86_64, linux-gnu           
-#  ui       X11                         
-#  language (EN)                        
-#  collate  en_US.UTF-8                 
-#  tz       America/New_York            
-#  date     2017-03-22</code></pre>
-<pre><code># Packages ------------------------------------------------------------------</code></pre>
-<pre><code>#  package   * version date       source        
-#  backports   1.0.5   2017-01-18 CRAN (R 3.3.2)
-#  devtools    1.12.0  2016-12-05 CRAN (R 3.3.2)
-#  digest      0.6.12  2017-01-27 CRAN (R 3.3.2)
-#  evaluate    0.10    2016-10-11 CRAN (R 3.3.2)
-#  highr       0.6     2016-05-09 CRAN (R 3.3.2)
-#  htmltools   0.3.5   2016-03-21 CRAN (R 3.3.2)
-#  knitr       1.15.1  2016-11-22 CRAN (R 3.3.2)
-#  magrittr    1.5     2014-11-22 CRAN (R 3.3.2)
-#  memoise     1.0.0   2016-01-29 CRAN (R 3.3.2)
-#  Rcpp        0.12.9  2017-01-14 CRAN (R 3.3.2)
-#  rmarkdown   1.3     2016-12-21 CRAN (R 3.3.2)
-#  rprojroot   1.2     2017-01-16 CRAN (R 3.3.2)
-#  stringi     1.1.2   2016-10-01 CRAN (R 3.3.2)
-#  stringr     1.1.0   2016-08-19 CRAN (R 3.3.2)
-#  withr       1.0.2   2016-06-20 CRAN (R 3.3.2)
-#  yaml        2.1.14  2016-11-12 CRAN (R 3.3.2)</code></pre>
+<pre><code># R version 3.3.2 (2016-10-31)
+# Platform: x86_64-redhat-linux-gnu (64-bit)
+# Running under: CentOS Linux 7 (Core)
+# 
+# locale:
+#  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+#  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+#  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+# [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+# 
+# attached base packages:
+# [1] parallel  stats     graphics  grDevices utils     datasets  methods  
+# [8] base     
+# 
+# loaded via a namespace (and not attached):
+#  [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
+#  [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.9     stringi_1.1.2  
+#  [9] rmarkdown_1.3   highr_0.6       knitr_1.15.1    stringr_1.1.0  
+# [13] digest_0.6.12   evaluate_0.10</code></pre>
 </div>
 <div id="references" class="slide section level2">
 <h1>References</h1>
-<p>For more, checkout the <a href="https://cran.r-project.org/web/views/HighPerformanceComputing.html">CRAN Task View</a></p>
+<ul>
+<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf">Package parallel</a></li>
+<li><a href="https://cran.r-project.org/web/packages/iterators/vignettes/iterators.pdf">Using the iterators package</a></li>
+<li><a href="https://cran.r-project.org/web/packages/foreach/vignettes/foreach.pdf">Using the foreach package</a></li>
+<li><a href="https://software.intel.com/en-us/articles/32-openmp-traps-for-c-developers">32 OpenMP traps for C++ developers</a></li>
+<li><a href="http://www.openmp.org/">The OpenMP API specification for parallel programming</a></li>
+<li><a href="gallery.rcpp.org/tags/openmp/">‘openmp’ tag in Rcpp gallery</a></li>
+<li><a href="http://www.openmp.org/resources/tutorials-articles/">OpenMP tutorials and articles</a></li>
+</ul>
+<p>For more, checkout the <a href="https://cran.r-project.org/web/views/HighPerformanceComputing.html">CRAN Task View on HPC</a></p>
 </div>
 
   <!-- dynamically load mathjax for compatibility with self-contained -->

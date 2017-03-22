@@ -1,16 +1,21 @@
 ---
-title: 'The Happy Scientist Semminar<br>A brief introduction to using R for high-performance computing'
-author: 'George Vega Yon<br>Garret Weaver'
+title: 'The "Happy Scientist" Semminar Series #5<br>A brief introduction to using R for high-performance computing'
+author: '<br>George Vega Yon &nbsp; Garret Weaver'
 output: 
   slidy_presentation:
     theme: journal
     highlight: haddock
     duration: 45
-date: 'Department of Preventive Medicine<br>March 23, 2017'
+date: '<br>Department of Preventive Medicine<br>March 23, 2017'
 ---
 
-```{r setup, include=FALSE, fig.align='center'}
+```{r setup, include=FALSE, fig.align='center', warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = FALSE, comment = "#")
+
+# Installing required packages if you don't have it!
+pkgs <- c("devtools", "RcppArmadillo", "foreach", "iterators", "rbenchmark", "microbenchmark")
+pkgs <- pkgs[which(!(pkgs %in% installed.packages()[,1]))]
+if (length(pkgs)) install.packages(pkgs)
 ```
 
 ## Agenda
@@ -284,6 +289,14 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
 *   Need to think about how processors work, cache memory, etc. Otherwise you could
     get into trouble... if your code is slower when run in parallel, then you probably
     are facing [false sharing](https://software.intel.com/en-us/articles/avoiding-and-identifying-false-sharing-among-threads)
+    
+*   If R crashes... try running R with a debugger (see
+    [Section 4.3 in Writing R extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Checking-memory-access)):
+    
+    ```shell
+    ~$ R --debugger=valgrind
+    ```
+
 
 
 ## RcppArmadillo and OpenMP workflow
@@ -465,10 +478,19 @@ No big speed gains... but at least you know how to use it now :)!
 ## Thanks!
 
 ```{r session, echo=FALSE}
-devtools::session_info()
+sessionInfo()
 ```
 
 ## References
 
-For more, checkout the [CRAN Task View](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
+*   [Package parallel](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf) 
+*   [Using the iterators package](https://cran.r-project.org/web/packages/iterators/vignettes/iterators.pdf)
+*   [Using the foreach package](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.pdf)
+*   [32 OpenMP traps for C++ developers](https://software.intel.com/en-us/articles/32-openmp-traps-for-c-developers)
+*   [The OpenMP API specification for parallel programming](http://www.openmp.org/)
+*   ['openmp' tag in Rcpp gallery](gallery.rcpp.org/tags/openmp/)
+*   [OpenMP tutorials and articles](http://www.openmp.org/resources/tutorials-articles/)
+
+For more, checkout the [CRAN Task View on HPC](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
+
 
