@@ -24,7 +24,7 @@ This project's main contents is located in the project's [Wiki](https://github.c
 
 # Happy Scientist Semminars
 
-Here some presentations
+The Happy Scientist Semminars are educational seminars sponsored by Cores C and D of the Biostats Program Project award. This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Paul Marjoram at (pmarjora@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
 
 1.  *Seminar 1: Introduction to Collaborating with GitHub* ([materials](https://github.com/USCbiostats/HappyScientist))
 3.  *R Package Template* ([materials](https://github.com/USCbiostats/RPackageTemplate))
