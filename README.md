@@ -26,5 +26,8 @@ This project's main contents is located in the project's [Wiki](https://github.c
 
 Here some presentations
 
-*  *A brief introduction to using R for high-performance computing* ([materials](happy_scientist/parallel_computing))
-*  *Yet Another 'Writing R packages' tutorial* ([materials](happy_scientist/rpkgs))
+1.  *Seminar 1: Introduction to Collaborating with GitHub* ([materials](https://github.com/USCbiostats/HappyScientist))
+3.  *R Package Template* ([materials](https://github.com/USCbiostats/RPackageTemplate))
+4.  *Yet Another 'Writing R packages' tutorial* ([materials](happy_scientist/rpkgs))
+5.  *A brief introduction to using R for high-performance computing* ([materials](happy_scientist/parallel_computing))
+
