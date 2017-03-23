@@ -1,26 +1,8 @@
----
-title: 'The "Happy Scientist" Semminar Series #5<br>A brief introduction to using R for high-performance computing'
-author: '<par><table style="text-align:center;width:100%"><tr><td>George Vega Yon</td><td>Garrett Weaver</td></tr><tr><td>vegayon@usc.edu</td><td>gmweaver@usc.edu</tb></tr></table></par>'
-output: 
-  slidy_presentation:
-    theme: journal
-    highlight: haddock
-    duration: 45
-    incremental: true
-    footer: Vega Yon & Weaver
-    keep_md: true
-date: '<br>Department of Preventive Medicine<br>March 23, 2017'
----
+# The "Happy Scientist" Semminar Series #5<br>A brief introduction to using R for high-performance computing
+<par><table style="text-align:center;width:100%"><tr><td>George Vega Yon</td><td>Garrett Weaver</td></tr><tr><td>vegayon@usc.edu</td><td>gmweaver@usc.edu</tb></tr></table></par>  
+<br>Department of Preventive Medicine<br>March 23, 2017  
 
-```{r setup, include=FALSE, fig.align='center', warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(echo = TRUE, comment = "#")
 
-# Installing required packages if you don't have it!
-pkgs <- c("devtools", "RcppArmadillo", "foreach", "iterators", "rbenchmark", "microbenchmark",
-          "snow", "doParallel", "randomForest", "MASS")
-pkgs <- pkgs[which(!(pkgs %in% installed.packages()[,1]))]
-if (length(pkgs)) install.packages(pkgs)
-```
 
 ## Agenda
 
@@ -61,15 +43,17 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 
 ## Parallel computing
 
-```{r, echo=FALSE, fig.cap="Flynn's Classical Taxonomy ([Introduction to Parallel Computing, Blaise Barney, Lawrence Livermore National Laboratory](https://computing.llnl.gov/tutorials/parallel_comp/#Whatis))", fig.align='center'}
-knitr::include_graphics("flynnsTaxonomy.gif")
-```
+<div class="figure" style="text-align: center">
+<img src="flynnsTaxonomy.gif" alt="Flynn's Classical Taxonomy ([Introduction to Parallel Computing, Blaise Barney, Lawrence Livermore National Laboratory](https://computing.llnl.gov/tutorials/parallel_comp/#Whatis))"  />
+<p class="caption">Flynn's Classical Taxonomy ([Introduction to Parallel Computing, Blaise Barney, Lawrence Livermore National Laboratory](https://computing.llnl.gov/tutorials/parallel_comp/#Whatis))</p>
+</div>
 
 ## GPU vs CPU
 
-```{r, echo=FALSE, fig.cap="[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)", fig.align='center'}
-knitr::include_graphics("cpuvsgpu.jpg")
-```
+<div class="figure" style="text-align: center">
+<img src="cpuvsgpu.jpg" alt="[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)"  />
+<p class="caption">[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)</p>
+</div>
 
 **Why are we still using CPUs instead of GPUs?**
 
@@ -82,9 +66,10 @@ knitr::include_graphics("cpuvsgpu.jpg")
 
 ## When is it a good idea?
 
-```{r, echo=FALSE, fig.cap="Ask yourself these questions before jumping into HPC!", fig.align='center'}
-knitr::include_graphics("when_to_parallel.svg")
-```
+<div class="figure" style="text-align: center">
+<img src="when_to_parallel.svg" alt="Ask yourself these questions before jumping into HPC!"  />
+<p class="caption">Ask yourself these questions before jumping into HPC!</p>
+</div>
 
 
 ## Parallel computing in R
@@ -156,7 +141,8 @@ GPU.
     
 ## parallel example 1: Parallel RNG
 
-```{r parallel-ex1, echo=TRUE}
+
+```r
 # 1. CREATING A CLUSTER
 library(parallel)
 cl <- makePSOCKcluster(2)    
@@ -167,13 +153,29 @@ clusterSetRNGStream(cl, 123) # Equivalent to `set.seed(123)`
 # 3. DO YOUR CALL
 ans <- parSapply(cl, 1:2, function(x) runif(1e3))
 (ans0 <- var(ans))
+```
 
+```
+#               [,1]          [,2]
+# [1,]  0.0861888293 -0.0001633431
+# [2,] -0.0001633431  0.0853841838
+```
+
+```r
 # I want to get the same!
 clusterSetRNGStream(cl, 123)
 ans1 <- var(parSapply(cl, 1:2, function(x) runif(1e3)))
 
 ans0 - ans1 # A matrix of zeros
+```
 
+```
+#      [,1] [,2]
+# [1,]    0    0
+# [2,]    0    0
+```
+
+```r
 # 4. STOP THE CLUSTER
 stopCluster(cl)
 ```
@@ -182,7 +184,8 @@ stopCluster(cl)
 
 In the case of `makeForkCluster`
 
-```{r parallel-ex1-cont, echo=TRUE}
+
+```r
 # 1. CREATING A CLUSTER
 library(parallel)
 
@@ -201,13 +204,29 @@ ans <- do.call(cbind, mclapply(1:2, function(x) {
                # if we didn't copy -nsims- first.
   }))
 (ans0 <- var(ans))
+```
 
+```
+#            [,1]       [,2]
+# [1,] 0.08538418 0.00239079
+# [2,] 0.00239079 0.08114219
+```
+
+```r
 # Same sequence with same seed
 set.seed(123) 
 ans1 <- var(do.call(cbind, mclapply(1:2, function(x) runif(nsims))))
 
 ans0 - ans1 # A matrix of zeros
+```
 
+```
+#      [,1] [,2]
+# [1,]    0    0
+# [2,]    0    0
+```
+
+```r
 # 4. STOP THE CLUSTER
 stopCluster(cl)
 ```
@@ -220,16 +239,12 @@ stopCluster(cl)
 
 *   So, we approximate $\pi$ as $\Pr\{\|x\| \leq 1\}\times 2^2$
 
-```{r, echo=FALSE, dev='jpeg', dev.args=list(quality=100), fig.width=6, fig.height=6, out.width='300px', out.height='300px'}
-set.seed(1231)
-p    <- matrix(runif(5e3*2, -1, 1), ncol=2)
-pcol <- ifelse(sqrt(rowSums(p^2)) <= 1, adjustcolor("blue", .7), adjustcolor("gray", .7))
-plot(p, col=pcol, pch=18)
-```
+<img src="presentation_files/figure-slidy/unnamed-chunk-4-1.jpeg" width="300px" height="300px" />
 
 The R code to do this
 
-```{r simpi, echo=TRUE}
+
+```r
 pisim <- function(i, nsim) {  # Notice we don't use the -i-
   # Random points
   ans  <- matrix(runif(nsim*2), ncol=2)
@@ -244,8 +259,8 @@ pisim <- function(i, nsim) {  # Notice we don't use the -i-
 
 ## parallel example 2: Simulating $\pi$ (cont.)
 
-```{r parallel-ex2, echo=TRUE, cache=TRUE}
 
+```r
 # Setup
 cl <- makePSOCKcluster(10)
 clusterSetRNGStream(cl, 123)
@@ -264,17 +279,25 @@ rbenchmark::benchmark(
   parallel = parSapply(cl, 1:100, pisim, nsim=nsim),
   serial   = sapply(1:100, pisim, nsim=nsim), replications = 1
 )[,1:4]
-
 ```
 
-```{r printing-and-stop, cache=TRUE}
+```
+#       test replications elapsed relative
+# 1 parallel            1   0.302    1.000
+# 2   serial            1   1.556    5.152
+```
+
+
+```r
 ans_par <- parSapply(cl, 1:100, pisim, nsim=nsim)
 ans_ser <- sapply(1:100, pisim, nsim=nsim)
 stopCluster(cl)
 ```
 
-```{r, echo=FALSE}
-c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
+
+```
+#      par      ser        R 
+# 3.141561 3.141247 3.141593
 ```
 
 
@@ -284,7 +307,8 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
 
 * The general syntax of `foreach` looks very similar to a for loop
 
-```{r, eval = FALSE}
+
+```r
 # With parallelization --> %dopar%
 output <- foreach(i = 'some object to iterate over', 'options') %dopar% {some r code}
 
@@ -294,26 +318,41 @@ output <- foreach(i = 'some object to iterate over', 'options') %do% {some r cod
 
 * As a first example, we can use `foreach` just like a for loop without parallelization
 
-```{r}
+
+```r
 library(foreach)
 result <- foreach(x = c(4,9,16)) %do% sqrt(x)
 ```
 
-```{r, echo = FALSE}
-result
+
+```
+# [[1]]
+# [1] 2
+# 
+# [[2]]
+# [1] 3
+# 
+# [[3]]
+# [1] 4
 ```
 
 ## The 'foreach' package
 
 * A closer look at the previous example
-```{r}
+
+```r
 result <- foreach(x = c(4,9,16)) %do% sqrt(x)
 class(result)
+```
+
+```
+# [1] "list"
 ```
   + Unlike a for loop, foreach returns an object (by default a list) that contains the results compiled across all iterations
   
   + We can change the object returned by specifying the function used to combine results across iterations with the '.combine' option
-```{r}
+
+```r
 result <- foreach(x = c(4,9,16), .combine = 'c') %do% sqrt(x)
 result2 <- foreach(x = c(4,9,16), .combine = '+') %do% x
 
@@ -327,10 +366,17 @@ customCombine <- function(i,j){
 result3 <- foreach(x = c(4,9,16), .combine = customCombine) %do% x
 ```
 
-```{r, echo = FALSE}
-result
-result2
-result3
+
+```
+# [1] 2 3 4
+```
+
+```
+# [1] 29
+```
+
+```
+# [1]   4  36 576
 ```
 
 ## Parallel Execution with 'foreach'
@@ -339,27 +385,31 @@ result3
 
   1. Create the cluster
   
-```{r, eval = FALSE}
+
+```r
 myCluster <- makeCluster(# of Cores to Use, type = "SOCK or FORK")
 ```
 
   2. Register the cluster with the 'foreach' package
   
   
-```{r, eval = FALSE}
+
+```r
 registerDoParallel(myCluster)
 registerDoSNOW(myCluster)
 ```
 
   3. To use the cluster with `foreach`, we only have to change %do% to %dopar%
 
-```{r, eval = FALSE}
+
+```r
 output <- foreach(i = 'some object to iterate over', 'options') %dopar% {some r code}
 ```
 
   4. Stop cluster when you have finished
 
-```{r, eval = FALSE}
+
+```r
 stopCluster(myCluster)
 ```
 
@@ -367,7 +417,8 @@ stopCluster(myCluster)
 
 * Below is a function that computes the log of each element in a sequence of numbers from 1 to x and returns the sum of the new sequence
 
-```{r, cache = TRUE}
+
+```r
 sumLog <- function(x){
   sum <- 0
   temp <- log(seq(1,x))
@@ -377,14 +428,26 @@ sumLog <- function(x){
   sum
 }
 sumLog(3)
+```
+
+```
+# [1] 1.791759
+```
+
+```r
 log(1) + log(2) + log(3)
+```
+
+```
+# [1] 1.791759
 ```
 
 * You have been asked to find the fastest way to use this function on a large list of values, let's say for all integers from 1 to 15,000
 
 ## foreach example 1: Summing up numbers (cont.)
 
-```{r, cache = TRUE}
+
+```r
 # A vector of integers to use with sumLog function
 myNumbers <- seq(1,15000)
 
@@ -404,6 +467,13 @@ test2 <- sapply(myNumbers, sumLog)
 # Third Attempt: Use foreach function
 cl <- makeCluster(10, type = "SOCK")
 library(doParallel)
+```
+
+```
+# Loading required package: iterators
+```
+
+```r
 registerDoParallel(cl)
 
 test3 <- foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog(myNumbers[i])
@@ -415,28 +485,25 @@ stopCluster(cl)
 
 * Timing
 
-```{r, echo = FALSE}
-library(doParallel)
-cl <- makeCluster(10, type = "SOCK")
-registerDoParallel(cl)
+
+```
+# Loading required package: iterators
 ```
 
-```{r, echo = FALSE, cache = TRUE}
-# Timing
-summary(microbenchmark::microbenchmark(
-  forloop = seqTest1(myNumbers),
-  sapply = sapply(myNumbers, sumLog),
-  foreach = foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog(myNumbers[i]),
-  times = 1
-))[,c("expr","mean","median")]
 
+```
+#      expr     mean   median
+# 1 forloop 28.27404 28.27404
+# 2  sapply 28.54954 28.54954
+# 3 foreach  8.43848  8.43848
 ```
 
 * Can we do better?
 
     + In `sumLog()`, we use R to sum the sequence, what if we use the `sum()` function instead?
 
-```{r, cache = TRUE}
+
+```r
 sumLog2 <- function(x){
   sum(log(seq(1,x)))
 }
@@ -444,15 +511,11 @@ sapply_sumLog2 <- sapply(myNumbers, sumLog2)
 foreach_sumLog2 <- foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog2(i)
 ```
 
-```{r, echo = FALSE, cache = TRUE}
 
-summary(microbenchmark::microbenchmark(
-  sapply_sumLog2 = sapply(myNumbers, sumLog2),
-  foreach_sumLog2 = foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog2(i),
-  times = 10,
-  unit = "s"
-))[,c("expr","mean","median")]
-
+```
+#              expr     mean   median
+# 1  sapply_sumLog2 3.203019 3.196875
+# 2 foreach_sumLog2 4.791163 4.718027
 ```
 
 * `foreach` is now slower, why? 
@@ -463,7 +526,8 @@ summary(microbenchmark::microbenchmark(
 
 * The 'iterators' package provides tools for iterating over a number of different data types
 
-```{r, eval = FALSE}
+
+```r
 # General function to create an iterator
 myIterator <- iter(object_to_iterate_over, by = "How to iterate over object")
 ```
@@ -472,10 +536,22 @@ myIterator <- iter(object_to_iterate_over, by = "How to iterate over object")
 
 * Example 1: A simple vector iterator
 
-```{r}
+
+```r
 vector_iterator <- iter(1:5)
 nextElem(vector_iterator)
+```
+
+```
+# [1] 1
+```
+
+```r
 nextElem(vector_iterator)
+```
+
+```
+# [1] 2
 ```
 
 ## An aside: foreach + iterators (cont.)
@@ -484,7 +560,8 @@ nextElem(vector_iterator)
   
     + The advantage? Never send the whole matrix to any one core and reduce the amount of data communication
 
-```{r, cache = TRUE}
+
+```r
 # A function to split our iterator (matrix) into blocks (column-wise)
 iblkcol <- function(a, chunks) {  
   n <- ncol(a)
@@ -506,9 +583,17 @@ splitMatrix <- iblkcol(myMatrix, 25)
 splitMatrix()
 ```
 
+```
+#           [,1]      [,2]      [,3]      [,4]
+# [1,] 0.5642110 0.8680218 0.5209036 0.9408382
+# [2,] 0.1586587 0.3346269 0.2838197 0.1985143
+# [3,] 0.6396941 0.2618662 0.4432034 0.5593025
+```
+
 ## An aside: foreach + iterators (cont.)
 
-```{r, eval = FALSE}
+
+```r
 # Example: Standardize the columns of a random large matrix with foreach + iterators
 randomMatrix <- matrix(runif(100000), ncol = 10000)
 
@@ -527,22 +612,21 @@ foreach_blocks_1 <- foreach(x = iblkcol(randomMatrix, 1), .combine = 'cbind') %d
 
 * Timing
 
-```{r, echo = FALSE, cache = TRUE}
-randomMatrix <- matrix(runif(100000), ncol = 10000)
-summary(microbenchmark::microbenchmark(
-  scale = scale(randomMatrix),
-  foreach_singlecolumn = foreach(x = iter(randomMatrix, by = 'col'), .combine = 'cbind') %dopar% scale(x),
-  foreach_blocks_1000 = foreach(x = iblkcol(randomMatrix, 1000), .combine = 'cbind') %dopar% scale(x),
-  foreach_blocks_100 = foreach(x = iblkcol(randomMatrix, 100), .combine = 'cbind') %dopar% scale(x),
-  foreach_blocks_10 = foreach(x = iblkcol(randomMatrix, 10), .combine = 'cbind') %dopar% scale(x),
-  foreach_blocks_1 = foreach(x = iblkcol(randomMatrix, 1), .combine = 'cbind') %dopar% scale(x),
-  times = 1,
-  unit = "s"))[,c("expr","mean","median")]
+
+```
+#                   expr       mean     median
+# 1                scale 0.05335319 0.05335319
+# 2 foreach_singlecolumn 3.14870216 3.14870216
+# 3  foreach_blocks_1000 0.42620077 0.42620077
+# 4   foreach_blocks_100 0.86075290 0.86075290
+# 5    foreach_blocks_10 0.14986960 0.14986960
+# 6     foreach_blocks_1 0.10987660 0.10987660
 ```
 
 ## foreach example 1: More improvements
 
-```{r, cache = TRUE}
+
+```r
 # New function to compute sum(log(seq)) for a vector of x values
 sumLog3 <- function(x){
   sapply(x, sumLog2)
@@ -566,14 +650,14 @@ sumLog2_block <- foreach(i = iter(chunks5), .combine = 'c') %dopar% sumLog3(i)
 
 * Timing
 
-```{r, echo = FALSE,cache = TRUE}
-summary(microbenchmark::microbenchmark(
-  sapply_sumlog2 = sapply(myNumbers, sumLog2),
-  foreach_blocks_1000 = foreach(i = iter(chunks1000), .combine = 'c') %dopar% sumLog3(i),
-  foreach_blocks_100 = foreach(i = iter(chunks100), .combine = 'c') %dopar% sumLog3(i),
-  foreach_blocks_10 = foreach(i = iter(chunks10), .combine = 'c') %dopar% sumLog3(i),
-  foreach_blocks_5 = foreach(i = iter(chunks5), .combine = 'c') %dopar% sumLog3(i),
-  times = 20, unit = 's'))[,c("expr","mean","median")]
+
+```
+#                  expr      mean    median
+# 1      sapply_sumlog2 3.2640003 3.2544051
+# 2 foreach_blocks_1000 0.8613782 0.8714444
+# 3  foreach_blocks_100 0.5958943 0.5915252
+# 4   foreach_blocks_10 0.6814783 0.6811157
+# 5    foreach_blocks_5 1.0260959 1.0351314
 ```
 
 ## foreach example 2: Random Forests
@@ -582,7 +666,8 @@ summary(microbenchmark::microbenchmark(
 
     + Random Forests, Gradient Boosting, Bootstrapping, Clustering, k-fold Cross-Validation
     
-```{r, cache = TRUE}
+
+```r
 # Random Forest Example
 
 # Number of observations and predictor variables
@@ -607,8 +692,8 @@ y <- gl(2, 1500)
 
 ## foreach example 2: Random Forests (cont.)
 
-```{r, cache = TRUE, eval = FALSE}
 
+```r
 rf <- randomForest(X, y, ntree = 5000, nodesize = 3)
 
 rf_par <- foreach(ntree = rep(500, 10), .combine = combine, .packages = "randomForest") %dopar% {
@@ -630,16 +715,19 @@ rf_par <- foreach(ntree = rep(500, 10), .combine = combine, .packages = "randomF
 
 * Timing
 
-```{r, cache = TRUE, echo = FALSE}
-library(randomForest)
-summary(microbenchmark::microbenchmark(
-    rf = randomForest(X, y, ntree = 5000, nodesize = 3),
-    rf_parallel = foreach(ntree = rep(500, 10), .combine = combine, .packages = "randomForest") %dopar% {
-      randomForest(X, y, ntree = ntree, nodesize = 3)},
-    times = 1
-))[,c("expr","mean","median")]
 
-stopCluster(cl)
+```
+# randomForest 4.6-12
+```
+
+```
+# Type rfNews() to see new features/changes/bug fixes.
+```
+
+```
+#          expr      mean    median
+# 1          rf 466.03393 466.03393
+# 2 rf_parallel  66.94749  66.94749
 ```
 
 
@@ -743,7 +831,8 @@ arma::mat dist_par(arma::mat X, int cores = 1) {
 
 ## RcppArmadillo + OpenMP example 1: Distance matrix (cont.)
 
-```{r openmp-example1, cache=TRUE, echo=TRUE}
+
+```r
 # Compiling the function
 Rcpp::sourceCpp("dist.cpp")
 
@@ -755,7 +844,15 @@ x <- matrix(rnorm(n*K), ncol=K)
 
 # Are we getting the same?
 table(as.matrix(dist(x)) - dist_par(x, 10)) # Only zeros
+```
 
+```
+# 
+#      0 
+# 250000
+```
+
+```r
 # Benchmarking!
 rbenchmark::benchmark(
   dist(x),                 # stats::dist
@@ -764,6 +861,14 @@ rbenchmark::benchmark(
   dist_par(x, cores = 10), # 10 cores
   replications = 1, order="elapsed"
 )[,1:4]
+```
+
+```
+#                      test replications elapsed relative
+# 4 dist_par(x, cores = 10)            1   0.508    1.000
+# 3  dist_par(x, cores = 4)            1   1.225    2.411
+# 2  dist_par(x, cores = 1)            1   2.344    4.614
+# 1                 dist(x)            1   5.465   10.758
 ```
 
 
@@ -825,14 +930,28 @@ double sim_pi(int m, int cores = 1) {
 
 ## RcppArmadillo + OpenMP example 2: Simulating $\pi$ (cont.)
 
-```{r pi-cpp, cache=TRUE, echo=TRUE}
+
+```r
 # Compiling c++
 Rcpp::sourceCpp("simpi.cpp")
 
 # Running in 1 or 10 cores should be the same
 set.seed(1); sim_pi(1e5, 1)
-set.seed(1); sim_pi(1e5, 10)
+```
 
+```
+# [1] 3.14532
+```
+
+```r
+set.seed(1); sim_pi(1e5, 10)
+```
+
+```
+# [1] 3.14532
+```
+
+```r
 # Benchmarking
 nsim <- 1e8
 rbenchmark::benchmark(
@@ -841,15 +960,52 @@ rbenchmark::benchmark(
   pi10 = sim_pi(nsim, 10),
   replications = 1
 )[,1:4]
+```
 
+```
+#   test replications elapsed relative
+# 1 pi01            1   4.517    1.108
+# 2 pi04            1   4.227    1.037
+# 3 pi10            1   4.077    1.000
 ```
 
 No big speed gains... but at least you know how to use it now :)!
 
 ## Thanks!
 
-```{r session, echo=FALSE}
-sessionInfo()
+
+```
+# R version 3.3.2 (2016-10-31)
+# Platform: x86_64-redhat-linux-gnu (64-bit)
+# Running under: CentOS Linux 7 (Core)
+# 
+# locale:
+#  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+#  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+#  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+# [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+# 
+# attached base packages:
+# [1] parallel  stats     graphics  grDevices utils     datasets  methods  
+# [8] base     
+# 
+# other attached packages:
+# [1] randomForest_4.6-12 doParallel_1.0.10   iterators_1.0.8    
+# [4] foreach_1.4.3      
+# 
+# loaded via a namespace (and not attached):
+#  [1] Rcpp_0.12.9               rbenchmark_1.0.0         
+#  [3] codetools_0.2-15          snow_0.4-2               
+#  [5] digest_0.6.12             rprojroot_1.2            
+#  [7] backports_1.0.5           magrittr_1.5             
+#  [9] evaluate_0.10             highr_0.6                
+# [11] stringi_1.1.2             RcppArmadillo_0.7.700.0.0
+# [13] rmarkdown_1.3             tools_3.3.2              
+# [15] stringr_1.1.0             compiler_3.3.2           
+# [17] yaml_2.1.14               htmltools_0.3.5          
+# [19] knitr_1.15.1
 ```
 
 ## References

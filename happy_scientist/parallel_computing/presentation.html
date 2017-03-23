@@ -61,7 +61,7 @@ code > span.in { color: #008000; } /* Information */
 George Vega Yon
 </td>
 <td>
-Garret Weaver
+Garrett Weaver
 </td>
 </tr>
 <tr>
@@ -279,13 +279,13 @@ rbenchmark::<span class="kw">benchmark</span>(
   <span class="dt">serial   =</span> <span class="kw">sapply</span>(<span class="dv">1</span>:<span class="dv">100</span>, pisim, <span class="dt">nsim=</span>nsim), <span class="dt">replications =</span> <span class="dv">1</span>
 )[,<span class="dv">1</span>:<span class="dv">4</span>]</code></pre></div>
 <pre><code>#       test replications elapsed relative
-# 1 parallel            1   0.292    1.000
-# 2   serial            1   1.386    4.747</code></pre>
+# 1 parallel            1   0.302    1.000
+# 2   serial            1   1.556    5.152</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans_par &lt;-<span class="st"> </span><span class="kw">parSapply</span>(cl, <span class="dv">1</span>:<span class="dv">100</span>, pisim, <span class="dt">nsim=</span>nsim)
 ans_ser &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span>:<span class="dv">100</span>, pisim, <span class="dt">nsim=</span>nsim)
 <span class="kw">stopCluster</span>(cl)</code></pre></div>
 <pre><code>#      par      ser        R 
-# 3.141538 3.141247 3.141593</code></pre>
+# 3.141561 3.141247 3.141593</code></pre>
 </div>
 <div id="the-foreach-package" class="slide section level2">
 <h1>The ‘foreach’ package</h1>
@@ -403,8 +403,9 @@ test2 &lt;-<span class="st"> </span><span class="kw">sapply</span>(myNumbers, su
 
 <span class="co"># Third Attempt: Use foreach function</span>
 cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">10</span>, <span class="dt">type =</span> <span class="st">&quot;SOCK&quot;</span>)
-<span class="kw">library</span>(doParallel)
-<span class="kw">registerDoParallel</span>(cl)
+<span class="kw">library</span>(doParallel)</code></pre></div>
+<pre><code># Loading required package: iterators</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">registerDoParallel</span>(cl)
 
 test3 &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">i =</span> <span class="dv">1</span>:<span class="kw">length</span>(myNumbers), <span class="dt">.combine =</span> <span class="st">'c'</span>) %dopar%<span class="st"> </span><span class="kw">sumLog</span>(myNumbers[i])
 
@@ -415,10 +416,11 @@ test3 &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class=
 <ul class="incremental">
 <li>Timing</li>
 </ul>
-<pre><code>#      expr      mean    median
-# 1 forloop 28.018352 28.018352
-# 2  sapply 28.957390 28.957390
-# 3 foreach  8.813801  8.813801</code></pre>
+<pre><code># Loading required package: iterators</code></pre>
+<pre><code>#      expr     mean   median
+# 1 forloop 28.27404 28.27404
+# 2  sapply 28.54954 28.54954
+# 3 foreach  8.43848  8.43848</code></pre>
 <ul class="incremental">
 <li><p>Can we do better?</p>
 <ul class="incremental">
@@ -431,8 +433,8 @@ test3 &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class=
 sapply_sumLog2 &lt;-<span class="st"> </span><span class="kw">sapply</span>(myNumbers, sumLog2)
 foreach_sumLog2 &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">i =</span> <span class="dv">1</span>:<span class="kw">length</span>(myNumbers), <span class="dt">.combine =</span> <span class="st">'c'</span>) %dopar%<span class="st"> </span><span class="kw">sumLog2</span>(i)</code></pre></div>
 <pre><code>#              expr     mean   median
-# 1  sapply_sumLog2 3.195792 3.193792
-# 2 foreach_sumLog2 4.903201 4.887575</code></pre>
+# 1  sapply_sumLog2 3.203019 3.196875
+# 2 foreach_sumLog2 4.791163 4.718027</code></pre>
 <ul class="incremental">
 <li><p><code>foreach</code> is now slower, why?</p>
 <ul class="incremental">
@@ -509,12 +511,12 @@ foreach_blocks_1 &lt;-<span class="st"> </span><span class="kw">foreach</span>(<
 <li>Timing</li>
 </ul>
 <pre><code>#                   expr       mean     median
-# 1                scale 0.05361551 0.05361551
-# 2 foreach_singlecolumn 3.19764155 3.19764155
-# 3  foreach_blocks_1000 0.42987731 0.42987731
-# 4   foreach_blocks_100 0.86191001 0.86191001
-# 5    foreach_blocks_10 0.06656503 0.06656503
-# 6     foreach_blocks_1 0.12647986 0.12647986</code></pre>
+# 1                scale 0.05335319 0.05335319
+# 2 foreach_singlecolumn 3.14870216 3.14870216
+# 3  foreach_blocks_1000 0.42620077 0.42620077
+# 4   foreach_blocks_100 0.86075290 0.86075290
+# 5    foreach_blocks_10 0.14986960 0.14986960
+# 6     foreach_blocks_1 0.10987660 0.10987660</code></pre>
 </div>
 <div id="foreach-example-1-more-improvements" class="slide section level2">
 <h1>foreach example 1: More improvements</h1>
@@ -541,11 +543,11 @@ sumLog2_block &lt;-<span class="st"> </span><span class="kw">foreach</span>(<spa
 <li>Timing</li>
 </ul>
 <pre><code>#                  expr      mean    median
-# 1      sapply_sumlog2 3.3442986 3.3296310
-# 2 foreach_blocks_1000 0.8718011 0.8739951
-# 3  foreach_blocks_100 0.5980580 0.6040918
-# 4   foreach_blocks_10 0.6765864 0.6750979
-# 5    foreach_blocks_5 1.0359652 1.0357994</code></pre>
+# 1      sapply_sumlog2 3.2640003 3.2544051
+# 2 foreach_blocks_1000 0.8613782 0.8714444
+# 3  foreach_blocks_100 0.5958943 0.5915252
+# 4   foreach_blocks_10 0.6814783 0.6811157
+# 5    foreach_blocks_5 1.0260959 1.0351314</code></pre>
 </div>
 <div id="foreach-example-2-random-forests" class="slide section level2">
 <h1>foreach example 2: Random Forests</h1>
@@ -596,9 +598,11 @@ rf_par &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class
 </ul></li>
 <li><p>Timing</p></li>
 </ul>
-<pre><code>#          expr     mean   median
-# 1          rf 482.6303 482.6303
-# 2 rf_parallel  67.7144  67.7144</code></pre>
+<pre><code># randomForest 4.6-12</code></pre>
+<pre><code># Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>#          expr      mean    median
+# 1          rf 466.03393 466.03393
+# 2 rf_parallel  66.94749  66.94749</code></pre>
 </div>
 <div id="rcpparmadillo-and-openmp" class="slide section level2">
 <h1>RcppArmadillo and OpenMP</h1>
@@ -698,10 +702,10 @@ rbenchmark::<span class="kw">benchmark</span>(
   <span class="dt">replications =</span> <span class="dv">1</span>, <span class="dt">order=</span><span class="st">&quot;elapsed&quot;</span>
 )[,<span class="dv">1</span>:<span class="dv">4</span>]</code></pre></div>
 <pre><code>#                      test replications elapsed relative
-# 4 dist_par(x, cores = 10)            1   0.555    1.000
-# 3  dist_par(x, cores = 4)            1   1.243    2.240
-# 2  dist_par(x, cores = 1)            1   2.400    4.324
-# 1                 dist(x)            1   5.465    9.847</code></pre>
+# 4 dist_par(x, cores = 10)            1   0.508    1.000
+# 3  dist_par(x, cores = 4)            1   1.225    2.411
+# 2  dist_par(x, cores = 1)            1   2.344    4.614
+# 1                 dist(x)            1   5.465   10.758</code></pre>
 </div>
 <div id="rcpparmadillo-openmp-example-2-simulating-pi" class="slide section level2">
 <h1>RcppArmadillo + OpenMP example 2: Simulating <span class="math inline">\(\pi\)</span></h1>
@@ -769,16 +773,16 @@ Rcpp::<span class="kw">sourceCpp</span>(<span class="st">&quot;simpi.cpp&quot;</
 <pre><code># [1] 3.14532</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Benchmarking</span>
 nsim &lt;-<span class="st"> </span><span class="fl">1e8</span>
-<span class="kw">benchmark</span>(
+rbenchmark::<span class="kw">benchmark</span>(
   <span class="dt">pi01 =</span> <span class="kw">sim_pi</span>(nsim, <span class="dv">1</span>),
   <span class="dt">pi04 =</span> <span class="kw">sim_pi</span>(nsim, <span class="dv">4</span>),
   <span class="dt">pi10 =</span> <span class="kw">sim_pi</span>(nsim, <span class="dv">10</span>),
   <span class="dt">replications =</span> <span class="dv">1</span>
 )[,<span class="dv">1</span>:<span class="dv">4</span>]</code></pre></div>
 <pre><code>#   test replications elapsed relative
-# 1 pi01            1   4.535    1.112
-# 2 pi04            1   4.162    1.021
-# 3 pi10            1   4.078    1.000</code></pre>
+# 1 pi01            1   4.517    1.108
+# 2 pi04            1   4.227    1.037
+# 3 pi10            1   4.077    1.000</code></pre>
 <p>No big speed gains… but at least you know how to use it now :)!</p>
 </div>
 <div id="thanks" class="slide section level2">
@@ -801,19 +805,19 @@ nsim &lt;-<span class="st"> </span><span class="fl">1e8</span>
 # 
 # other attached packages:
 # [1] randomForest_4.6-12 doParallel_1.0.10   iterators_1.0.8    
-# [4] rbenchmark_1.0.0    foreach_1.4.3      
+# [4] foreach_1.4.3      
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_0.12.9            knitr_1.15.1           magrittr_1.5          
-#  [4] MASS_7.3-45            munsell_0.4.3          colorspace_1.3-2      
-#  [7] plyr_1.8.4             stringr_1.1.0          highr_0.6             
-# [10] tools_3.3.2            grid_3.3.2             gtable_0.2.0          
-# [13] snow_0.4-2             htmltools_0.3.5        assertthat_0.1        
-# [16] lazyeval_0.2.0         yaml_2.1.14            rprojroot_1.2         
-# [19] digest_0.6.12          tibble_1.2             ggplot2_2.2.1         
-# [22] microbenchmark_1.4-2.1 codetools_0.2-15       evaluate_0.10         
-# [25] rmarkdown_1.3          stringi_1.1.2          compiler_3.3.2        
-# [28] scales_0.4.1           backports_1.0.5</code></pre>
+#  [1] Rcpp_0.12.9               rbenchmark_1.0.0         
+#  [3] codetools_0.2-15          snow_0.4-2               
+#  [5] digest_0.6.12             rprojroot_1.2            
+#  [7] backports_1.0.5           magrittr_1.5             
+#  [9] evaluate_0.10             highr_0.6                
+# [11] stringi_1.1.2             RcppArmadillo_0.7.700.0.0
+# [13] rmarkdown_1.3             tools_3.3.2              
+# [15] stringr_1.1.0             compiler_3.3.2           
+# [17] yaml_2.1.14               htmltools_0.3.5          
+# [19] knitr_1.15.1</code></pre>
 </div>
 <div id="references" class="slide section level2">
 <h1>References</h1>
