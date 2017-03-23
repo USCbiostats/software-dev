@@ -1,6 +1,6 @@
 ---
 title: 'The "Happy Scientist" Semminar Series #5<br>A brief introduction to using R for high-performance computing'
-author: '<par><table style="text-align:center;width:100%"><tr><td>George Vega Yon</td><td>Garret Weaver</td></tr><tr><td>vegayon@usc.edu</td><td>gmweaber@usc.edu</tb></tr></table></par>'
+author: '<par><table style="text-align:center;width:100%"><tr><td>George Vega Yon</td><td>Garret Weaver</td></tr><tr><td>vegayon@usc.edu</td><td>gmweaver@usc.edu</tb></tr></table></par>'
 output: 
   slidy_presentation:
     theme: journal
