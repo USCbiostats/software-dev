@@ -40,9 +40,15 @@ num_int <- function(fn, ..., a, b, N = 100, ncores = 1, cl = NULL) {
   V <- prod(b - a)
   
   # Computing density
-  f       <- function(x) f(x, ...)
-  fsample <- parApply(cl, samp, 1, fn)
+  f       <- function(x) fn(x, ...)
+  fsample <- parApply(cl, samp, 1, f)
   ans     <- V*sum(fsample)/N
+  
+  # Preparing arguments
+  env <- new.env()
+  environment(f) <- env
+  args <- list(...)
+  environment(args) <- env
   
   # Returning an object of class numint
   structure(
@@ -54,28 +60,85 @@ num_int <- function(fn, ..., a, b, N = 100, ncores = 1, cl = NULL) {
       sd = sd(fsample*V),
       N=N,
       a = a,
-      b = b
+      b = b,
+      f = f,
+      args = args
       ),
     class = "numint"
   )
 }
 
 # Plotting method
-plot.numint <- function(x, y = NULL, main = "Monte Carlo Integration", ...) {
-  with(x,boxplot(fsample*vol, main=main, ...))
+plot.numint <- function(x, y = NULL, main = "Monte Carlo Integration", col=blues9[4],...) {
+  
+  n <- 100
+  
+  # Computing values
+  xran <- c(x$a[1], x$b[1])
+  vals <- NULL
+  if (length(x$a > 1)) {
+    vals <- Map(function(a,b) rep((a + b)/2, n), a = x$a[-1], x$b[-1])
+    vals <- do.call(cbind, vals)
+  } 
+  
+  # Computing coordinates
+  vals <- cbind(seq(xran[1], xran[2], length.out = n), vals)
+  y <- apply(vals, 1, x$f)
+  
+  
+  # Adding missing points
+  coordinates <- cbind(vals[,1], y)
+  coordinates <- rbind(coordinates, c(xran[2], 0), c(xran[1], 0))
+  
+  # Plotting
+  plot.new()
+  plot.window(xlim = xran, ylim = range(y))
+  polygon(coordinates, col = col, ...)
+  
+  # Adding axis
+  axis(1);axis(2)
+  
+  # A nice title
+  title(main = main)
+  
+  # And a neat legend
+  legend("topright",
+         legend = substitute(
+           Volume~~a %+-% b,
+           list(
+             a = sprintf("%.4f", x$val),
+             b = sprintf("%.4f", x$sd))
+           ),
+         bty = "n"
+         )
+  
+  # Returning the coordinates used for the plot
+  invisible(cbind(x = vals, y = y))
 }
 
 # printing method 
 print.numint <- function(x, ...) {
   with(x, cat(sprintf("MONTE CARLO INTEGRATION\nN: %i\nVolume: %.4f\n", N, vol)))
   with(x, cat(sprintf("%.4f in [%.4f, %.4f]", val, val - sd, val + sd)))
+  
+  invisible(x)
 }
 
 # Example with univariate function ----------------------------------------
+
+# Normal
 ans <- num_int(dnorm, a = -1, b = 1, mean = 0, sd = 1,
                N = 1e6, ncores = 4)
 ans
 1 - pnorm(-1)*2
+plot(ans)
+
+# Beta
+bmedian <- (2 - 1/3)/(2 + 20 - 2/3)
+ans <- num_int(dbeta, a = 0, b = bmedian, shape1 = 2, shape2 = 20, N = 2e6,
+               ncores=4)
+ans
+plot(ans)
 
 # Example with multivariate normal ----------------------------------------
 
