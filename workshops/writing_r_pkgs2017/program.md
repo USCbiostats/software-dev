@@ -1,7 +1,7 @@
 Workshop: Hands-on on Writing R packages
 ================
-Date and Location: TBD
-This version: 2017-06-01 16:11:48
+Date and Location: June 19 and 20 on SSB 116
+This version: 2017-06-14 18:00:35
 
 -   [Goal](#goal)
 -   [Who is this for](#who-is-this-for)

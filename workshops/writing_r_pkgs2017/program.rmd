@@ -1,7 +1,7 @@
 ---
 title: 'Workshop: Hands-on on Writing R packages'
 date: "`r paste('This version:', Sys.time())`"
-author: 'Date and Location: TBD'
+author: 'Date and Location: June 19 and 20 on SSB 116'
 output: # rtf_document
   github_document:
     toc: true
