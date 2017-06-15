@@ -1,3 +1,4 @@
+# Clean working space
 rm(list = ls())
 
 # Packages that we will be using
@@ -12,7 +13,7 @@ library(microbenchmark) # For speed benchmark
 # b is the upper bound
 # N is the sample size
 # ncores is the number of processors to call
-# cl is an object of class cluster
+# cl is an object of class cluster 
 num_int <- function(fn, ..., a, b, N = 100, ncores = 1, cl = NULL) {
   
   # Getting the call
