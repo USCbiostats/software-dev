@@ -1,0 +1,657 @@
+---
+title: "Workshop: Hands-on on Writing R packages"
+author: 'George G. Vega Yon<br><a href="http://cana.usc.edu/vegayon">cana.usc.edu/vegayon</a><br><a href="mailto:vegayon@usc.edu">vegayon@usc.edu</a>'
+date: "June 19, 2017"
+output: 
+  slidy_presentation:
+    footer: vegayon@usc.edu
+    incremental: false
+    font_adjustment: -1
+    duration: 45
+    # css: ggvy_style.css
+    slide_level: 2
+    highlight: haddock
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(out.width = "600px", fig.align = "center")
+```
+
+# Introduction and General Overview
+
+**Why writing an R package?**
+
+To name a few:
+
+1.  Easy way to share code: Just type `install.packages` and voilà!
+
+2.  Already standarized: So you don't need to think about how to structure it.
+
+3.  CRAN checks everything for you: Force yourself to code things right.
+
+4.  **Reproducible Research**
+    
+    *   Accessible Reproducible Research ([Mesirov, __Science__ 2010](http://science.sciencemag.org/content/327/5964/415))
+    
+    *   Again, and Again, and Again, ... ([Jasny et al., __Science__ 2011](http://science.sciencemag.org/content/334/6060/1225))
+        
+    *   Challenges in Irreproducible Research ([__nature__ topic](http://www.nature.com/news/reproducibility-1.17552))
+
+
+----
+
+**What's an R package, anyway? (cont.)**
+
+According to Hadley Wickham's ["R packages"](http://r-pkgs.had.co.nz/)
+
+> Packages are **the fundamental units of reproducible R code**. They include
+**reusable R functions**, the **documentation** that describes how to use them, and
+**sample data**.
+
+```{r What it has, echo=FALSE}
+words <- c("R/", "tests/","vignettes/", "data/", "man/",
+           "DESCRIPTION", "NAMESPACE")
+freqs <- 7:1
+# oldpar <- par(no.readonly = TRUE)
+# par(mar = rep(0,4))
+# wordcloud::wordcloud(words, colors = c(blues9[5:9], gray(c(.8, .6)))[7:1],
+#                      freqs, min.freq = 1)
+# par(oldpar)
+
+library(d3wordcloud)
+d3wordcloud(words, freqs, colors = c(blues9[5:9], gray(c(.8, .6))))
+```
+
+----
+
+**What's an R package, anyway? (cont.)**
+
+Folders
+
+*   **R** Where the R scripts live, e.g. `addnums.r`, `funny-pkg.r`.
+
+*   **tests** Where the tests live, e.g. `testthat/test-addnums.r` (using testthat).
+
+*   **vignettes** Where vignettes live, e.g. `vignettes/mode_details_on_addnums.rmd`.
+
+*   **data** Where the data lives, e.g. `fakedata.rda`, `aneattable.csv`.
+
+*   **man** Where the manuals live, e.g. `addnums.Rd`, `funnypkg.Rd`.
+
+And files
+
+*   **DESCRIPTION** The metadata of the package: name, description, version, author(s),
+    dependencies, etc.
+
+*   **NAMESPACE** Declares the name of the objects (functions mostly) that will
+    be part of the package (and will be visible to the user)
+
+More info [here](http://r-pkgs.had.co.nz/package.html) and [here](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-structure)
+
+
+----
+
+Writing R packages is an iterative process
+
+1.  **Set up the structure**: Create folders and files `R/`, `data/`, `src/`, `tests/`, `man/`,
+    `vignettes/`, `DESCRIPTION`, `NAMESPACE`(?)
+
+2.  **Code!** For `f` in `F` do
+    
+    1.  Write `f`
+    
+    2.  Document `f`: what it does, what the inputs are, what it returns, examples.
+    
+    3.  Add some tests: is it doing what is supposed to do?
+    
+    4.  `R CMD Check`: Will CRAN, and the rest of the functions, 'like' it?
+    
+    5.  Commit your changes!: Update `ChangeLog`+`news.md`, and commit
+        (so travis and friends run)!
+    
+    6.  next `f`
+    
+3.  Submit your package to CRAN/Bioconductor (read [more](http://r-pkgs.had.co.nz/release.html#release-submission))
+
+----
+
+**How are we going to work today**
+
+1.  Each "topic" will be introduced in the general context of CRAN's requirements.
+
+2.  Explain how the CRAN requirment works by examples.
+
+3.  Pick one or more volunteers so we can ilustrate the presentation with their projects.
+
+4.  Actually work you the projects... :).
+
+
+# Lightning talks: Presentation of the Projects
+
+
+----
+
+<h1>
+<center>15 min Break</center><br>
+</h1>
+
+----
+
+
+# Setting Up the Rstudio+git project
+
+Create an R Package project
+
+*   Go to "File" > "New Project" and and select "R Package" in project type
+
+*   RStudio will create a new R package project with a template set of functions and files that you will be able to modify (as the ones we described in the introduction).
+
+
+# Setting Up the Rstudio+git project (cont. 1)
+
+Using the `devtools` package, we can add some extras
+
+```r
+# Creating a README for the project
+devtools::use_readme_rmd()
+
+# Infrastructure for testing
+devtools::use_testthat()
+
+# Infrastructure for Code Coverage
+devtools::use_coverage(type = "codecov") # This creates the .travis.yml
+devtools::use_appveyor()
+
+# A LICENSE file (required by CRAN)
+# The line "license: MIT + file" in the DESCRIPTION file
+devtools::use_mit_license(copyright_holder = "George G. Vega Yon")
+devtools::use_news_md()
+```
+
+# Setting Up the Rstudio+git project (cont. 2)
+
+What did just happen?
+
+1.  `use_readme_rmd()`: Creates a readme file that will be in the main folder
+    of the project. Think about it as the home page of your project.
+    
+2.  `use_testthat()`: Will create the basic infrastructure for package testing.
+
+3.  `use_coverage(type = "codecov")`: Creates the [.travis.yml file](https://en.wikipedia.org/wiki/Comparison_of_continuous_integration_software)
+    for Unix CI, and
+    sets it up for code coverage using [codecov.io](https://codecov.io/).
+    
+4.  `devtools::use_appveyor()`: Creates the [appveyor.yml](https://www.appveyor.com/)
+    for windows CI.
+    
+5.  `devtools::use_mit_license(copyright_holder = "George G. Vega Yon")`: Creates the----
+    `LICENSE` file and puts it under 'George G. Vega Yon'.
+
+6.  `devtools::use_news_md()`: Creates the `news.md` file which us used for
+    tracking changes, and communicating them to the users (e.g.
+    [netdiffuseR](https://github.com/USCCANA/netdiffuseR/blob/master/NEWS.md))
+
+# Setting Up the Rstudio+git project (cont. 3)
+
+For Git, you will need to create a project on github. Just go to your account:
+
+*   Go to http://github.com and log in into your account to create a new repository.
+    If you are already logged in, you can simple go to http://github.com/new
+
+*   You'll need to initialize the repository with data. For that we all all the files (source code file) tha should be tracked by git and/or need to be included so that the package can be built.
+
+*   To add a file to your repository just type
+    
+    ```shell
+    $ git add [list of files to add]
+    ```
+    
+    To remove a file (only from the tracking), type
+    
+    ```shell
+    $ git rm --cached [list of files to remove]
+    ```
+    
+*   To make a commit, just type
+    
+    ```shell
+    $ git commit -a m "[Comment about the commit]"
+    ```
+
+*   For the first commit, you need to (1) add the remote repo, and (2) include the -u flag  
+    
+    ```shell
+    $ git remote add origin https://github.com/gvegayon/numint.git
+    $ git push -u origin master
+    ```
+    
+----
+
+Once you have your first commit, the (git)dev cycle is pretty much as follows:
+    
+1.  Pull the changes 
+    
+    ```shell
+    $ git pull
+    ```
+    
+2.  Edit/add/remove code/files.
+
+3.  Add files (if any) 
+    
+    ```shell
+    $ git add [list of files to add]
+    ```
+
+4.  Commit the changes 
+    
+    ```shell
+    $ git commit -a -m "[a brief comment on what you did]"
+    ```
+
+5.  Push your changes 
+    
+    ```shell
+    $ git push
+    ```
+
+**Obs** Besides of the comment that you add to the commit, it is recommended to include a [`ChangeLog`](https://en.wikipedia.org/wiki/Changelog)
+Examples: https://github.com/USCCANA/netdiffuseR/blob/master/ChangeLog and https://github.com/USCbiostats/aphylo/blob/master/ChangeLog
+
+----
+
+<h1>
+<center>Lets see some examples!</center>
+</h1>
+
+# Documenting an R package with roxygen2: functions
+
+*   Using `roxygen2` is very straight forward. For our fist pice of code, we create the
+    `R/addnums.r` file:
+        
+    ```{r}
+    #' The title of -addnums-
+    #'
+    #' Here is a brief description
+    #' 
+    #' @param a Numeric scalar. A brief description.
+    #' @param b Numeric scalar. A brief description.
+    #' 
+    #' @details Computes the sum of \code{x} and \code{y}.
+    #' @return A list of class \code{funnypkg_addnums}:
+    #' \item{a}{Numeric scalar.}
+    #' \item{b}{Numeric scalar.}
+    #' \item{ab}{Numeric scalar. the sum of \code{a} and \code{b}}
+    #' @examples
+    #' foo(1, 2)
+    #' 
+    #' @export
+    addnums <- function(a, b) {
+      ans <- a + b
+      structure(list(a = a, b = b, ab = ans)
+      , class = "funnypkg_addnums")
+    }
+    
+    ```
+
+*   Type `devtools::document()`, or press Ctrl + Shift + D (RStudio will: create the manual, and the NAMESPACE).
+    Make sure you activate this option in RStudio (not the default).
+    
+*   Notice that the output is defined using S3-type objects ([read more](http://adv-r.had.co.nz/S3.html))
+
+---
+
+
+*   Here we are adding a function that is documented in `addnums`. The plot method
+    
+    ```{r}
+    #' @rdname addnums
+    #' @export
+    #' @param x An object of class \code{funnypkg_addnums}.
+    #' @param y Ignored.
+    #' @param ... Further arguments passed to
+    #' \code{\link[graphics:plot.window]{plot.window}}.
+    plot.funnypkg_addnums <- function(x, y = NULL, ...) {
+      graphics::plot.new()
+      graphics::plot.window(xlim = range(unlist(c(0,x))), ylim = c(-.5,1))
+      graphics::axis(1)
+      with(x, graphics::segments(0, 1, ab, col = "blue", lwd=3))
+      with(x, graphics::segments(0, 0, a, col = "green", lwd=3))
+      with(x, graphics::segments(a, .5, a + b, col = "red", lwd=3))
+      graphics::legend("bottom", col = c("blue", "green", "red"), 
+             legend = c("a+b", "a", "b"), bty = "n", 
+             ncol = 3, lty = 1, lwd=3)
+    }
+    
+    ```
+      
+*   You'll need to update the `man/*Rd` every time that you add new roxygen content.
+    Just press Ctrl + Shift + D and RStudio will do it for you.
+    
+*   Notice that functions from foreign packages are called using the `::` operator
+    (read more [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/ns-dblcolon.html)
+    and [here](http://r-pkgs.had.co.nz/namespace.html)). Not a requirement, but
+    makes the code easier to maintain (and less error-prone... because of R's scoping rules).
+
+---
+
+Since we added foreign functions, we need to add them to the NAMESPACE and
+to the DESCRIPTION files:
+
+*   Here is the `R/funny-pkg.r` file:
+    
+    ```r
+    #' @importFrom graphics plot.new plot.window axis legend
+    NULL
+    
+    #' funnypkg
+    #'
+    #' A (not so) funny collection of functions
+    #'
+    #' @description We add stuff up... You can access to the project
+    #' website at \url{https://github.com/USCbiostats/software-dev/tree/master/rpkgs/funnypkg}
+    #'
+    #' @docType package
+    #' @name funnypkg
+    #'
+    #' @author George G. Vega Yon
+    NULL
+    ```
+    
+*   Here is the DESCRIPTION updated
+    
+    ```
+    Package: funnypkg
+    Type: Package
+    Title: What the Package Does (Title Case)
+    Version: 0.1.0
+    Author: Who wrote it
+    Maintainer: The package maintainer <yourself@somewhere.net>
+    Description: More about what it does (maybe more than one line)
+        Use four spaces when indenting paragraphs within the Description.
+    License: What license is it under?
+    Encoding: UTF-8
+    LazyData: true
+    Suggests:
+        testthat,
+        covr
+    RoxygenNote: 5.0.1
+    Imports: graphics
+    ```
+    
+*   The `Suggests` and `RoxygenNote` fields where added automagically by `devtools`.
+
+
+----
+
+<h1>
+<center>15 min Break</center><br>
+</h1>
+
+
+----
+
+# Documenting an R package with roxygen2: Dependencies, data and the package itself
+
+```r
+#' netdiffuseR
+#'
+#' Analysis of Diffusion and Contagion Processes on Networks
+#'
+#' @description
+#'
+#' Statistical analysis, visualization and simulation of diffusion and contagion
+#' processes on networks. The package implements algorithms for
+#' calculating stats such as innovation threshold levels, infectiousness
+#' (contagion) and susceptibility, and hazard rates as presented in Burt (1987),
+#' Valente (1995), and Myers (2000) (among others).
+#'
+#' You can access to the project website at
+#' \url{https://github.com/USCCANA/netdiffuseR}
+#'
+#' @section Acknowledgements:
+#' netdiffuseR was created with the support of grant R01 CA157577 from the National Cancer Institute/National Institutes of Health.
+#'
+#' @docType package
+#' @name netdiffuseR
+#'
+#' @author Vega Yon, Dyal, Hayes & Valente
+#'
+NULL
+```
+
+----
+
+Documenting *Dependencies* from the [netdiffuseR](https://github.com/USCCANA/netdiffuseR/blob/master/R/imports.R) R package
+
+```r
+#' @importFrom Rcpp evalCpp
+NULL
+
+#' @importFrom sna gplot as.sociomatrix.sna
+NULL
+
+#' @importFrom igraph graph_from_adjacency_matrix set_vertex_attr
+#'  any_multiple graph_attr_names as_adj is.loop set_graph_attr V permute
+#' @importFrom network as.edgelist is.multiplex is.directed has.loops
+NULL
+
+#' @useDynLib netdiffuseR
+NULL
+
+# Importing from the Matrix pkg ------------------------------------------------
+
+#' @import methods
+#' @importClassesFrom Matrix dgCMatrix
+#' @importFrom Matrix Matrix rowSums colSums
+#' @importMethodsFrom Matrix t
+NULL
+
+#' @importClassesFrom SparseM matrix.csc
+NULL
+
+# Importing from R CORE packages -----------------------------------------------
+
+#' @importFrom grDevices grey rgb colorRampPalette blues9
+#' @importFrom graphics grid par plot points symbols text layout legend lines
+#'  matplot plot.new plot.window hist mtext polygon image title .filled.contour
+#' @importFrom stats complete.cases runif reshape setNames ftable sd pnorm var
+#' as.formula optim nls coef
+#' @importFrom utils getFromNamespace head str
+#' @importFrom boot boot
+#' @importFrom MASS bandwidth.nrd kde2d
+#' @importFrom MatchIt matchit
+NULL
+
+release_questions <- function() {
+  c(
+    "Have you updated the inst/NEWS file?",
+    "Have you changed the version+dates in DESCRIPTION and NEWS.md?",
+    "Have you added all new files to GIT?",
+    "Have you clean the vignettes file (source)?"
+    )
+}
+```
+
+Which genertes this [NAMESPACE](https://github.com/USCCANA/netdiffuseR/blob/master/NAMESPACE)
+
+-----
+
+An example of data documentation can be found in the R package [`aphylo`](https://github.com/USCbiostats/aphylo/blob/master/R/package.r#L56-L86)
+
+
+```r
+#' Fake Phylogenetic Tree
+#' 
+#' A fake dataset containing the parent-offspring relations between genes.
+#' This dataset is inteded for testing only.
+#' 
+#' @format A data frame with 6 rows and 2 variables:
+#' \describe{
+#'   \item{NodeId}{Integer, ID of the offspring.}
+#'   \item{ParentId}{Integer, ID of the parent.}
+#' }
+#' 
+#' @source BiostatsUSC
+#' @name faketree
+NULL
+
+#' Fake Experimental Data
+#' 
+#' A fake dataset containing 2 functional state of the leaf nodes. Each
+#' function can have either 0 (unactive), 1 (active) or 9 (n/a).
+#' This dataset is inteded for testing only.
+#' 
+#' @format A data frame with 4 rows and 3 variables:
+#' \describe{
+#'   \item{f1}{State of function 1.}
+#'   \item{f2}{State of function 1.}
+#'   \item{LeafId}{Integer, ID of the leaf.}
+#' }
+#' 
+#' @source BiostatsUSC
+#' @name fakeexperiment
+NULL
+```
+
+
+# Writing tests with testthat
+
+> Software testing is important, but, in part because it is frustrating and boring, many of us avoid it.
+> 
+> testthat is a new testing framework for R that is easy learn and use, and integrates with your existing workflow. (?testthat)
+
+----
+
+Test are run every time that you run R CMD check
+
+*   In the `tests/testthat/` dir, add/edit a source file with tests, e.g. `test-addnums.r`
+    
+    ```r
+    context("Basic set of tests")
+    test_that("addnums(a, b) = a+b", {
+      # Preparing the test
+      a <- 1
+      b <- -2
+      
+      # Calling the function
+      ans0 <- a+b
+      ans1 <- addnums(a, b)
+      
+      # Are these equal?
+      expect_equal(ans0, ans1$ab)
+    })
+    
+    test_that("Plot returns -funnypkg_foo-", {
+      expect_s3_class(plot(addnums(1,2)), "funnypkg_foo")
+    })
+    ```
+    
+*   You can run the tests using Ctrl + Shift + t
+
+*   Furthermore, tests are use to evaluate code coverage.
+
+
+-----------
+
+<h1>
+<center>15 min Break</center><br>
+</h1>
+
+# Ready to publish: R CMD check
+
+Running `R CMD check` is easy with RStudio
+
+*   If you don't have C/C++  code Just press Ctrl + Shift + E
+
+*   If you have C/C++ code, use `R CMD Check` with valgrind (check for segfaults)
+    
+    ```shell
+    $ R CMD build funnypkg/
+    $ R CMD check --as-cran --use-valgrind funnypkg*.tar.gz
+    ```
+    
+    You can ask RStudio to use valgrind too.
+
+For an extensive list of the checks, see the section
+[1.3.1 Checking packages](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Checking-packages)
+in the "Writing R extensions" manual.
+
+
+-----
+
+Once you have run R CMD checks and no errors or unexpected issues are detected,
+you should commit your changes and push them to Github.
+
+1.  Edit the [`NEWS.md`](https://github.com/hadley/dplyr/blob/master/NEWS.md) file and the
+    [`ChangeLog`](https://github.com/RcppCore/RcppArmadillo/blob/master/ChangeLog) (if you have one).
+
+2.  Add the new files to the tree, commit your changes, and push them to Github
+    
+    ```shell
+    $ git add R/newfile.r man/newfile.Rd
+    $ git commit -a -m "Adding new function"
+    $ git push
+    ```
+    
+Once uploaded, I recommend checking Travis and AppVeyor to see if everything
+went well.
+
+-----
+
+*   You can release your package using `devtools::release()` function.
+
+*   The devtools package was built to make life easier. Such is it's creator's
+    confidence on the `release` function that it comes with a warranty!
+    
+    > If a devtools bug causes one of the CRAN maintainers to **treat you
+      impolitely**, I will personally send you a handwritten apology note. Please
+      forward me the email and your address, and I'll get a card in the mail.
+
+# Dev Cycle (once again!)
+
+The most important step
+
+2.  **Code!** For `f` in `F` do
+    
+    1.  Write `f`
+    
+    2.  Document `f`: what it does, what the inputs are, what it returns, examples.
+    
+    3.  Add some tests: is it doing what is supposed to do?
+    
+    4.  `R CMD Check`: Will CRAN, and the rest of the functions, 'like' it?
+    
+    5.  Commit your changes!: Update `ChangeLog`+`news.md`, and commit
+        (so travis and friends run)!
+    
+    6.  next `f`
+    
+    
+# Workshop: Hands-on on Writing R packages
+
+<body>
+<p align="center" style="font-size:50px"><b>Thanks!</b></pr><br>
+<p align="center">George G. Vega Yon<br><a href="http://cana.usc.edu/vegayon">cana.usc.edu/vegayon</a><br><a href="mailto:vegayon@usc.edu">vegayon@usc.edu</a></p>
+</body>
+
+## More resources
+
+*   ["Writing R extensions"](https://cran.r-project.org/doc/manuals/r-release/R-exts.html)
+    (R Core Team)
+
+*   ["R packages"](http://r-pkgs.had.co.nz/) (Hadley Wickham)
+
+*   ["Developing Packages with RStudio"](https://support.rstudio.com/hc/en-us/articles/200486488-Developing-Packages-with-RStudio)
+    (Josh Paulson)
+    
+*   ["A template for R packages using Rcpp and/or RcppArmadillo "](https://github.com/patrickmuchmore/RPackageTemplate)
+    (Patrick Muchmore)
+
+*   ["R package primer: a minimal tutorial"](http://kbroman.org/pkg_primer/) (Karl Broman)
+
+*   ["Writing an R package from scratch"](https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/)
+    (Hilary Parker)
+
+*   ["Instructions for Creating Your Own R Package"](http://web.mit.edu/insong/www/pdf/rpackage_instructions.pdf)
+    (Kim _et al._)
