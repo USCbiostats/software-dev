@@ -28,7 +28,7 @@ library(mvtnorm)
 ans <- num_int(
   dmvnorm, a = c(-1, -10), b = c(1, 1),
   mean = c(0,0), sigma = diag(2),
-  N = 1e7, ncores = 10
+  N = 1e7, ncores = 4
 )
 ans
 pmvnorm(lower = c(-1,-10), upper = c(1,1), mean = c(0,0), sigma = diag(2))

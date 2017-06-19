@@ -2,7 +2,7 @@
 title: 'Workshop: Hands-on on Writing R packages'
 date: "`r paste('This version:', Sys.time())`"
 author: 'Date and Location: June 19 and 20 on SSB 116'
-output: # rtf_document
+output: #pdf_document
   github_document:
     toc: true
   # html_document:
@@ -48,7 +48,7 @@ In this first round, the event will be open only to Members of the Department of
 
 # When and where
 
-The workshop is designed to last one day and a half. The first day dedicated to write the R package, and the reminder to Package Vignettes and time to finish the development process if needed. The workshop will take place in **TBD** on **TBD from 9:30 to 16:00**, and **TBD from 9:30 to 12:00**.
+The workshop is designed to last one day and a half. The first day dedicated to write the R package, and the reminder to Package Vignettes and time to finish the development process if needed. The workshop will take place in **SSB 116** on **June 19 from 9:30 to 16:00**, and **June 20 from 9:30 to 12:00**.
 
 # Program
 
@@ -133,6 +133,8 @@ Each participant should bring the following:
 *   A set of R functions (can be a single function) to bind into an R package. The functions' parameters must have a description.
 
 *   At least 1 example dataset (will be used for both testing and examples)
+
+Otherwise, participants can use the files `numint.r` and `examples.r` which are intended to be wrapped as an R package for Montecarlo Integration.
 
 
 ## System requirements
