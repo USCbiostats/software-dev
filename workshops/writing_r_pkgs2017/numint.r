@@ -1,4 +1,12 @@
 
+
+splitN <- function(N, nchunks) {
+  nchunks <- min(N, nchunks)
+  ans <- rep(N %/% nchunks, nchunks)
+  ans[nchunks] <- ans[nchunks] + N %% nchunks
+  ans
+}
+
 # This function performes numerical integration using monte carlo integration
 # fn is a function
 # ... are further arguments to be passed to fn
@@ -31,8 +39,8 @@ num_int <- function(fn, ..., a, b, N = 100, ncores = 1, cl = NULL) {
   }
   
   # Sampling
-  samp <- Map(function(lb, ub) runif(N, lb, ub), lb = a, ub = b)
-  samp <- do.call(cbind, samp)
+  # samp <- Map(function(lb, ub) runif(N, lb, ub), lb = a, ub = b)
+  # samp <- do.call(cbind, samp)
   
   # Computing the volume
   V <- prod(b - a)
@@ -41,8 +49,13 @@ num_int <- function(fn, ..., a, b, N = 100, ncores = 1, cl = NULL) {
   f       <- function(x) fn(x, ...)
   
   # Distributing indices across processors
-  idx     <- splitIndices(N, length(cl))
-  fsample <- parLapply(cl, lapply(idx, function(w) samp[w,,drop=FALSE]), f)
+  # idx     <- splitIndices(N, length(cl))
+  # fsample <- parLapply(cl, lapply(idx, function(w) samp[w,,drop=FALSE]), f)
+  fsample <- parLapply(cl, splitN(N, length(cl)), function(n, a, b) {
+    samp <- Map(function(lb, ub) runif(n, lb, ub), lb = a, ub = b)
+    samp <- do.call(cbind, samp)
+    f(samp)
+  }, a = a, b = b)
   fsample <- unlist(fsample)
   
   ans     <- V*sum(fsample)/N
@@ -122,7 +135,7 @@ plot.numint <- function(x, y = NULL, main = "Monte Carlo Integration", col=blues
 # printing method 
 print.numint <- function(x, ...) {
   with(x, cat(sprintf("MONTE CARLO INTEGRATION\nN: %i\nVolume: %.4f\n", N, vol)))
-  with(x, cat(sprintf("%.4f in [%.4f, %.4f]", val, val - sd, val + sd)))
+  with(x, cat(sprintf("%.4f +- %.4f", val, sd)))
   
   invisible(x)
 }

@@ -28,7 +28,7 @@ library(mvtnorm)
 ans <- num_int(
   dmvnorm, a = c(-1, -10), b = c(1, 1),
   mean = c(0,0), sigma = diag(2),
-  N = 3e6, ncores = 4
+  N = 1e7, ncores = 10
 )
 ans
 pmvnorm(lower = c(-1,-10), upper = c(1,1), mean = c(0,0), sigma = diag(2))
@@ -38,15 +38,16 @@ pmvnorm(lower = c(-1,-10), upper = c(1,1), mean = c(0,0), sigma = diag(2))
 
 library(microbenchmark) # For speed benchmark
 
-k     <- 5
-N     <- 1e6
+k     <- 100
+N     <- 2e6
 lower <- rep(-1, k)
 upper <- rep(0,k)
 
 microbenchmark(
-  core1 = num_int(dmvnorm, a = lower, b = upper, mean = rep(0,5), sigma = diag(5),
+  core1 = num_int(dmvnorm, a = lower, b = upper, mean = rep(0,100), sigma = diag(100),
                   N = N, ncores = 1),
-  core2 = num_int(dmvnorm, a = lower, b = upper, mean = rep(0,5), sigma = diag(5),
-                  N = N, ncores = 2),
+  core4 = num_int(dmvnorm, a = lower, b = upper, mean = rep(0,100), sigma = diag(100),
+                  N = N, ncores = 4),
   times = 1, unit="relative"
 )
+
