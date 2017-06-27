@@ -1,0 +1,59 @@
+---
+title: "Monte Carlo Integration"
+author: "George"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Monte Carlo Integration}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Definition
+
+From Wolfram MathWorld:
+
+> Picking $N$ randomly distributed points $x_1, x_2, ..., x_N$ in a multidimensional volume $V$ to determine the integral of a function $f$ in this volume gives a result
+
+$$
+\tag{1}
+\int f dV \approx V \langle f\rangle \pm V\sqrt{\frac{\langle f^2 \rangle- \langle f \rangle^2}{N}}
+$$
+Where 
+
+$$
+\begin{align}
+\langle f \rangle & = \frac{1}{N}\sum^N{i=1}f(x_i)\tag{2}\\
+\langle f \rangle & = \frac{1}{N}\sum^N{i=1}f(x_i)^2\tag{3}
+\end{align}
+$$
+
+# Example with 2D Multivariate Normal
+
+Integrate between a = {-1, -10} and b = {1, 1}
+
+```{r}
+set.seed(1231)
+library(mvtnorm)
+library(numint)
+
+ans <- num_int(
+  dmvnorm, a = c(-1, -10), b = c(1, 1),
+  mean = c(0,0), sigma = diag(2),
+  N = 1e7, ncores = 2
+)
+ans$val
+pmvnorm(lower = c(-1,-10), upper = c(1,1), mean = c(0,0), sigma = diag(2))
+```
+
+We can visualize a single dim of the area
+
+```{r}
+plot(ans)
+```
+
+
+
+# References
+
+Weisstein, Eric W. "Monte Carlo Integration." From _MathWorld_--A Wolfram Web Resource. http://mathworld.wolfram.com/MonteCarloIntegration.html
