@@ -3,14 +3,14 @@ title: 'Workshop: Hands-on on Writing R packages'
 date: "`r paste('This version:', Sys.time())`"
 author: 'Date and Location: June 19 and 20 on SSB 116'
 output: #pdf_document
-  github_document:
-    toc: true
-  # html_document:
+  # github_document:
   #   toc: true
-  #   toc_float: true
-  #   number_sections: false
-  #   self_contained: true
-  #   theme: cosmo
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: false
+    self_contained: true
+    theme: cosmo
 linkcolor: blue
 ---
 

@@ -58,6 +58,7 @@ freqs <- 7:1
 #                      freqs, min.freq = 1)
 # par(oldpar)
 
+# devtools::install_github("jbkunst/d3wordcloud")
 library(d3wordcloud)
 d3wordcloud(words, freqs, colors = c(blues9[5:9], gray(c(.8, .6))))
 ```
@@ -626,8 +627,25 @@ The most important step
         (so travis and friends run)!
     
     6.  next `f`
-    
-    
+  
+
+# Beyond examples: Writing Vignettes
+
+What are vignettes? From the "Writing R Extensions" manual, [section 1.4](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Writing-package-vignettes)
+
+> Vignettes are documents in PDF or HTML format obtained from plain text literate source files from which R knows how to extract R code and create output (in PDF/HTML or intermediate LaTeX).
+
+> Vignette engines do this work, using “tangle” and “weave” functions respectively. Sweave, provided by the R distribution, is the default engine. Since R version 3.0.0, other vignette engines besides Sweave are supported; see Non-Sweave vignettes.
+
+----
+
+An example vignette for the [numint R package](http://github.com/gvegayon/numint)
+
+```{r, results='markup', comment="", warning=FALSE}
+cat(paste(readLines("numint.rmd"), collapse="\n"), fill = TRUE)
+```
+
+
 # Workshop: Hands-on on Writing R packages
 
 <body>
