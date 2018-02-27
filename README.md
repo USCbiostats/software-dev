@@ -9,6 +9,8 @@ This project's main contents is located in the project's [Wiki](https://github.c
 3.  [Development Workflow](../../wiki/Home#development-workflow)
 4.  [Misc](../../wiki/Home#misc)
 
+We do have some direct guidelines developed as issue templates [here](templates). 
+
 ## Bioghost Server
 
 1.  [Introduction](../../wiki/Biogohst-server#introduction)
