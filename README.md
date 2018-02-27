@@ -33,3 +33,17 @@ The Happy Scientist Semminars are educational seminars sponsored by Cores C and 
 4.  *Yet Another 'Writing R packages' tutorial* ([materials](happy_scientist/rpkgs))
 5.  *A brief introduction to using R for high-performance computing* ([materials](happy_scientist/parallel_computing))
 
+# USCbiostats R packages
+
+*  [aphylo](https://github.com/USCbiostats/aphylo) Statistical inference of genetic functions in phylogenetic trees
+*  [fdrci](https://github.com/USCbiostats/fdrci) Permutation-Based FDR Point and Confidence Interval Estimation
+*  [GxEScanR](https://github.com/USCbiostats/GxEScanR) R version of GxEScan
+*  [amcmc](https://github.com/USCbiostats/amcmc) Adaptive and other Markov Chain Monte Carlo methods
+*  [rphyloxml](https://github.com/USCbiostats/rphyloxml) Read and write phyloXML files in R
+*  [partition](https://github.com/USCbiostats/partition) 
+*  [LUCid](https://github.com/USCbiostats/LUCid) Latent and Unknown Cluster Analysis using Integrated Data
+*  [jsPhyloSVG](https://github.com/USCbiostats/jsPhyloSVG) htmlwidgets for the jsPhyloSVG javascript library
+*  [MergeBinaryDosage](https://github.com/USCbiostats/MergeBinaryDosage) R package for merging binary dosage files
+*  [polygons](https://github.com/USCbiostats/polygons)
+*  [BinaryDosage](https://github.com/USCbiostats/BinaryDosage) Converts VCF files to a binary format
+
