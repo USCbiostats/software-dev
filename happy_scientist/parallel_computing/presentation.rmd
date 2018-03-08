@@ -182,7 +182,7 @@ stopCluster(cl)
 
 In the case of `makeForkCluster`
 
-```{r parallel-ex1-cont, echo=TRUE}
+```{r parallel-ex1-cont, echo=TRUE, eval = F}
 # 1. CREATING A CLUSTER
 library(parallel)
 
@@ -296,39 +296,37 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
     
     ```{r foreach-simple-ex}
     library(foreach)
-    result <- foreach(x = c(4,9,16)) %do% sqrt(x)
+    result <- foreach(x = c(4, 9, 16)) %do% sqrt(x)
     result
     ```
 
+* Note that `%do%` and `%dopar%` act like any other operators and can be equivalently called as `'%do%'(obj, expr)` and `'%dopar%'(obj, expr)`
+
 ## The 'foreach' package
 
-*   A closer look at the previous example
-    
+*   Unlike a for loop, `foreach` returns an object (by default a list) that contains the results compiled across all iterations
+
     ```{r foreach-simple-ex-cont}
-    result <- foreach(x = c(4,9,16)) %do% sqrt(x)
+    result <- foreach(x = c(4, 9, 16)) %do% sqrt(x)
     class(result)
     ```
     
-    Unlike a for loop, foreach returns an object (by default a list) that contains the results compiled across all iterations
-    
-    We can change the object returned by specifying the function used to combine results across iterations with the '.combine' option
+*   We can change the object returned by specifying the function used to combine results across iterations with the '.combine' option
     
     ```{r foreach-combine}
-    result <- foreach(x = c(4,9,16), .combine = 'c') %do% sqrt(x)
-    result2 <- foreach(x = c(4,9,16), .combine = '+') %do% x
-    
+    # Create a vector of the results
+    foreach(x = c(4, 9, 16), .combine = 'c') %do% sqrt(x)
+    # Add the results
+    foreach(x = c(4, 9, 16), .combine = '+') %do% x
+    # Custom combine that is tracking a running product
     customCombine <- function(i,j){
-      if(length(i) < 1){
+      if (length(i) < 2){
         c(i,j)
       } else {
         c(i, i[length(i)]*j)
       }
     }
-    result3 <- foreach(x = c(4,9,16), .combine = customCombine) %do% x
-    
-    result
-    result2
-    result3
+    foreach(x = c(4, 9, 16), .combine = customCombine) %do% x
     ```
     
     
@@ -369,9 +367,8 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
     ```{r foreach-example1, cache = TRUE}
     sumLog <- function(x){
       sum <- 0
-      temp <- log(seq(1,x))
-      for(i in temp){
-        sum <- sum + i
+      for(i in seq.int(1, x)){
+        sum <- sum + log(i)
       }
       sum
     }
@@ -379,66 +376,78 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
     log(1) + log(2) + log(3)
     ```
 
-*   You have been asked to find the fastest way to use this function on a large list of values, let's say for all integers from 1 to 15,000
+*   You have been asked to find the fastest way to use this function on a large list of values
+
+*   Let's say 5,000 integers randomly selected from the range {0, 1,..., 20,000}
 
 ## foreach example 1: Summing up numbers (cont.)
 
-```{r foreach-example1-cont, cache = TRUE}
-# A vector of integers to use with sumLog function
-myNumbers <- seq(1,15000)
 
-# First Attempt: Use a for loop to loop through all the numbers
-seqTest1 <- function(numbers){
-  out <- vector("numeric", length = length(numbers))
-  for(i in 1:length(numbers)){
-    out[i] <- sumLog(myNumbers[i])
-  }
-  out
-}
-test1 <- seqTest1(myNumbers)
-
-# Second Attempt: Use sapply function
-test2 <- sapply(myNumbers, sumLog)
-
-# Third Attempt: Use foreach function
-cl <- makeCluster(10, type = "SOCK")
-library(doParallel)
-registerDoParallel(cl)
-
-test3 <- foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog(myNumbers[i])
-
-stopCluster(cl)
+```{r, echo = FALSE}
+suppressMessages(library(doParallel))
 ```
+
+```{r}
+# Sample 5000 integers from the range 1 - 20,000
+myNumbers <- sample(seq(1,20000), 5000)
+```
+
+*   First Attempt: Use a for loop
+
+    ```{r foreach-example1-cont, cache = TRUE}
+    seqTest1 <- function(numbers){
+      out <- vector("numeric", length = length(numbers))
+      for(i in seq.int(1, length(numbers))){
+        out[i] <- sumLog(myNumbers[i])
+      }
+      out
+    }
+    test1 <- seqTest1(myNumbers)
+    ```
+
+*   Second Attempt: Use `sapply()`
+
+    ```{r, cache = TRUE}
+    test2 <- sapply(myNumbers, sumLog)
+    ```
+
+*   Third Attempt: Use `foreach()`
+
+    ```{r, cache = TRUE}
+    cl <- makeCluster(10, type = "SOCK")
+    registerDoParallel(cl)
+    test3 <- foreach(i = 1:length(myNumbers), .maxcombine = length(myNumbers),.combine = 'c') %dopar% sumLog(myNumbers[i])
+    stopCluster(cl)
+    ```
+
 
 ## foreach example 1: Summing up numbers (cont.)
 
-* Timing
+*   Timing
 
-```{r foreach-cluster-setup, echo = FALSE}
-library(doParallel)
-cl <- makeCluster(10, type = "SOCK")
-registerDoParallel(cl)
-```
+    ```{r foreach-cluster-setup, echo = FALSE}
+    library(doParallel)
+    cl <- makeCluster(4, type = "SOCK")
+    registerDoParallel(cl)
+    ```
 
-```{r foreach-benchmark1, echo = FALSE, cache = TRUE}
-# Timing
-summary(microbenchmark::microbenchmark(
-  forloop = seqTest1(myNumbers),
-  sapply = sapply(myNumbers, sumLog),
-  foreach = foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog(myNumbers[i]),
-  times = 1
-))[,c("expr","mean","median")]
+    ```{r foreach-benchmark1, echo = FALSE, cache = TRUE}
+    # Timing
+    summary(microbenchmark::microbenchmark(
+        forloop = seqTest1(myNumbers),
+        sapply = sapply(myNumbers, sumLog),
+        foreach = foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog(myNumbers[i]),
+    times = 1))[,c("expr", "mean", "median")]
 
-```
+    ```
 
-*   Can we do better?
-    
-    +   In `sumLog()`, we use R to sum the sequence, what if we use the `sum()` function instead?
+*   Can we do better? In `sumLog()`, we use R loops to sum the sequence, what if we use the `log()` and `sum()` functions instead?
     
     ```{r foreach-some-function, cache = TRUE}
     sumLog2 <- function(x){
-      sum(log(seq(1,x)))
+      sum(log(seq.int(1,x)))
     }
+
     sapply_sumLog2 <- sapply(myNumbers, sumLog2)
     foreach_sumLog2 <- foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog2(i)
     ```
@@ -446,17 +455,21 @@ summary(microbenchmark::microbenchmark(
     ```{r foreach-some-function-benchmark, echo = FALSE, cache = TRUE}
     
     summary(microbenchmark::microbenchmark(
-      sapply_sumLog2 = sapply(myNumbers, sumLog2),
-      foreach_sumLog2 = foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog2(i),
-      times = 5,
-      unit = "s"
-    ))[,c("expr","mean","median")]
+        sapply_sumLog2 = sapply(myNumbers, sumLog2),
+        foreach_sumLog2 = foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog2(i),
+        times = 2,
+        unit = "s"
+    ))[,c("expr", "mean", "median")]
     
     ```
 
-*   `foreach` is now slower, why? 
+*   The improvement in performance of `foreach` over `sapply` is not that large, why? 
     
-    The overhead due to data communication with the cores
+    *   Overhead due to data communication with the cores
+    
+    *   Use of `c` leads to a continual resizing of the results vector
+    
+    *   The operations being performed within threads are not computationally intensive
 
 ## An aside: foreach + iterators
 
@@ -469,10 +482,12 @@ summary(microbenchmark::microbenchmark(
     
 *   `foreach` transforms the object you want to iterate over into an object of class "iter"
 
-*   Example 1: A simple vector iterator
+*   Example: A simple vector iterator
 
     ```{r foreach-iterators-ex1}
-    vector_iterator <- iter(1:5)
+    vector_iterator <- iter(1:4)
+    nextElem(vector_iterator)
+    nextElem(vector_iterator)
     nextElem(vector_iterator)
     nextElem(vector_iterator)
     ```
@@ -480,66 +495,82 @@ summary(microbenchmark::microbenchmark(
 ## An aside: foreach + iterators (cont.)
 
 *   Example 2: An iterator that traverses over blocks of columns of a matrix
-    
-    *   The advantage? Never send the whole matrix to any one core and reduce the amount of data communication
 
     ```{r foreach-and-iterators, cache = TRUE}
-    # A function to split our iterator (matrix) into blocks (column-wise)
-    iblkcol <- function(a, chunks) {  
-      n <- ncol(a)
+    # Iterator function that traverses over blocks of columns of a matrix
+    iblkcol <- function(mat, num_blocks) {  
+      nc <- ncol(mat)
       i <- 1
-    
       nextElem <- function() {
-        if (chunks <= 0 || n <= 0) stop('StopIteration')
-        m <- ceiling(n / chunks)
-        r <- seq(i, length=m)
-        i <<- i + m
-        n <<- n - m
-        chunks <<- chunks - 1
-        a[,r, drop=FALSE]
+        if (num_blocks <= 0 || nc <= 0) stop('StopIteration')
+        block_size <- ceiling(nc / num_blocks)
+        col_idx <- seq(i, length = block_size)
+        i <<- i + block_size
+        nc <<- nc - block_size
+        num_blocks <<- num_blocks - 1
+        mat[, col_idx, drop=FALSE]
       }
     }
-    
-    myMatrix <- matrix(runif(300), nrow = 3)
+    myMatrix <- matrix(runif(300), nrow = 3, ncol = 100)
     splitMatrix <- iblkcol(myMatrix, 25)
+    splitMatrix()
     splitMatrix()
     ```
 
-## An aside: foreach + iterators (cont.)
+## An aside: Standardizing a Matrix
+
+* Using foreach + iter
 
     ```r
-    # Example: Standardize the columns of a random large matrix with foreach + iterators
-    randomMatrix <- matrix(runif(100000), ncol = 10000)
+    # Generate matrix with random values
+    randomMatrix <- matrix(runif(5e7), ncol = 1e4)
     
     # Without foreach
     scale_noparallel <- scale(randomMatrix)
     
-    # With foreach, by column
-    scale_bycolumn <- foreach(x = iter(randomMatrix, by = 'col'), .combine = 'cbind') %dopar% scale(x)
-    
-    # With foreach, blocks of columns
-    foreach_blocks_1000 <- foreach(x = iblkcol(randomMatrix, 1000), .combine = 'cbind') %dopar% scale(x)
-    foreach_blocks_100 <- foreach(x = iblkcol(randomMatrix, 100), .combine = 'cbind') %dopar% scale(x)
-    foreach_blocks_10 <- foreach(x = iblkcol(randomMatrix, 10), .combine = 'cbind') %dopar% scale(x)
-    foreach_blocks_1 <- foreach(x = iblkcol(randomMatrix, 1), .combine = 'cbind') %dopar% scale(x)
+    # With foreach, different blocks of columns
+    scale_size_1 <- foreach(x = iter(randomMatrix, by = 'col'), .combine = 'cbind') %dopar% scale(x)
+    foreach_size_100 <- foreach(x = iter(randomMatrix, by = "col", chunksize = 100), .combine = 'cbind') %dopar% scale(x)
+    ```
+* Another option (bonus): Rcpp + Armadillo
+
+    ```{r, engine = 'Rcpp', cache = TRUE}
+    #include <RcppArmadillo.h>
+    // [[Rcpp::depends(RcppArmadillo)]]
+    // [[Rcpp::export]]
+    arma::mat standardize_data(const arma::mat & x) {
+        arma::mat xnew(x.n_rows, x.n_cols);
+        arma::vec w(x.n_rows);
+        w.fill(1.0 / x.n_rows);
+        for (unsigned int j = 0; j < x.n_cols; ++j) {
+            double xm = arma::dot(w, x.unsafe_col(j));
+            double xs = sqrt((arma::dot(x.unsafe_col(j) - xm, (x.unsafe_col(j) - xm) % w)) * x.n_rows / (x.n_rows - 1));
+            xnew.col(j) = (x.unsafe_col(j) - xm) / xs;
+        }
+        return(xnew);
+    }
     ```
 
 *   Timing
 
+```{r, echo = FALSE}
+scale_col <- function(x) {
+    (x - mean(x)) / sd(x)
+}
+```
+
     ```{r foreach-iterators-benchmark, echo = FALSE, cache = TRUE}
-    randomMatrix <- matrix(runif(100000), ncol = 10000)
+    randomMatrix <- matrix(runif(5e7), ncol = 1e4)
     summary(microbenchmark::microbenchmark(
-      scale = scale(randomMatrix),
-      foreach_singlecolumn = foreach(x = iter(randomMatrix, by = 'col'), .combine = 'cbind') %dopar% scale(x),
-      foreach_blocks_1000 = foreach(x = iblkcol(randomMatrix, 1000), .combine = 'cbind') %dopar% scale(x),
-      foreach_blocks_100 = foreach(x = iblkcol(randomMatrix, 100), .combine = 'cbind') %dopar% scale(x),
-      foreach_blocks_10 = foreach(x = iblkcol(randomMatrix, 10), .combine = 'cbind') %dopar% scale(x),
-      foreach_blocks_1 = foreach(x = iblkcol(randomMatrix, 1), .combine = 'cbind') %dopar% scale(x),
-      times = 1,
-      unit = "s"))[,c("expr","mean","median")]
+        noparallel = scale(randomMatrix),
+        foreach_size_1 = foreach(x = iter(randomMatrix, by = 'col'), .combine = 'cbind') %dopar% scale_col(x),
+        foreach_size_100 = foreach(x = iter(randomMatrix, by = "col", chunksize = 100), .combine = 'cbind') %dopar% scale(x),
+        rcpp_armadillo = standardize_data(randomMatrix),
+        times = 1,
+      unit = "s"))[,c("expr", "mean", "median")]
     ```
 
-## foreach example 1: More improvements
+## foreach example 1: More improvements to our previous problem
 
 ```{r foreach-iterators-small-changes, cache = TRUE}
 # New function to compute sum(log(seq)) for a vector of x values
@@ -547,20 +578,15 @@ sumLog3 <- function(x){
   sapply(x, sumLog2)
 }
 
-# Reorder the numbers so that big and small numbers are mixed together --> Balance load across cores
-myNumbers_interweave <- c(rbind(myNumbers[1:7500], sort(myNumbers[7501:15000], decreasing = T)))
-
-# Create blocks of numbers --> Reduce data communication
-chunks1000 <- split(myNumbers_interweave, cut(seq_along(myNumbers_interweave), 1000, labels = FALSE))
-chunks100 <- split(myNumbers_interweave, cut(seq_along(myNumbers_interweave), 100, labels = FALSE))
-chunks10 <- split(myNumbers_interweave, cut(seq_along(myNumbers_interweave), 10, labels = FALSE))
-chunks5 <- split(myNumbers_interweave, cut(seq_along(myNumbers_interweave), 5, labels = FALSE))
+# Create blocks of numbers 
+chunks1000 <- split(myNumbers, cut(seq_along(myNumbers), 1000, labels = FALSE))
+chunks100 <- split(myNumbers, cut(seq_along(myNumbers), 100, labels = FALSE))
+chunks10 <- split(myNumbers, cut(seq_along(myNumbers), 10, labels = FALSE))
 
 # foreach with iter object to iterate of blocks of objects
 sumLog2_block <- foreach(i = iter(chunks1000), .combine = 'c') %dopar% sumLog3(i)
 sumLog2_block <- foreach(i = iter(chunks100), .combine = 'c') %dopar% sumLog3(i)
 sumLog2_block <- foreach(i = iter(chunks10), .combine = 'c') %dopar% sumLog3(i)
-sumLog2_block <- foreach(i = iter(chunks5), .combine = 'c') %dopar% sumLog3(i)
 ```
 
 *   Timing
@@ -571,55 +597,54 @@ sumLog2_block <- foreach(i = iter(chunks5), .combine = 'c') %dopar% sumLog3(i)
       foreach_blocks_1000 = foreach(i = iter(chunks1000), .combine = 'c') %dopar% sumLog3(i),
       foreach_blocks_100 = foreach(i = iter(chunks100), .combine = 'c') %dopar% sumLog3(i),
       foreach_blocks_10 = foreach(i = iter(chunks10), .combine = 'c') %dopar% sumLog3(i),
-      foreach_blocks_5 = foreach(i = iter(chunks5), .combine = 'c') %dopar% sumLog3(i),
-      times = 2, unit = 's'))[,c("expr","mean","median")]
+      times = 1, unit = 's'))[,c("expr","mean","median")]
     ```
 
 ## foreach example 2: Random Forests
 
 * A number of statistical/learning methods involve computational steps that can be done in parallel
 
-    + Random Forests, Gradient Boosting, Bootstrapping, Clustering, k-fold Cross-Validation
     
-```{r foreach-example2, cache = TRUE}
-# Random Forest Example
+    ```{r foreach-example2, cache = TRUE}
+    # Random Forest Example
 
-# Number of observations and predictor variables
-n <- 3000
-p <- 500
+    # Number of observations and predictor variables
+    n <- 3000
+    p <- 500
 
-# Predictor data simulated as MVN(0,sigma) with AR(1) correlation
-means_x <- rep(0,p)
-var_x <- 1
-rho <- 0.8
-sigma_x <- matrix(NA, nrow = p, ncol = p)
-for(i in 1:p){
-    for(j in 1:p){
-        sigma_x[i,j] <- var_x*rho^abs(i-j)
+    # Predictor data simulated as MVN(0,sigma) with AR(1) correlation
+    means_x <- rep(0,p)
+    var_x <- 1
+    rho <- 0.8
+    sigma_x <- matrix(NA, nrow = p, ncol = p)
+    for(i in 1:p){
+        for(j in 1:p){
+            sigma_x[i,j] <- var_x*rho^abs(i-j)
+        }
     }
-}
-X <- MASS::mvrnorm(n = n, mu = means_x, Sigma = sigma_x)
+    X <- MASS::mvrnorm(n = n, mu = means_x, Sigma = sigma_x)
 
-# Outcome is binary (two classes)
-y <- gl(2, 1500)
-```
+    # Outcome is binary (two classes)
+    y <- gl(2, 1500)
+    ```
 
 ## foreach example 2: Random Forests (cont.)
 
-```r
-rf <- randomForest(X, y, ntree = 500, nodesize = 3)
-
-rf_par <- foreach(ntree = rep(50, 10), .combine = combine, .packages = "randomForest") %dopar% {
-  randomForest(X, y, ntree = ntree, nodesize = 3)
-}
-```
-
 * Two changes in the call to `foreach`
+
+    ```r
+    rf <- randomForest(X, y, ntree = 500, nodesize = 3)
+
+    rf_par <- foreach(ntree = rep(50, 10), .combine = combine, .packages = "randomForest") %dopar% {
+        randomForest(X, y, ntree = ntree, nodesize = 3)
+    }
+    ```
 
     1. The 'randomForest' package has its own combine function that we can call with `.combine = combine`
     
     2. The `.packages` option is used to export the 'randomForest' package to all the cores
-    
+
+
 * In previous examples, we never explicitly export variables to the cores
     
     + By default, all objects in the current environment that are refenced in `foreach` are exported
@@ -628,18 +653,20 @@ rf_par <- foreach(ntree = rep(50, 10), .combine = combine, .packages = "randomFo
 
 * Timing
 
-```{r foreach-example2-cont-timing, cache = TRUE, echo = FALSE}
-library(randomForest)
-summary(microbenchmark::microbenchmark(
-    rf = randomForest(X, y, ntree = 500, nodesize = 3),
-    rf_parallel = foreach(ntree = rep(50, 10), .combine = combine, .packages = "randomForest") %dopar% {
-      randomForest(X, y, ntree = ntree, nodesize = 3)},
-    times = 1
-))[,c("expr","mean","median")]
+    ```{r, echo = FALSE}
+    suppressMessages(library(randomForest))
+    ```
 
-stopCluster(cl)
-```
-
+    ```{r foreach-example2-cont-timing, cache = TRUE, echo = FALSE}
+    summary(microbenchmark::microbenchmark(
+                rf = randomForest(X, y, ntree = 250, nodesize = 3),
+                rf_parallel = foreach(ntree = rep(50, 10), .combine = combine, .packages = "randomForest") %dopar% {
+                randomForest(X, y, ntree = ntree, nodesize = 3)},
+                times = 1)
+            )[,c("expr","mean","median")]
+    
+    stopCluster(cl)
+    ```
 
 
 ## RcppArmadillo and OpenMP
