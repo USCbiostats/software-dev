@@ -176,13 +176,11 @@ ans <- parSapply(cl, 1:2, function(x) runif(1e3))
 clusterSetRNGStream(cl, 123)
 ans1 <- var(parSapply(cl, 1:2, function(x) runif(1e3)))
 
-ans0 - ans1 # A matrix of zeros
+all.equal(ans0, ans1) # All equal!
 ```
 
 ```
-#      [,1] [,2]
-# [1,]    0    0
-# [2,]    0    0
+# [1] TRUE
 ```
 
 ```r
@@ -277,8 +275,8 @@ rbenchmark::benchmark(
 
 ```
 #       test replications elapsed relative
-# 1 parallel            1    0.47    1.000
-# 2   serial            1    1.39    2.957
+# 1 parallel            1   0.302    1.000
+# 2   serial            1   1.556    5.152
 ```
 
 
@@ -497,9 +495,9 @@ myNumbers <- sample(seq(1,20000), 5000)
     
     ```
     #      expr     mean   median
-    # 1 forloop 4.084628 4.084628
-    # 2  sapply 4.350735 4.350735
-    # 3 foreach 2.185781 2.185781
+    # 1 forloop 3.686336 3.686336
+    # 2  sapply 3.595314 3.595314
+    # 3 foreach 2.678469 2.678469
     ```
 
 *   Can we do better? In `sumLog()`, we use R loops to sum the sequence, what if we use the `log()` and `sum()` functions instead?
@@ -517,8 +515,8 @@ myNumbers <- sample(seq(1,20000), 5000)
     
     ```
     #              expr     mean   median
-    # 1  sapply_sumLog2 1.587161 1.587161
-    # 2 foreach_sumLog2 1.182589 1.182589
+    # 1  sapply_sumLog2 1.431586 1.431586
+    # 2 foreach_sumLog2 1.414736 1.414736
     ```
 
 *   The improvement in performance of `foreach` over `sapply` is not that large, why? 
@@ -602,10 +600,10 @@ myNumbers <- sample(seq(1,20000), 5000)
     ```
     
     ```
-    #             [,1]      [,2]       [,3]       [,4]
-    # [1,] 0.003147065 0.8202381 0.04666312 0.57934424
-    # [2,] 0.782405319 0.6782123 0.92710481 0.01614295
-    # [3,] 0.656852388 0.9828715 0.64867923 0.71503554
+    #           [,1]      [,2]        [,3]      [,4]
+    # [1,] 0.4978646 0.4623230 0.003147065 0.8202381
+    # [2,] 0.2206823 0.4972740 0.782405319 0.6782123
+    # [3,] 0.4412441 0.4354755 0.656852388 0.9828715
     ```
     
     ```r
@@ -613,10 +611,10 @@ myNumbers <- sample(seq(1,20000), 5000)
     ```
     
     ```
-    #             [,1]      [,2]       [,3]      [,4]
-    # [1,] 0.602049450 0.4287616 0.70046484 0.5623987
-    # [2,] 0.816525605 0.7960140 0.20744594 0.5521983
-    # [3,] 0.003589622 0.6741020 0.07346661 0.8416888
+    #            [,1]       [,2]        [,3]      [,4]
+    # [1,] 0.04666312 0.57934424 0.602049450 0.4287616
+    # [2,] 0.92710481 0.01614295 0.816525605 0.7960140
+    # [3,] 0.64867923 0.71503554 0.003589622 0.6741020
     ```
 
 ## An aside: Standardizing a Matrix
@@ -660,11 +658,11 @@ myNumbers <- sample(seq(1,20000), 5000)
 
     
     ```
-    #               expr       mean     median
-    # 1       noparallel  3.3448419  3.3448419
-    # 2   foreach_size_1 10.2813561 10.2813561
-    # 3 foreach_size_100  2.9852107  2.9852107
-    # 4   rcpp_armadillo  0.3807034  0.3807034
+    #               expr        mean      median
+    # 1       noparallel   3.0501885   3.0501885
+    # 2   foreach_size_1 218.7627853 218.7627853
+    # 3 foreach_size_100   3.9705817   3.9705817
+    # 4   rcpp_armadillo   0.3621105   0.3621105
     ```
 
 ## foreach example 1: More improvements to our previous problem
@@ -692,10 +690,10 @@ sumLog2_block <- foreach(i = iter(chunks10), .combine = 'c') %dopar% sumLog3(i)
     
     ```
     #                  expr      mean    median
-    # 1      sapply_sumlog2 1.5563548 1.5563548
-    # 2 foreach_blocks_1000 0.6058905 0.6058905
-    # 3  foreach_blocks_100 0.4407942 0.4407942
-    # 4   foreach_blocks_10 0.4996990 0.4996990
+    # 1      sapply_sumlog2 1.8069201 1.8069201
+    # 2 foreach_blocks_1000 0.8820639 0.8820639
+    # 3  foreach_blocks_100 0.6383977 0.6383977
+    # 4   foreach_blocks_10 0.6921709 0.6921709
     ```
 
 ## foreach example 2: Random Forests
@@ -757,8 +755,8 @@ sumLog2_block <- foreach(i = iter(chunks10), .combine = 'c') %dopar% sumLog3(i)
     
     ```
     #          expr     mean   median
-    # 1          rf 27.04903 27.04903
-    # 2 rf_parallel 19.84977 19.84977
+    # 1          rf 25.57701 25.57701
+    # 2 rf_parallel 18.62694 18.62694
     ```
 
 
@@ -895,10 +893,10 @@ rbenchmark::benchmark(
 
 ```
 #                      test replications elapsed relative
-# 3  dist_par(x, cores = 4)            1    1.58    1.000
-# 4 dist_par(x, cores = 10)            1    1.67    1.057
-# 2  dist_par(x, cores = 1)            1    3.11    1.968
-# 1                 dist(x)            1    7.59    4.804
+# 4 dist_par(x, cores = 10)            1   0.508    1.000
+# 3  dist_par(x, cores = 4)            1   1.225    2.411
+# 2  dist_par(x, cores = 1)            1   2.344    4.614
+# 1                 dist(x)            1   5.465   10.758
 ```
 
 
@@ -994,9 +992,9 @@ rbenchmark::benchmark(
 
 ```
 #   test replications elapsed relative
-# 1 pi01            1    4.78    1.081
-# 2 pi04            1    4.42    1.000
-# 3 pi10            1    4.43    1.002
+# 1 pi01            1   4.517    1.108
+# 2 pi04            1   4.227    1.037
+# 3 pi10            1   4.077    1.000
 ```
 
 No big speed gains... but at least you know how to use it now :)!
@@ -1006,25 +1004,27 @@ No big speed gains... but at least you know how to use it now :)!
 
 ```
 # R version 3.4.3 (2017-11-30)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 10 x64 (build 16299)
+# Platform: x86_64-redhat-linux-gnu (64-bit)
+# Running under: CentOS Linux 7 (Core)
 # 
 # Matrix products: default
+# BLAS/LAPACK: /usr/lib64/R/lib/libRblas.so
 # 
 # locale:
-# [1] LC_COLLATE=English_United States.1252 
-# [2] LC_CTYPE=English_United States.1252   
-# [3] LC_MONETARY=English_United States.1252
-# [4] LC_NUMERIC=C                          
-# [5] LC_TIME=English_United States.1252    
+#  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+#  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+#  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+# [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 # 
 # attached base packages:
 # [1] parallel  stats     graphics  grDevices utils     datasets  methods  
 # [8] base     
 # 
 # other attached packages:
-# [1] randomForest_4.6-12 doParallel_1.0.11   iterators_1.0.9    
-# [4] foreach_1.4.4      
+# [1] randomForest_4.6-12 doParallel_1.0.10   iterators_1.0.8    
+# [4] foreach_1.4.3      
 # 
 # loaded via a namespace (and not attached):
 #  [1] Rcpp_0.12.15     codetools_0.2-15 snow_0.4-2       digest_0.6.15   
