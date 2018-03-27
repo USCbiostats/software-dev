@@ -172,7 +172,7 @@ ans <- parSapply(cl, 1:2, function(x) runif(1e3))
 clusterSetRNGStream(cl, 123)
 ans1 <- var(parSapply(cl, 1:2, function(x) runif(1e3)))
 
-ans0 - ans1 # A matrix of zeros
+all.equal(ans0, ans1) # All equal!
 
 # 4. STOP THE CLUSTER
 stopCluster(cl)

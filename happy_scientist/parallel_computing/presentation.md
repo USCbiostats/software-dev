@@ -176,13 +176,11 @@ ans <- parSapply(cl, 1:2, function(x) runif(1e3))
 clusterSetRNGStream(cl, 123)
 ans1 <- var(parSapply(cl, 1:2, function(x) runif(1e3)))
 
-ans0 - ans1 # A matrix of zeros
+all.equal(ans0, ans1) # All equal!
 ```
 
 ```
-#      [,1] [,2]
-# [1,]    0    0
-# [2,]    0    0
+# [1] TRUE
 ```
 
 ```r
@@ -277,8 +275,13 @@ rbenchmark::benchmark(
 
 ```
 #       test replications elapsed relative
+<<<<<<< HEAD
 # 1 parallel            1    0.52    1.000
 # 2   serial            1    1.45    2.788
+=======
+# 1 parallel            1   0.302    1.000
+# 2   serial            1   1.556    5.152
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
 ```
 
 
@@ -565,8 +568,15 @@ stopCluster(cl)
     ```
     
     ```
+<<<<<<< HEAD
     #  [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144  0.5867664
     #  [7]  2.5357901 -0.7981109  1.6391797  2.3059299
+=======
+    #      expr     mean   median
+    # 1 forloop 3.686336 3.686336
+    # 2  sapply 3.595314 3.595314
+    # 3 foreach 2.678469 2.678469
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
     ```
 
 *   We can modify the previous code to run 10,000 bootstrap replicates and obtain an estimate of the standard error for the median
@@ -587,7 +597,30 @@ stopCluster(cl)
     ```
     
     ```
+<<<<<<< HEAD
     # [1] 1.820074
+=======
+    #              expr     mean   median
+    # 1  sapply_sumLog2 1.431586 1.431586
+    # 2 foreach_sumLog2 1.414736 1.414736
+    ```
+
+*   The improvement in performance of `foreach` over `sapply` is not that large, why? 
+    
+    *   Overhead due to data communication with the cores
+    
+    *   Use of `c` leads to a continual resizing of the results vector
+    
+    *   The operations being performed within threads are not computationally intensive
+
+## An aside: foreach + iterators
+
+*   The 'iterators' package provides tools for iterating over a number of different data types
+    
+    ```r
+    # General function to create an iterator
+    myIterator <- iter(object_to_iterate_over, by = "How to iterate over object")
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
     ```
     
     ```r
@@ -665,6 +698,19 @@ stopCluster(cl)
     boot_fun <- function(dat, idx, fmla) {
         coef(glm(fmla, data = dat[idx, ], family = binomial))
     }
+<<<<<<< HEAD
+=======
+    myMatrix <- matrix(runif(300), nrow = 3, ncol = 100)
+    splitMatrix <- iblkcol(myMatrix, 25)
+    splitMatrix()
+    ```
+    
+    ```
+    #           [,1]      [,2]        [,3]      [,4]
+    # [1,] 0.4978646 0.4623230 0.003147065 0.8202381
+    # [2,] 0.2206823 0.4972740 0.782405319 0.6782123
+    # [3,] 0.4412441 0.4354755 0.656852388 0.9828715
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
     ```
 
 *   The 'boot' package provides functions to easily apply our function across bootstrap replicates
@@ -676,6 +722,7 @@ stopCluster(cl)
     ```
     
     ```
+<<<<<<< HEAD
     # 
     # ORDINARY NONPARAMETRIC BOOTSTRAP
     # 
@@ -688,6 +735,12 @@ stopCluster(cl)
     #      original    bias    std. error
     # t1* 0.7985077 0.0395186   0.4309512
     # t2* 0.3646431 0.1520327   1.6066249
+=======
+    #            [,1]       [,2]        [,3]      [,4]
+    # [1,] 0.04666312 0.57934424 0.602049450 0.4287616
+    # [2,] 0.92710481 0.01614295 0.816525605 0.7960140
+    # [3,] 0.64867923 0.71503554 0.003589622 0.6741020
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
     ```
 
 
@@ -728,8 +781,16 @@ stopCluster(cl)
     ```
     
     ```
+<<<<<<< HEAD
     # (Intercept)         app 
     #   0.4349333   1.6874428
+=======
+    #               expr        mean      median
+    # 1       noparallel   3.0501885   3.0501885
+    # 2   foreach_size_1 218.7627853 218.7627853
+    # 3 foreach_size_100   3.9705817   3.9705817
+    # 4   rcpp_armadillo   0.3621105   0.3621105
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
     ```
 
 ## foreach Example: Bootstrapping (Logistic Regression)
@@ -751,9 +812,17 @@ stopCluster(cl)
     ```
     
     ```
+<<<<<<< HEAD
     #      expr      mean    median
     # 1    boot 16.099843 16.099843
     # 2 foreach  7.577051  7.577051
+=======
+    #                  expr      mean    median
+    # 1      sapply_sumlog2 1.8069201 1.8069201
+    # 2 foreach_blocks_1000 0.8820639 0.8820639
+    # 3  foreach_blocks_100 0.6383977 0.6383977
+    # 4   foreach_blocks_10 0.6921709 0.6921709
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
     ```
 
 
@@ -810,8 +879,13 @@ stopCluster(cl)
     
     ```
     #          expr     mean   median
+<<<<<<< HEAD
     # 1          rf 43.15325 43.15325
     # 2 rf_parallel 13.66006 13.66006
+=======
+    # 1          rf 25.57701 25.57701
+    # 2 rf_parallel 18.62694 18.62694
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
     ```
 
     
@@ -950,10 +1024,17 @@ rbenchmark::benchmark(
 
 ```
 #                      test replications elapsed relative
+<<<<<<< HEAD
 # 4 dist_par(x, cores = 10)            1    2.81    1.000
 # 3  dist_par(x, cores = 4)            1    3.82    1.359
 # 2  dist_par(x, cores = 1)            1    7.46    2.655
 # 1                 dist(x)            1    9.32    3.317
+=======
+# 4 dist_par(x, cores = 10)            1   0.508    1.000
+# 3  dist_par(x, cores = 4)            1   1.225    2.411
+# 2  dist_par(x, cores = 1)            1   2.344    4.614
+# 1                 dist(x)            1   5.465   10.758
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
 ```
 
 
@@ -1049,9 +1130,15 @@ rbenchmark::benchmark(
 
 ```
 #   test replications elapsed relative
+<<<<<<< HEAD
 # 1 pi01            1    5.08    1.142
 # 2 pi04            1    4.45    1.000
 # 3 pi10            1    4.52    1.016
+=======
+# 1 pi01            1   4.517    1.108
+# 2 pi04            1   4.227    1.037
+# 3 pi10            1   4.077    1.000
+>>>>>>> 10098ce572b4e2e67dfd16f81e800667b75309db
 ```
 
 No big speed gains... but at least you know how to use it now :)!
@@ -1061,25 +1148,27 @@ No big speed gains... but at least you know how to use it now :)!
 
 ```
 # R version 3.4.3 (2017-11-30)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 10 x64 (build 16299)
+# Platform: x86_64-redhat-linux-gnu (64-bit)
+# Running under: CentOS Linux 7 (Core)
 # 
 # Matrix products: default
+# BLAS/LAPACK: /usr/lib64/R/lib/libRblas.so
 # 
 # locale:
-# [1] LC_COLLATE=English_United States.1252 
-# [2] LC_CTYPE=English_United States.1252   
-# [3] LC_MONETARY=English_United States.1252
-# [4] LC_NUMERIC=C                          
-# [5] LC_TIME=English_United States.1252    
+#  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+#  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+#  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+# [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 # 
 # attached base packages:
 # [1] parallel  stats     graphics  grDevices utils     datasets  methods  
 # [8] base     
 # 
 # other attached packages:
-# [1] randomForest_4.6-12 doParallel_1.0.11   iterators_1.0.9    
-# [4] foreach_1.4.4      
+# [1] randomForest_4.6-12 doParallel_1.0.10   iterators_1.0.8    
+# [4] foreach_1.4.3      
 # 
 # loaded via a namespace (and not attached):
 #  [1] Rcpp_0.12.15     codetools_0.2-15 snow_0.4-2       digest_0.6.15   
