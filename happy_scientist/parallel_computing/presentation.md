@@ -1,5 +1,5 @@
 ---
-title: 'The "Happy Scientist" Semminar Series #5<br>A brief introduction to using R for high-performance computing'
+title: 'The "Happy Scientist" Seminar Series #5<br>A brief introduction to using R for high-performance computing'
 author: '<par><table style="text-align:center;width:100%"><tr><td>George Vega Yon</td><td>Garrett Weaver</td></tr><tr><td>vegayon@usc.edu</td><td>gmweaver@usc.edu</tb></tr></table></par>'
 output: 
   slidy_presentation:
@@ -277,8 +277,8 @@ rbenchmark::benchmark(
 
 ```
 #       test replications elapsed relative
-# 1 parallel            1    0.47    1.000
-# 2   serial            1    1.39    2.957
+# 1 parallel            1    0.52    1.000
+# 2   serial            1    1.45    2.788
 ```
 
 
@@ -295,26 +295,26 @@ stopCluster(cl)
 ```
 
 
-## The 'foreach' package
+## The 'foreach' Package
 
 *   The 'foreach' package provides a looping construct to execute R code repeatedly in parallel
 
-*   The general syntax of `foreach` looks very similar to a for loop
+*   The general syntax of `foreach` is similar to a standard for loop
     
     ```r
     # With parallelization --> %dopar%
     output <- foreach(i = 'some object to iterate over', 'options') %dopar% {some r code}
-    
     # Without parallelization --> %do%
     output <- foreach(i = 'some object to iterate over', 'options') %do% {some r code}
     ```
 
-*   As a first example, we can use `foreach` just like a for loop without parallelization
+*   As a first example, we use `foreach` without parallelization
+
+    
     
     
     ```r
-    library(foreach)
-    result <- foreach(x = c(4, 9, 16)) %do% sqrt(x)
+    result <- foreach(x = c(4, 9, 16, 25)) %do% sqrt(x)
     result
     ```
     
@@ -327,224 +327,147 @@ stopCluster(cl)
     # 
     # [[3]]
     # [1] 4
+    # 
+    # [[4]]
+    # [1] 5
     ```
 
-* Note that `%do%` and `%dopar%` act like any other operators and can be equivalently called as `'%do%'(obj, expr)` and `'%dopar%'(obj, expr)`
-
-## The 'foreach' package
-
-*   Unlike a for loop, `foreach` returns an object (by default a list) that contains the results compiled across all iterations
-
+* The default object returned is a list that contains the individual results compiled across all iterations
     
     ```r
-    result <- foreach(x = c(4, 9, 16)) %do% sqrt(x)
     class(result)
     ```
     
     ```
     # [1] "list"
     ```
-    
-*   We can change the object returned by specifying the function used to combine results across iterations with the '.combine' option
-    
-    
-    ```r
-    # Create a vector of the results
-    foreach(x = c(4, 9, 16), .combine = 'c') %do% sqrt(x)
-    ```
-    
-    ```
-    # [1] 2 3 4
-    ```
-    
-    ```r
-    # Add the results
-    foreach(x = c(4, 9, 16), .combine = '+') %do% x
-    ```
-    
-    ```
-    # [1] 29
-    ```
-    
-    ```r
-    # Custom combine that is tracking a running product
-    customCombine <- function(i,j){
-      if (length(i) < 2){
-        c(i,j)
-      } else {
-        c(i, i[length(i)]*j)
-      }
-    }
-    foreach(x = c(4, 9, 16), .combine = customCombine) %do% x
-    ```
-    
-    ```
-    # [1]   4   9 144
-    ```
-    
-    
 
-## Parallel Execution with 'foreach'
 
-* The steps to setup the cluster and use `foreach` in parallel are similar to the 'parallel' package  
+## Setting Up Parallel Execution With 'foreach'
 
-  1. Create the cluster
-      
+* The steps to create the parallel backend are similar to the 'parallel' package
+
+1. Create and register the cluster with the 'doParallel' package
+    * Method 1: `makeCluster` + `registerDoParallel`
     ```r
-    myCluster <- makeCluster(# of Cores to Use, type = "SOCK or FORK")
-    ```
-
-  2. Register the cluster with the 'foreach' package
-      
-    ```r
+    # Create cluster
+    myCluster <- makeCluster("# of cores", type = "SOCK" or "FORK")
+    # Register cluster
     registerDoParallel(myCluster)
-    registerDoSNOW(myCluster)
     ```
-
-  3. To use the cluster with `foreach`, we only have to change %do% to %dopar%
-    
+    * Method 2: `registerDoParallel` + `cores = ` option
     ```r
-    output <- foreach(i = 'some object to iterate over', 'options') %dopar% {some r code}
+    # Create and register cluster
+    registerDoParallel(cores = "# of cores")
     ```
-    
-  4. Stop cluster when you have finished
 
+3. Use `foreach` with %dopar%
+    ```r
+    result <- foreach(x = c(4, 9, 16, 25)) %dopar% sqrt(x)
+    ```
+
+4. Stop the cluster (only required if you used Method 1 above)
     ```r
     stopCluster(myCluster)
     ```
 
-## foreach example 1: Summing up numbers
+* By default, Method 2 will create a SOCK cluster on Windows systems and a FORK cluster on Unix systems
 
-*   Below is a function that computes the log of each element in a sequence of numbers from 1 to x and returns the sum of the new sequence
+* `getDoParWorkers()` can be used to verify the number of workers (cores)
+
+## The 'foreach' Package: Combining Results
+
+*   We can change the function used to combine results with the `.combine` option
+
+    
     
     
     ```r
-    sumLog <- function(x){
-      sum <- 0
-      for(i in seq.int(1, x)){
-        sum <- sum + log(i)
-      }
-      sum
+    # Combine the results in a vector
+    foreach(x = c(4, 9, 16, 25), .combine = 'c') %dopar% sqrt(x)
+    ```
+    
+    ```
+    # [1] 2 3 4 5
+    ```
+
+    
+    ```r
+    # Add the results together
+    foreach(x = rep(10, 6), .combine = '/') %dopar% x
+    ```
+    
+    ```
+    # [1] 1e-04
+    ```
+    
+*   By default, `.combine` assumes that the function accepts two arguments (except for `c`, `cbind`, `rbind`)
+
+    
+    ```r
+    # Custom combine that creates a running product
+    customCombine <- function(i, j) {
+      c(i, i[length(i)] * j)
     }
-    sumLog(3)
+    foreach(x = c(2, 4, 6, 8, 10), .combine = customCombine) %dopar% x
     ```
     
     ```
-    # [1] 1.791759
+    # [1]    2    8   48  384 3840
     ```
+
+*   `.multicombine = TRUE` specifies that our combine function can accept more than two arguments
+
+*   `.maxcombine` sets the max number of arguments that can be passed to the combine function
+
     
+
+## foreach + iterators
+
+*   The 'iterators' package provides functions to generate: "A special type of object that supplies data on demand, one element at a time."
+
+*   `iter()` is a generic function to create iterators over common R objects (vector,  list,  data frame)
     ```r
-    log(1) + log(2) + log(3)
+    myIterator <- iter(object_to_iterate_over, by = "How to iterate over object", checkFunc = "optional function", recycle = FALSE)
     ```
+*   Example:  A simple vector iterator over odd integers
+
     
-    ```
-    # [1] 1.791759
-    ```
 
-*   You have been asked to find the fastest way to use this function on a large list of values
-
-*   Let's say 5,000 integers randomly selected from the range {0, 1,..., 20,000}
-
-## foreach example 1: Summing up numbers (cont.)
-
-
-
-
-
-```r
-# Sample 5000 integers from the range 1 - 20,000
-myNumbers <- sample(seq(1,20000), 5000)
-```
-
-*   First Attempt: Use a for loop
 
     
     ```r
-    seqTest1 <- function(numbers){
-      out <- vector("numeric", length = length(numbers))
-      for(i in seq.int(1, length(numbers))){
-        out[i] <- sumLog(myNumbers[i])
-      }
-      out
-    }
-    test1 <- seqTest1(myNumbers)
+    vector_iterator <- iter(1:4, checkFunc = function(x) x %% 2 != 0)
     ```
 
-*   Second Attempt: Use `sapply()`
 
     
     ```r
-    test2 <- sapply(myNumbers, sumLog)
+    str(vector_iterator)
+    ```
+    
+    ```
+    # List of 4
+    #  $ state    :<environment: 0x000000001a0c1720> 
+    #  $ length   : int 4
+    #  $ checkFunc:function (x)  
+    #   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 1 42 1 64 42 64 1 1
+    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x000000001a050d20> 
+    #  $ recycle  : logi FALSE
+    #  - attr(*, "class")= chr [1:2] "containeriter" "iter"
+    ```
+    
+    ```r
+    vector_iterator$state$obj
+    ```
+    
+    ```
+    # [1] 1 2 3 4
     ```
 
-*   Third Attempt: Use `foreach()`
 
     
     ```r
-    cl <- makeCluster(10, type = "SOCK")
-    registerDoParallel(cl)
-    test3 <- foreach(i = 1:length(myNumbers), .maxcombine = length(myNumbers),.combine = 'c') %dopar% sumLog(myNumbers[i])
-    stopCluster(cl)
-    ```
-
-
-## foreach example 1: Summing up numbers (cont.)
-
-*   Timing
-
-    
-
-    
-    ```
-    #      expr     mean   median
-    # 1 forloop 4.084628 4.084628
-    # 2  sapply 4.350735 4.350735
-    # 3 foreach 2.185781 2.185781
-    ```
-
-*   Can we do better? In `sumLog()`, we use R loops to sum the sequence, what if we use the `log()` and `sum()` functions instead?
-    
-    
-    ```r
-    sumLog2 <- function(x){
-      sum(log(seq.int(1,x)))
-    }
-    
-    sapply_sumLog2 <- sapply(myNumbers, sumLog2)
-    foreach_sumLog2 <- foreach(i = 1:length(myNumbers), .combine = 'c') %dopar% sumLog2(i)
-    ```
-
-    
-    ```
-    #              expr     mean   median
-    # 1  sapply_sumLog2 1.587161 1.587161
-    # 2 foreach_sumLog2 1.182589 1.182589
-    ```
-
-*   The improvement in performance of `foreach` over `sapply` is not that large, why? 
-    
-    *   Overhead due to data communication with the cores
-    
-    *   Use of `c` leads to a continual resizing of the results vector
-    
-    *   The operations being performed within threads are not computationally intensive
-
-## An aside: foreach + iterators
-
-*   The 'iterators' package provides tools for iterating over a number of different data types
-    
-    ```r
-    # General function to create an iterator
-    myIterator <- iter(object_to_iterate_over, by = "How to iterate over object")
-    ```
-    
-*   `foreach` transforms the object you want to iterate over into an object of class "iter"
-
-*   Example: A simple vector iterator
-
-    
-    ```r
-    vector_iterator <- iter(1:4)
     nextElem(vector_iterator)
     ```
     
@@ -557,36 +480,20 @@ myNumbers <- sample(seq(1,20000), 5000)
     ```
     
     ```
-    # [1] 2
-    ```
-    
-    ```r
-    nextElem(vector_iterator)
-    ```
-    
-    ```
     # [1] 3
     ```
-    
-    ```r
-    nextElem(vector_iterator)
-    ```
-    
-    ```
-    # [1] 4
-    ```
 
-## An aside: foreach + iterators (cont.)
 
-*   Example 2: An iterator that traverses over blocks of columns of a matrix
+## foreach + iterators: Creating An Iterator
+
+*   An iterator that traverses over blocks of columns of a matrix
 
     
     ```r
-    # Iterator function that traverses over blocks of columns of a matrix
     iblkcol <- function(mat, num_blocks) {  
       nc <- ncol(mat)
       i <- 1
-      nextElem <- function() {
+      next_element <- function() {
         if (num_blocks <= 0 || nc <= 0) stop('StopIteration')
         block_size <- ceiling(nc / num_blocks)
         col_idx <- seq(i, length = block_size)
@@ -595,124 +502,278 @@ myNumbers <- sample(seq(1,20000), 5000)
         num_blocks <<- num_blocks - 1
         mat[, col_idx, drop=FALSE]
       }
+      itr <- list(nextElem = next_element)
+      class(itr) <- c('iblkcol', 'abstractiter', 'iter')
+      itr
     }
-    myMatrix <- matrix(runif(300), nrow = 3, ncol = 100)
-    splitMatrix <- iblkcol(myMatrix, 25)
-    splitMatrix()
+    myMatrix <- matrix(runif(200), nrow = 2, ncol = 100)
+    splitMatrix <- iblkcol(myMatrix, num_blocks = 25)
+    nextElem(splitMatrix)
     ```
     
     ```
-    #             [,1]      [,2]       [,3]       [,4]
-    # [1,] 0.003147065 0.8202381 0.04666312 0.57934424
-    # [2,] 0.782405319 0.6782123 0.92710481 0.01614295
-    # [3,] 0.656852388 0.9828715 0.64867923 0.71503554
+    #           [,1]       [,2]       [,3]      [,4]
+    # [1,] 0.8045434 0.72741801 0.08226454 0.5665807
+    # [2,] 0.9651406 0.01187498 0.85304835 0.4813925
     ```
     
     ```r
-    splitMatrix()
+    myMatrix[, 1:4]
     ```
     
     ```
-    #             [,1]      [,2]       [,3]      [,4]
-    # [1,] 0.602049450 0.4287616 0.70046484 0.5623987
-    # [2,] 0.816525605 0.7960140 0.20744594 0.5521983
-    # [3,] 0.003589622 0.6741020 0.07346661 0.8416888
+    #           [,1]       [,2]       [,3]      [,4]
+    # [1,] 0.8045434 0.72741801 0.08226454 0.5665807
+    # [2,] 0.9651406 0.01187498 0.85304835 0.4813925
     ```
 
-## An aside: Standardizing a Matrix
+## foreach Example: Bootstrapping
 
-* Using foreach + iter
-
+*   Bootstrapping (Efron, 1979) uses the sample to learn about the sampling distribution of a statistic
+    *   "The population is to the sample as the sample is to the bootstrap samples"
+*   Nonparametric bootstrap
+    *   To learn about characteristics of the sample, we sample (with replacement) from the original sample
+    *   Useful in scenarios where we do not want to assume a particular distribution for the statistic
+*   Example pseudocode for a simple bootstrap to estimate the standard error for a sample statistic
+    
     ```r
-    # Generate matrix with random values
-    randomMatrix <- matrix(runif(5e7), ncol = 1e4)
+    # vector to hold estimates across bootstrap samples
+    est <- vector(mode = "numeric", length = Num_Bootstrap_Samples)
     
-    # Without foreach
-    scale_noparallel <- scale(randomMatrix)
-    
-    # With foreach, different blocks of columns
-    scale_size_1 <- foreach(x = iter(randomMatrix, by = 'col'), .combine = 'cbind') %dopar% scale(x)
-    foreach_size_100 <- foreach(x = iter(randomMatrix, by = "col", chunksize = 100), .combine = 'cbind') %dopar% scale(x)
+    for (i in 1:Num_Bootstrap_Samples) {
+        
+        # Sample with replacement from original data (bootstrap sample size same as original data)
+        boot_sample <- sample(1:n, n, replace = TRUE)
+            
+        # Compute statistic in bootstrap sample using some function g()
+        est[i] <- g(dat[boot_sample])
+    }
+        
+    # Compute standard error of estimate based on bootstrap sample statistics
+    se_est <- sd(est)
     ```
-* Another option (bonus): Rcpp + Armadillo
+
+## foreach Example: Bootstrapping (Estimating a Median)
+
+*   Suppose we have the following small sample of 10 observations for which we want to estimate the sample median
 
     
-    ```cpp
-    #include <RcppArmadillo.h>
-    // [[Rcpp::depends(RcppArmadillo)]]
-    // [[Rcpp::export]]
-    arma::mat standardize_data(const arma::mat & x) {
-        arma::mat xnew(x.n_rows, x.n_cols);
-        arma::vec w(x.n_rows);
-        w.fill(1.0 / x.n_rows);
-        for (unsigned int j = 0; j < x.n_cols; ++j) {
-            double xm = arma::dot(w, x.unsafe_col(j));
-            double xs = sqrt((arma::dot(x.unsafe_col(j) - xm, (x.unsafe_col(j) - xm) % w)) * x.n_rows / (x.n_rows - 1));
-            xnew.col(j) = (x.unsafe_col(j) - xm) / xs;
-        }
-        return(xnew);
+    ```r
+    set.seed(123)
+    dat <- rnorm(n = 10, mean = 2.3, sd = 1.5)
+    dat
+    ```
+    
+    ```
+    #  [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144  0.5867664
+    #  [7]  2.5357901 -0.7981109  1.6391797  2.3059299
+    ```
+
+*   We can modify the previous code to run 10,000 bootstrap replicates and obtain an estimate of the standard error for the median
+    
+    ```r
+    # vector to hold estimates across bootstrap samples
+    n <- length(dat)
+    num_reps <- 10000
+    median_est <- vector(mode = "numeric", length = num_reps)
+    for (i in 1:num_reps) {
+        # Sample with replacement from original data (bootstrap sample size same as original data)
+        boot_sample <- sample(1:n, n, replace = TRUE)
+        # Compute statistic in bootstrap sample
+        median_est[i] <- median(dat[boot_sample])
+    }
+    # Compute mean and standard error of median estimate based on bootstrap sample statistics
+    mean(median_est)
+    ```
+    
+    ```
+    # [1] 1.820074
+    ```
+    
+    ```r
+    sd(median_est)
+    ```
+    
+    ```
+    # [1] 0.7335949
+    ```
+
+## foreach Example: Bootstrapping (Estimating a Median)
+
+*   To use 'foreach', the loop is very similar
+
+
+
+    
+    ```r
+    median_est_fe <- foreach(i = seq.int(num_reps), .combine = c) %dopar% {
+        boot_sample <- sample(1:n, n, replace = TRUE)
+        median(dat[boot_sample])
+    }
+    mean(median_est_fe)
+    ```
+    
+    ```
+    # [1] 1.824205
+    ```
+    
+    ```r
+    sd(median_est_fe)
+    ```
+    
+    ```
+    # [1] 0.7166544
+    ```
+
+*   Timing
+    
+    ```r
+    summary(microbenchmark::microbenchmark(
+            for_loop = for (i in 1:num_reps) {
+                                boot_sample <- sample(1:n, n, replace = TRUE)
+                                median_est[i] <- median(dat[boot_sample])
+                        },
+            foreach = foreach(i = seq.int(num_reps), .combine = c) %dopar% {
+                            boot_sample <- sample(1:n, n, replace = TRUE)
+                            median(dat[boot_sample])
+                      },
+            times = 1)
+        )[,c("expr","mean","median")]
+    ```
+    
+    ```
+    #       expr      mean    median
+    # 1 for_loop  413.5951  413.5951
+    # 2  foreach 2468.3255 2468.3255
+    ```
+
+
+
+
+## foreach Example: Bootstrapping (Logistic Regression)
+
+*   We can use the data set 'bacteria' from the 'MASS' package to analyze the association between bacteria presence and treatment (drug vs. placebo) 
+*   To simplify the example, we sample both the outcome and predictors (i.e. case resampling)
+
+    
+    ```r
+    library(boot)
+    # get last observation point for each person (i.e. last time point tested for bacteria)
+    bact <- MASS::bacteria
+    bact <- do.call(rbind, by(bact, bact$ID, function(x) x[which.max(x$week), ]))
+    # function to compute coefficents
+    boot_fun <- function(dat, idx, fmla) {
+        coef(glm(fmla, data = dat[idx, ], family = binomial))
     }
     ```
 
+*   The 'boot' package provides functions to easily apply our function across bootstrap replicates
+
+    
+    ```r
+    set.seed(123)
+    boot(bact, boot_fun, R = 10000, fmla = as.formula("y ~ ap"))
+    ```
+    
+    ```
+    # 
+    # ORDINARY NONPARAMETRIC BOOTSTRAP
+    # 
+    # 
+    # Call:
+    # boot(data = bact, statistic = boot_fun, R = 10000, fmla = as.formula("y ~ ap"))
+    # 
+    # 
+    # Bootstrap Statistics :
+    #      original    bias    std. error
+    # t1* 0.7985077 0.0395186   0.4309512
+    # t2* 0.3646431 0.1520327   1.6066249
+    ```
+
+
+## foreach Example: Bootstrapping (Logistic Regression)
+
+*   We can replicate the results from 'boot' with 'foreach'
+    
+    ```r
+    set.seed(123)
+    n <- nrow(bact)
+    # generate bootstrap sample indices
+    indices <- sample.int(n, n * 10000, replace = TRUE)
+    dim(indices) <- c(10000, n)
+    # fit all bootstrap logistic regression models and extract coefficients into a matrix
+    registerDoParallel(cores = 4)
+    results_foreach <- foreach(x = iter(indices, by = 'row'), .combine = cbind, .inorder = FALSE) %dopar% {
+        coef(glm(y ~ ap, data = bact[x, ], family = binomial))
+    }
+    # standard error estimates
+    apply(results_foreach, 1, sd)
+    ```
+    
+    ```
+    # (Intercept)         app 
+    #   0.4309512   1.6066249
+    ```
+
+*   The 'doRNG' package allows us to easily handle random number generation (uses "L'Ecuyer-CMRG")
+    
+    ```r
+    library(doRNG)
+    registerDoParallel(cores = 4)
+    results_foreach <- foreach(i = seq.int(10000), .combine = cbind, .inorder = FALSE) %dorng% {
+        boot_samp <- sample.int(n, n, replace = TRUE)
+        coef(glm(y ~ ap, data = bact[boot_samp, ], family = binomial))
+    }
+    apply(results_foreach, 1, sd)
+    ```
+    
+    ```
+    # (Intercept)         app 
+    #   0.4349333   1.6874428
+    ```
+
+## foreach Example: Bootstrapping (Logistic Regression)
+
 *   Timing
 
-
+    
 
     
+    ```r
+    summary(microbenchmark::microbenchmark(
+            boot = boot::boot(bact, boot_fun, R = 10000, fmla = as.formula("y ~ ap")),
+            foreach = foreach(i = seq.int(10000), .combine = cbind, .inorder = FALSE) %dopar% {
+                                boot_samp <- sample.int(n, n, replace = TRUE)
+                                coef(glm(y ~ ap, data = bact[boot_samp, ], family = binomial))
+                      },
+            times = 1, unit = 's')
+        )[,c("expr","mean","median")]
     ```
-    #               expr       mean     median
-    # 1       noparallel  3.3448419  3.3448419
-    # 2   foreach_size_1 10.2813561 10.2813561
-    # 3 foreach_size_100  2.9852107  2.9852107
-    # 4   rcpp_armadillo  0.3807034  0.3807034
-    ```
-
-## foreach example 1: More improvements to our previous problem
-
-
-```r
-# New function to compute sum(log(seq)) for a vector of x values
-sumLog3 <- function(x){
-  sapply(x, sumLog2)
-}
-
-# Create blocks of numbers 
-chunks1000 <- split(myNumbers, cut(seq_along(myNumbers), 1000, labels = FALSE))
-chunks100 <- split(myNumbers, cut(seq_along(myNumbers), 100, labels = FALSE))
-chunks10 <- split(myNumbers, cut(seq_along(myNumbers), 10, labels = FALSE))
-
-# foreach with iter object to iterate of blocks of objects
-sumLog2_block <- foreach(i = iter(chunks1000), .combine = 'c') %dopar% sumLog3(i)
-sumLog2_block <- foreach(i = iter(chunks100), .combine = 'c') %dopar% sumLog3(i)
-sumLog2_block <- foreach(i = iter(chunks10), .combine = 'c') %dopar% sumLog3(i)
-```
-
-*   Timing
-    
     
     ```
-    #                  expr      mean    median
-    # 1      sapply_sumlog2 1.5563548 1.5563548
-    # 2 foreach_blocks_1000 0.6058905 0.6058905
-    # 3  foreach_blocks_100 0.4407942 0.4407942
-    # 4   foreach_blocks_10 0.4996990 0.4996990
+    #      expr      mean    median
+    # 1    boot 16.099843 16.099843
+    # 2 foreach  7.577051  7.577051
     ```
+
 
 ## foreach example 2: Random Forests
 
-* A number of statistical/learning methods involve computational steps that can be done in parallel
-
-    
+*   A number of statistical/learning methods involve computational steps that can be done in parallel
+*   Random forests, an ensemble method that involves generating a large number of decision trees, is one such example
+    *   Each tree is generated based on a bootstrap sample from the original sample
+    *   Within each tree, each node/split of a decision tree is based on a random subset of variables (features)
+*   Below we generate two classes and a set of potential predictors
     
     ```r
     # Random Forest Example
     
     # Number of observations and predictor variables
-    n <- 3000
+    n <- 1500
     p <- 500
     
     # Predictor data simulated as MVN(0,sigma) with AR(1) correlation
-    means_x <- rep(0,p)
+    means_x <- rep(0, p)
     var_x <- 1
     rho <- 0.8
     sigma_x <- matrix(NA, nrow = p, ncol = p)
@@ -724,42 +785,36 @@ sumLog2_block <- foreach(i = iter(chunks10), .combine = 'c') %dopar% sumLog3(i)
     X <- MASS::mvrnorm(n = n, mu = means_x, Sigma = sigma_x)
     
     # Outcome is binary (two classes)
-    y <- gl(2, 1500)
+    y <- gl(2, 750)
     ```
 
 ## foreach example 2: Random Forests (cont.)
 
-* Two changes in the call to `foreach`
-
+*   Two changes in the call to `foreach`
+    
     ```r
-    rf <- randomForest(X, y, ntree = 500, nodesize = 3)
-
-    rf_par <- foreach(ntree = rep(50, 10), .combine = combine, .packages = "randomForest") %dopar% {
+    rf <- randomForest(X, y, ntree = 1000, nodesize = 3)
+    
+    rf_par <- foreach(ntree = rep(250, 4), .combine = combine, .packages = "randomForest") %dopar% {
         randomForest(X, y, ntree = ntree, nodesize = 3)
     }
     ```
-
-    1. The 'randomForest' package has its own combine function that we can call with `.combine = combine`
-    
-    2. The `.packages` option is used to export the 'randomForest' package to all the cores
-
-
-* In previous examples, we never explicitly export variables to the cores
-    
-    + By default, all objects in the current environment that are refenced in `foreach` are exported
-    
-    + '.export' and '.noexport' can be used to control which objects are exported
-
-* Timing
-
+    *   The 'randomForest' package has its own combine function that we can call with `.combine = combine`
+    *   The `.packages` option is used to export the 'randomForest' package to all the cores
+*   In the previous examples, we never explicitly export variables to the cores
+    *   By default, all objects in the current environment that are refenced in `foreach` are exported
+    *   '.export' and '.noexport' can be used to control which objects are exported
+*   Timing
     
 
     
     ```
     #          expr     mean   median
-    # 1          rf 27.04903 27.04903
-    # 2 rf_parallel 19.84977 19.84977
+    # 1          rf 43.15325 43.15325
+    # 2 rf_parallel 13.66006 13.66006
     ```
+
+    
 
 
 ## RcppArmadillo and OpenMP
@@ -895,10 +950,10 @@ rbenchmark::benchmark(
 
 ```
 #                      test replications elapsed relative
-# 3  dist_par(x, cores = 4)            1    1.58    1.000
-# 4 dist_par(x, cores = 10)            1    1.67    1.057
-# 2  dist_par(x, cores = 1)            1    3.11    1.968
-# 1                 dist(x)            1    7.59    4.804
+# 4 dist_par(x, cores = 10)            1    2.81    1.000
+# 3  dist_par(x, cores = 4)            1    3.82    1.359
+# 2  dist_par(x, cores = 1)            1    7.46    2.655
+# 1                 dist(x)            1    9.32    3.317
 ```
 
 
@@ -994,9 +1049,9 @@ rbenchmark::benchmark(
 
 ```
 #   test replications elapsed relative
-# 1 pi01            1    4.78    1.081
-# 2 pi04            1    4.42    1.000
-# 3 pi10            1    4.43    1.002
+# 1 pi01            1    5.08    1.142
+# 2 pi04            1    4.45    1.000
+# 3 pi10            1    4.52    1.016
 ```
 
 No big speed gains... but at least you know how to use it now :)!
