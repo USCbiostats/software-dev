@@ -275,8 +275,8 @@ rbenchmark::benchmark(
 
 ```
 #       test replications elapsed relative
-# 1 parallel            1    0.52    1.000
-# 2   serial            1    1.45    2.788
+# 1 parallel            1    0.50      1.0
+# 2   serial            1    1.35      2.7
 ```
 
 
@@ -349,7 +349,7 @@ stopCluster(cl)
     * Method 1: `makeCluster` + `registerDoParallel`
     ```r
     # Create cluster
-    myCluster <- makeCluster("# of cores", type = "SOCK" or "FORK")
+    myCluster <- makeCluster("# of cores", type = "PSOCK" or "FORK")
     # Register cluster
     registerDoParallel(myCluster)
     ```
@@ -369,13 +369,15 @@ stopCluster(cl)
     stopCluster(myCluster)
     ```
 
-* By default, Method 2 will create a SOCK cluster on Windows systems and a FORK cluster on Unix systems
+*   By default, Method 2 will create a SOCK cluster on Windows systems and a FORK cluster on Unix systems
 
-* `getDoParWorkers()` can be used to verify the number of workers (cores)
+*   `getDoParWorkers()` can be used to verify the number of workers (cores)
+
+*   With some extra work and packages (Rmpi, doMPI), we can also use an MPI backend to enable parallelization on multiple nodes
 
 ## The 'foreach' Package: Combining Results
 
-*   We can change the function used to combine results with the `.combine` option
+*   The `.combine` option is used to specify the function used to combine results
 
     
     
@@ -392,11 +394,11 @@ stopCluster(cl)
     
     ```r
     # Add the results together
-    foreach(x = rep(10, 6), .combine = '/') %dopar% x
+    foreach(x = c(4, 9, 16, 25), .combine = '+') %dopar% x
     ```
     
     ```
-    # [1] 1e-04
+    # [1] 54
     ```
     
 *   By default, `.combine` assumes that the function accepts two arguments (except for `c`, `cbind`, `rbind`)
@@ -405,9 +407,17 @@ stopCluster(cl)
     ```r
     # Custom combine that creates a running product
     customCombine <- function(i, j) {
-      c(i, i[length(i)] * j)
+        cat(i, "\n")
+        c(i, i[length(i)] * j)
     }
     foreach(x = c(2, 4, 6, 8, 10), .combine = customCombine) %dopar% x
+    ```
+    
+    ```
+    # 2 
+    # 2 8 
+    # 2 8 48 
+    # 2 8 48 384
     ```
     
     ```
@@ -435,7 +445,7 @@ stopCluster(cl)
 
     
     ```r
-    vector_iterator <- iter(1:4, checkFunc = function(x) x %% 2 != 0)
+    vector_iterator <- iter(c(5, 10, 15, 20), checkFunc = function(x) x %% 2 != 0)
     ```
 
 
@@ -446,39 +456,39 @@ stopCluster(cl)
     
     ```
     # List of 4
-    #  $ state    :<environment: 0x000000001a1a7728> 
+    #  $ state    :<environment: 0x000000001a331e08> 
     #  $ length   : int 4
     #  $ checkFunc:function (x)  
-    #   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 1 42 1 64 42 64 1 1
-    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x000000001a133390> 
+    #   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
+    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x000000001a0f9218> 
     #  $ recycle  : logi FALSE
     #  - attr(*, "class")= chr [1:2] "containeriter" "iter"
     ```
     
     ```r
-    vector_iterator$state$obj
+    cat("obj:", vector_iterator$state$obj, " i:", vector_iterator$state$i, "\n")
     ```
     
     ```
-    # [1] 1 2 3 4
+    # obj: 5 10 15 20  i: 0
     ```
 
 
     
     ```r
-    nextElem(vector_iterator)
+    cat("current element:", nextElem(vector_iterator), " i:", vector_iterator$state$i, "\n")
     ```
     
     ```
-    # [1] 1
+    # current element: 5  i: 1
     ```
     
     ```r
-    nextElem(vector_iterator)
+    cat("current element:", nextElem(vector_iterator), " i:", vector_iterator$state$i, "\n")
     ```
     
     ```
-    # [1] 3
+    # current element: 15  i: 3
     ```
 
 
@@ -488,21 +498,24 @@ stopCluster(cl)
 
     
     ```r
-    iblkcol <- function(mat, num_blocks) {  
-      nc <- ncol(mat)
-      i <- 1
-      next_element <- function() {
-        if (num_blocks <= 0 || nc <= 0) stop('StopIteration')
-        block_size <- ceiling(nc / num_blocks)
-        col_idx <- seq(i, length = block_size)
-        i <<- i + block_size
-        nc <<- nc - block_size
-        num_blocks <<- num_blocks - 1
-        mat[, col_idx, drop=FALSE]
-      }
-      itr <- list(nextElem = next_element)
-      class(itr) <- c('iblkcol', 'abstractiter', 'iter')
-      itr
+    iblkcol <- function(mat, num_blocks) {
+        # initialize variables to hold num of cols and current col index
+        nc <- ncol(mat)
+        i <- 1
+        # define nextElem function 
+        next_element <- function() {
+            if (num_blocks <= 0 || nc <= 0) stop('StopIteration') # stop when we have no more columns
+            block_size <- ceiling(nc / num_blocks)                # determine block size
+            col_idx <- seq(i, length = block_size)                # get indices
+            i <<- i + block_size                                  # update current col index
+            nc <<- nc - block_size                                # update num cols remaining
+            num_blocks <<- num_blocks - 1                         # update num blocks remaining
+            mat[, col_idx, drop = FALSE]                          # return next set of columns
+        }
+        # output list element with necessary class definitions
+        itr <- list(nextElem = next_element)
+        class(itr) <- c('iblkcol', 'abstractiter', 'iter')
+        itr
     }
     myMatrix <- matrix(runif(200), nrow = 2, ncol = 100)
     splitMatrix <- iblkcol(myMatrix, num_blocks = 25)
@@ -510,20 +523,12 @@ stopCluster(cl)
     ```
     
     ```
-    #           [,1]       [,2]       [,3]      [,4]
-    # [1,] 0.8045434 0.72741801 0.08226454 0.5665807
-    # [2,] 0.9651406 0.01187498 0.85304835 0.4813925
+    #           [,1]      [,2]       [,3]      [,4]
+    # [1,] 0.1090886 0.9651406 0.01187498 0.8530483
+    # [2,] 0.8045434 0.7274180 0.08226454 0.5665807
     ```
-    
-    ```r
-    myMatrix[, 1:4]
-    ```
-    
-    ```
-    #           [,1]       [,2]       [,3]      [,4]
-    # [1,] 0.8045434 0.72741801 0.08226454 0.5665807
-    # [2,] 0.9651406 0.01187498 0.85304835 0.4813925
-    ```
+
+* Note: The nextElem() function in splitMatrix is an example of a closure (encloses the environment of its parent function) 
 
 ## foreach Example: Bootstrapping
 
@@ -547,7 +552,7 @@ stopCluster(cl)
         est[i] <- g(dat[boot_sample])
     }
         
-    # Compute standard error of estimate based on bootstrap sample statistics
+    # Compute standard error of estimate based on bootstrap samples
     se_est <- sd(est)
     ```
 
@@ -598,7 +603,7 @@ stopCluster(cl)
 
 ## foreach Example: Bootstrapping (Estimating a Median)
 
-*   To use 'foreach', the loop is very similar
+*   The foreach loop is very similar
 
 
 
@@ -612,7 +617,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 1.824205
+    # [1] 1.820805
     ```
     
     ```r
@@ -620,10 +625,10 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.7166544
+    # [1] 0.7340887
     ```
 
-*   Timing
+*   Timing: foreach is slower due to communication overheard and the low computational burden of the individual tasks
     
     ```r
     summary(microbenchmark::microbenchmark(
@@ -640,37 +645,37 @@ stopCluster(cl)
     ```
     
     ```
-    #       expr      mean    median
-    # 1 for_loop  413.5951  413.5951
-    # 2  foreach 2468.3255 2468.3255
+    #       expr     mean   median
+    # 1 for_loop  357.286  357.286
+    # 2  foreach 2493.975 2493.975
     ```
 
 
 
+*   To speed up, you may also consider "chunking" tasks to reduce communication overhead
 
 ## foreach Example: Bootstrapping (Logistic Regression)
 
-*   We can use the data set 'bacteria' from the 'MASS' package to analyze the association between bacteria presence and treatment (drug vs. placebo) 
-*   To simplify the example, we sample both the outcome and predictors (i.e. case resampling)
+*   As another example, we analyze the association between bacteria presence and treatment (drug vs. placebo) in the data set 'bacteria'  
+*   To simplify the example, we sample both the outcome and predictors (i.e. the entire observation), this is known as case sampling
 
     
     ```r
     library(boot)
     # get last observation point for each person (i.e. last time point tested for bacteria)
-    bact <- MASS::bacteria
-    bact <- do.call(rbind, by(bact, bact$ID, function(x) x[which.max(x$week), ]))
+    bact <- do.call(rbind, by(MASS::bacteria, MASS::bacteria$ID, function(x) x[which.max(x$week), ]))
     # function to compute coefficents
     boot_fun <- function(dat, idx, fmla) {
         coef(glm(fmla, data = dat[idx, ], family = binomial))
     }
     ```
 
-*   The 'boot' package provides functions to easily apply our function across bootstrap replicates
+*   Rather than write a for loop, the 'boot' package provides functions to easily apply our function across bootstrap replicates
 
     
     ```r
     set.seed(123)
-    boot(bact, boot_fun, R = 10000, fmla = as.formula("y ~ ap"))
+    boot(bact, boot_fun, R = 10000, fmla = as.formula(y ~ ap))
     ```
     
     ```
@@ -679,7 +684,8 @@ stopCluster(cl)
     # 
     # 
     # Call:
-    # boot(data = bact, statistic = boot_fun, R = 10000, fmla = as.formula("y ~ ap"))
+    # boot(data = bact, statistic = boot_fun, R = 10000, fmla = as.formula(y ~ 
+    #     ap))
     # 
     # 
     # Bootstrap Statistics :
@@ -692,6 +698,9 @@ stopCluster(cl)
 ## foreach Example: Bootstrapping (Logistic Regression)
 
 *   We can replicate the results from 'boot' with 'foreach'
+
+    
+
     
     ```r
     set.seed(123)
@@ -700,7 +709,6 @@ stopCluster(cl)
     indices <- sample.int(n, n * 10000, replace = TRUE)
     dim(indices) <- c(10000, n)
     # fit all bootstrap logistic regression models and extract coefficients into a matrix
-    registerDoParallel(cores = 4)
     results_foreach <- foreach(x = iter(indices, by = 'row'), .combine = cbind, .inorder = FALSE) %dopar% {
         coef(glm(y ~ ap, data = bact[x, ], family = binomial))
     }
@@ -713,11 +721,10 @@ stopCluster(cl)
     #   0.4309512   1.6066249
     ```
 
-*   The 'doRNG' package allows us to easily handle random number generation (uses "L'Ecuyer-CMRG")
+*   The 'doRNG' package allows us to easily handle random number generation (note that the results will not match the previous)
     
     ```r
     library(doRNG)
-    registerDoParallel(cores = 4)
     results_foreach <- foreach(i = seq.int(10000), .combine = cbind, .inorder = FALSE) %dorng% {
         boot_samp <- sample.int(n, n, replace = TRUE)
         coef(glm(y ~ ap, data = bact[boot_samp, ], family = binomial))
@@ -732,9 +739,7 @@ stopCluster(cl)
 
 ## foreach Example: Bootstrapping (Logistic Regression)
 
-*   Timing
-
-    
+*   Timing: With increased computational burden for each task, we see an improvement by using the parallel approach
 
     
     ```r
@@ -749,11 +754,15 @@ stopCluster(cl)
     ```
     
     ```
-    #      expr      mean    median
-    # 1    boot 16.099843 16.099843
-    # 2 foreach  7.577051  7.577051
+    #      expr     mean   median
+    # 1    boot 17.11129 17.11129
+    # 2 foreach  8.10648  8.10648
     ```
 
+    
+    ```r
+    stopCluster(cl)
+    ```
 
 ## foreach example 2: Random Forests
 
@@ -791,25 +800,28 @@ stopCluster(cl)
 *   Two changes in the call to `foreach`
     
     ```r
+    # random forest sequentially
     rf <- randomForest(X, y, ntree = 1000, nodesize = 3)
     
+    # random forest parallel (split up tree generation)
     rf_par <- foreach(ntree = rep(250, 4), .combine = combine, .packages = "randomForest") %dopar% {
         randomForest(X, y, ntree = ntree, nodesize = 3)
     }
     ```
-    *   The 'randomForest' package has its own combine function that we can call with `.combine = combine`
-    *   The `.packages` option is used to export the 'randomForest' package to all the cores
+    *   The 'randomForest' package already has a function to combine objects of class randomForest `.combine = combine`
+    *   The `.packages` option must be used to export the 'randomForest' package to all the cores
 *   In the previous examples, we never explicitly export variables to the cores
-    *   By default, all objects in the current environment that are refenced in `foreach` are exported
-    *   '.export' and '.noexport' can be used to control which objects are exported
+    *   By default, (almost) all objects in the current scope that are refenced in `foreach` are exported
+    *   `.export` and `.noexport` can be used to control which objects are exported
+
 *   Timing
     
 
     
     ```
     #          expr     mean   median
-    # 1          rf 43.15325 43.15325
-    # 2 rf_parallel 13.66006 13.66006
+    # 1          rf 41.26863 41.26863
+    # 2 rf_parallel 13.85913 13.85913
     ```
 
     
@@ -948,10 +960,10 @@ rbenchmark::benchmark(
 
 ```
 #                      test replications elapsed relative
-# 4 dist_par(x, cores = 10)            1    2.81    1.000
-# 3  dist_par(x, cores = 4)            1    3.82    1.359
-# 2  dist_par(x, cores = 1)            1    7.46    2.655
-# 1                 dist(x)            1    9.32    3.317
+# 4 dist_par(x, cores = 10)            1    2.83    1.000
+# 3  dist_par(x, cores = 4)            1    3.60    1.272
+# 2  dist_par(x, cores = 1)            1    7.39    2.611
+# 1                 dist(x)            1    8.77    3.099
 ```
 
 
@@ -1047,9 +1059,9 @@ rbenchmark::benchmark(
 
 ```
 #   test replications elapsed relative
-# 1 pi01            1    5.08    1.142
-# 2 pi04            1    4.45    1.000
-# 3 pi10            1    4.52    1.016
+# 1 pi01            1    4.78    1.117
+# 2 pi04            1    4.28    1.000
+# 3 pi10            1    4.28    1.000
 ```
 
 No big speed gains... but at least you know how to use it now :)!
@@ -1080,11 +1092,10 @@ No big speed gains... but at least you know how to use it now :)!
 # [4] foreach_1.4.4      
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_0.12.15     codetools_0.2-15 snow_0.4-2       digest_0.6.15   
-#  [5] rprojroot_1.3-2  backports_1.1.2  magrittr_1.5     evaluate_0.10.1 
-#  [9] highr_0.6        stringi_1.1.6    rmarkdown_1.8    tools_3.4.3     
-# [13] stringr_1.3.0    yaml_2.1.16      compiler_3.4.3   htmltools_0.3.6 
-# [17] knitr_1.20
+#  [1] Rcpp_0.12.15     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
+#  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
+#  [9] stringi_1.1.6    rmarkdown_1.8    tools_3.4.3      stringr_1.3.0   
+# [13] yaml_2.1.16      compiler_3.4.3   htmltools_0.3.6  knitr_1.20
 ```
 
 ## References
