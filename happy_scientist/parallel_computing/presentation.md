@@ -275,8 +275,8 @@ rbenchmark::benchmark(
 
 ```
 #       test replications elapsed relative
-# 1 parallel            1    0.50      1.0
-# 2   serial            1    1.35      2.7
+# 1 parallel            1    0.47    1.000
+# 2   serial            1    1.34    2.851
 ```
 
 
@@ -456,11 +456,11 @@ stopCluster(cl)
     
     ```
     # List of 4
-    #  $ state    :<environment: 0x000000001a331e08> 
+    #  $ state    :<environment: 0x00000000140b02a0> 
     #  $ length   : int 4
     #  $ checkFunc:function (x)  
     #   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
-    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x000000001a0f9218> 
+    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x000000001a4c0990> 
     #  $ recycle  : logi FALSE
     #  - attr(*, "class")= chr [1:2] "containeriter" "iter"
     ```
@@ -558,18 +558,17 @@ stopCluster(cl)
 
 ## foreach Example: Bootstrapping (Estimating a Median)
 
-*   Suppose we have the following small sample of 10 observations for which we want to estimate the sample median
+*   Suppose we have the following sample of 100 observations for which we want to estimate the sample median
 
     
     ```r
     set.seed(123)
-    dat <- rnorm(n = 10, mean = 2.3, sd = 1.5)
-    dat
+    dat <- rnorm(n = 100, mean = 2.3, sd = 1.5)
+    dat[1:5]
     ```
     
     ```
-    #  [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144  0.5867664
-    #  [7]  2.5357901 -0.7981109  1.6391797  2.3059299
+    # [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144
     ```
 
 *   We can modify the previous code to run 10,000 bootstrap replicates and obtain an estimate of the standard error for the median
@@ -590,7 +589,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 1.820074
+    # [1] 2.238624
     ```
     
     ```r
@@ -598,7 +597,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.7335949
+    # [1] 0.1871364
     ```
 
 ## foreach Example: Bootstrapping (Estimating a Median)
@@ -617,7 +616,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 1.820805
+    # [1] 2.238222
     ```
     
     ```r
@@ -625,7 +624,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.7340887
+    # [1] 0.188434
     ```
 
 *   Timing: foreach is slower due to communication overheard and the low computational burden of the individual tasks
@@ -646,8 +645,8 @@ stopCluster(cl)
     
     ```
     #       expr     mean   median
-    # 1 for_loop  357.286  357.286
-    # 2  foreach 2493.975 2493.975
+    # 1 for_loop  416.624  416.624
+    # 2  foreach 2567.996 2567.996
     ```
 
 
@@ -754,9 +753,9 @@ stopCluster(cl)
     ```
     
     ```
-    #      expr     mean   median
-    # 1    boot 17.11129 17.11129
-    # 2 foreach  8.10648  8.10648
+    #      expr      mean    median
+    # 1    boot 16.716193 16.716193
+    # 2 foreach  7.661397  7.661397
     ```
 
     
@@ -804,7 +803,9 @@ stopCluster(cl)
     rf <- randomForest(X, y, ntree = 1000, nodesize = 3)
     
     # random forest parallel (split up tree generation)
-    rf_par <- foreach(ntree = rep(250, 4), .combine = combine, .packages = "randomForest") %dopar% {
+    rf_par <- foreach(ntree = rep(250, 4), 
+                      .combine = combine, 
+                      .packages = "randomForest") %dopar% {
         randomForest(X, y, ntree = ntree, nodesize = 3)
     }
     ```
@@ -820,8 +821,8 @@ stopCluster(cl)
     
     ```
     #          expr     mean   median
-    # 1          rf 41.26863 41.26863
-    # 2 rf_parallel 13.85913 13.85913
+    # 1          rf 40.43248 40.43248
+    # 2 rf_parallel 13.59818 13.59818
     ```
 
     
@@ -960,10 +961,10 @@ rbenchmark::benchmark(
 
 ```
 #                      test replications elapsed relative
-# 4 dist_par(x, cores = 10)            1    2.83    1.000
-# 3  dist_par(x, cores = 4)            1    3.60    1.272
-# 2  dist_par(x, cores = 1)            1    7.39    2.611
-# 1                 dist(x)            1    8.77    3.099
+# 4 dist_par(x, cores = 10)            1    2.81    1.000
+# 3  dist_par(x, cores = 4)            1    3.71    1.320
+# 2  dist_par(x, cores = 1)            1    7.24    2.577
+# 1                 dist(x)            1    8.62    3.068
 ```
 
 
@@ -1059,9 +1060,9 @@ rbenchmark::benchmark(
 
 ```
 #   test replications elapsed relative
-# 1 pi01            1    4.78    1.117
-# 2 pi04            1    4.28    1.000
-# 3 pi10            1    4.28    1.000
+# 1 pi01            1    4.75    1.131
+# 2 pi04            1    4.26    1.014
+# 3 pi10            1    4.20    1.000
 ```
 
 No big speed gains... but at least you know how to use it now :)!
@@ -1088,14 +1089,27 @@ No big speed gains... but at least you know how to use it now :)!
 # [8] base     
 # 
 # other attached packages:
-# [1] randomForest_4.6-12 doParallel_1.0.11   iterators_1.0.9    
-# [4] foreach_1.4.4      
+# [1] randomForest_4.6-12 doRNG_1.6.6         rngtools_1.2.4     
+# [4] pkgmaker_0.22       registry_0.5        boot_1.3-20        
+# [7] doParallel_1.0.11   iterators_1.0.9     foreach_1.4.4      
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_0.12.15     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
-#  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
-#  [9] stringi_1.1.6    rmarkdown_1.8    tools_3.4.3      stringr_1.3.0   
-# [13] yaml_2.1.16      compiler_3.4.3   htmltools_0.3.6  knitr_1.20
+#  [1] Rcpp_0.12.15              knitr_1.20               
+#  [3] magrittr_1.5              MASS_7.3-47              
+#  [5] splines_3.4.3             xtable_1.8-2             
+#  [7] lattice_0.20-35           RcppArmadillo_0.8.300.1.0
+#  [9] multcomp_1.4-8            stringr_1.3.0            
+# [11] highr_0.6                 tools_3.4.3              
+# [13] grid_3.4.3                TH.data_1.0-8            
+# [15] htmltools_0.3.6           rbenchmark_1.0.0         
+# [17] yaml_2.1.16               survival_2.41-3          
+# [19] rprojroot_1.3-2           digest_0.6.15            
+# [21] Matrix_1.2-12             microbenchmark_1.4-4     
+# [23] codetools_0.2-15          evaluate_0.10.1          
+# [25] rmarkdown_1.8             sandwich_2.4-0           
+# [27] stringi_1.1.6             compiler_3.4.3           
+# [29] backports_1.1.2           mvtnorm_1.0-7            
+# [31] zoo_1.8-1
 ```
 
 ## References

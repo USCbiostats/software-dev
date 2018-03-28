@@ -273,8 +273,8 @@ rbenchmark<span class="op">::</span><span class="kw">benchmark</span>(
   <span class="dt">serial   =</span> <span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, pisim, <span class="dt">nsim=</span>nsim), <span class="dt">replications =</span> <span class="dv">1</span>
 )[,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#       test replications elapsed relative
-# 1 parallel            1    0.50      1.0
-# 2   serial            1    1.35      2.7</code></pre>
+# 1 parallel            1    0.47    1.000
+# 2   serial            1    1.34    2.851</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans_par &lt;-<span class="st"> </span><span class="kw">parSapply</span>(cl, <span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, pisim, <span class="dt">nsim=</span>nsim)
 ans_ser &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, pisim, <span class="dt">nsim=</span>nsim)
 <span class="kw">stopCluster</span>(cl)</code></pre></div>
@@ -373,11 +373,11 @@ customCombine &lt;-<span class="st"> </span><span class="cf">function</span>(i, 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vector_iterator &lt;-<span class="st"> </span><span class="kw">iter</span>(<span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>), <span class="dt">checkFunc =</span> <span class="cf">function</span>(x) x <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(vector_iterator)</code></pre></div>
 <pre><code># List of 4
-#  $ state    :&lt;environment: 0x000000001a331e08&gt; 
+#  $ state    :&lt;environment: 0x00000000140b02a0&gt; 
 #  $ length   : int 4
 #  $ checkFunc:function (x)  
 #   ..- attr(*, &quot;srcref&quot;)=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
-#   .. .. ..- attr(*, &quot;srcfile&quot;)=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x000000001a0f9218&gt; 
+#   .. .. ..- attr(*, &quot;srcfile&quot;)=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x000000001a4c0990&gt; 
 #  $ recycle  : logi FALSE
 #  - attr(*, &quot;class&quot;)= chr [1:2] &quot;containeriter&quot; &quot;iter&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="st">&quot;obj:&quot;</span>, vector_iterator<span class="op">$</span>state<span class="op">$</span>obj, <span class="st">&quot; i:&quot;</span>, vector_iterator<span class="op">$</span>state<span class="op">$</span>i, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
@@ -452,12 +452,11 @@ se_est &lt;-<span class="st"> </span><span class="kw">sd</span>(est)</code></pre
 <div id="foreach-example-bootstrapping-estimating-a-median" class="slide section level2">
 <h2>foreach Example: Bootstrapping (Estimating a Median)</h2>
 <ul class="incremental">
-<li><p>Suppose we have the following small sample of 10 observations for which we want to estimate the sample median</p>
+<li><p>Suppose we have the following sample of 100 observations for which we want to estimate the sample median</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">123</span>)
-dat &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="dv">10</span>, <span class="dt">mean =</span> <span class="fl">2.3</span>, <span class="dt">sd =</span> <span class="fl">1.5</span>)
-dat</code></pre></div>
-<pre><code>#  [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144  0.5867664
-#  [7]  2.5357901 -0.7981109  1.6391797  2.3059299</code></pre></li>
+dat &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="dv">100</span>, <span class="dt">mean =</span> <span class="fl">2.3</span>, <span class="dt">sd =</span> <span class="fl">1.5</span>)
+dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</code></pre></div>
+<pre><code># [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144</code></pre></li>
 <li><p>We can modify the previous code to run 10,000 bootstrap replicates and obtain an estimate of the standard error for the median</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vector to hold estimates across bootstrap samples</span>
 n &lt;-<span class="st"> </span><span class="kw">length</span>(dat)
@@ -471,9 +470,9 @@ median_est &lt;-<span class="st"> </span><span class="kw">vector</span>(<span cl
 }
 <span class="co"># Compute mean and standard error of median estimate based on bootstrap sample statistics</span>
 <span class="kw">mean</span>(median_est)</code></pre></div>
-<pre><code># [1] 1.820074</code></pre>
+<pre><code># [1] 2.238624</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sd</span>(median_est)</code></pre></div>
-<pre><code># [1] 0.7335949</code></pre></li>
+<pre><code># [1] 0.1871364</code></pre></li>
 </ul>
 </div>
 <div id="foreach-example-bootstrapping-estimating-a-median-1" class="slide section level2">
@@ -485,9 +484,9 @@ median_est &lt;-<span class="st"> </span><span class="kw">vector</span>(<span cl
     <span class="kw">median</span>(dat[boot_sample])
 }
 <span class="kw">mean</span>(median_est_fe)</code></pre></div>
-<pre><code># [1] 1.820805</code></pre>
+<pre><code># [1] 2.238222</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sd</span>(median_est_fe)</code></pre></div>
-<pre><code># [1] 0.7340887</code></pre></li>
+<pre><code># [1] 0.188434</code></pre></li>
 <li><p>Timing: foreach is slower due to communication overheard and the low computational burden of the individual tasks</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
         <span class="dt">for_loop =</span> <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>num_reps) {
@@ -501,8 +500,8 @@ median_est &lt;-<span class="st"> </span><span class="kw">vector</span>(<span cl
         <span class="dt">times =</span> <span class="dv">1</span>)
     )[,<span class="kw">c</span>(<span class="st">&quot;expr&quot;</span>,<span class="st">&quot;mean&quot;</span>,<span class="st">&quot;median&quot;</span>)]</code></pre></div>
 <pre><code>#       expr     mean   median
-# 1 for_loop  357.286  357.286
-# 2  foreach 2493.975 2493.975</code></pre></li>
+# 1 for_loop  416.624  416.624
+# 2  foreach 2567.996 2567.996</code></pre></li>
 <li><p>To speed up, you may also consider “chunking” tasks to reduce communication overhead</p></li>
 </ul>
 </div>
@@ -577,9 +576,9 @@ results_foreach &lt;-<span class="st"> </span><span class="kw">foreach</span>(<s
                   },
         <span class="dt">times =</span> <span class="dv">1</span>, <span class="dt">unit =</span> <span class="st">'s'</span>)
     )[,<span class="kw">c</span>(<span class="st">&quot;expr&quot;</span>,<span class="st">&quot;mean&quot;</span>,<span class="st">&quot;median&quot;</span>)]</code></pre></div>
-<pre><code>#      expr     mean   median
-# 1    boot 17.11129 17.11129
-# 2 foreach  8.10648  8.10648</code></pre>
+<pre><code>#      expr      mean    median
+# 1    boot 16.716193 16.716193
+# 2 foreach  7.661397  7.661397</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stopCluster</span>(cl)</code></pre></div></li>
 </ul>
 </div>
@@ -623,7 +622,9 @@ y &lt;-<span class="st"> </span><span class="kw">gl</span>(<span class="dv">2</s
 rf &lt;-<span class="st"> </span><span class="kw">randomForest</span>(X, y, <span class="dt">ntree =</span> <span class="dv">1000</span>, <span class="dt">nodesize =</span> <span class="dv">3</span>)
 
 <span class="co"># random forest parallel (split up tree generation)</span>
-rf_par &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">ntree =</span> <span class="kw">rep</span>(<span class="dv">250</span>, <span class="dv">4</span>), <span class="dt">.combine =</span> combine, <span class="dt">.packages =</span> <span class="st">&quot;randomForest&quot;</span>) <span class="op">%dopar%</span><span class="st"> </span>{
+rf_par &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">ntree =</span> <span class="kw">rep</span>(<span class="dv">250</span>, <span class="dv">4</span>), 
+                  <span class="dt">.combine =</span> combine, 
+                  <span class="dt">.packages =</span> <span class="st">&quot;randomForest&quot;</span>) <span class="op">%dopar%</span><span class="st"> </span>{
     <span class="kw">randomForest</span>(X, y, <span class="dt">ntree =</span> ntree, <span class="dt">nodesize =</span> <span class="dv">3</span>)
 }</code></pre></div>
 <ul class="incremental">
@@ -637,8 +638,8 @@ rf_par &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class
 </ul></li>
 <li><p>Timing</p>
 <pre><code>#          expr     mean   median
-# 1          rf 41.26863 41.26863
-# 2 rf_parallel 13.85913 13.85913</code></pre></li>
+# 1          rf 40.43248 40.43248
+# 2 rf_parallel 13.59818 13.59818</code></pre></li>
 </ul>
 </div>
 <div id="rcpparmadillo-and-openmp" class="slide section level2">
@@ -739,10 +740,10 @@ rbenchmark<span class="op">::</span><span class="kw">benchmark</span>(
   <span class="dt">replications =</span> <span class="dv">1</span>, <span class="dt">order=</span><span class="st">&quot;elapsed&quot;</span>
 )[,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#                      test replications elapsed relative
-# 4 dist_par(x, cores = 10)            1    2.83    1.000
-# 3  dist_par(x, cores = 4)            1    3.60    1.272
-# 2  dist_par(x, cores = 1)            1    7.39    2.611
-# 1                 dist(x)            1    8.77    3.099</code></pre>
+# 4 dist_par(x, cores = 10)            1    2.81    1.000
+# 3  dist_par(x, cores = 4)            1    3.71    1.320
+# 2  dist_par(x, cores = 1)            1    7.24    2.577
+# 1                 dist(x)            1    8.62    3.068</code></pre>
 </div>
 <div id="rcpparmadillo-openmp-example-2-simulating-pi" class="slide section level2">
 <h2>RcppArmadillo + OpenMP example 2: Simulating <span class="math inline">\(\pi\)</span></h2>
@@ -817,9 +818,9 @@ rbenchmark<span class="op">::</span><span class="kw">benchmark</span>(
   <span class="dt">replications =</span> <span class="dv">1</span>
 )[,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#   test replications elapsed relative
-# 1 pi01            1    4.78    1.117
-# 2 pi04            1    4.28    1.000
-# 3 pi10            1    4.28    1.000</code></pre>
+# 1 pi01            1    4.75    1.131
+# 2 pi04            1    4.26    1.014
+# 3 pi10            1    4.20    1.000</code></pre>
 <p>No big speed gains… but at least you know how to use it now :)!</p>
 </div>
 <div id="thanks" class="slide section level2">
@@ -842,14 +843,27 @@ rbenchmark<span class="op">::</span><span class="kw">benchmark</span>(
 # [8] base     
 # 
 # other attached packages:
-# [1] randomForest_4.6-12 doParallel_1.0.11   iterators_1.0.9    
-# [4] foreach_1.4.4      
+# [1] randomForest_4.6-12 doRNG_1.6.6         rngtools_1.2.4     
+# [4] pkgmaker_0.22       registry_0.5        boot_1.3-20        
+# [7] doParallel_1.0.11   iterators_1.0.9     foreach_1.4.4      
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_0.12.15     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
-#  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
-#  [9] stringi_1.1.6    rmarkdown_1.8    tools_3.4.3      stringr_1.3.0   
-# [13] yaml_2.1.16      compiler_3.4.3   htmltools_0.3.6  knitr_1.20</code></pre>
+#  [1] Rcpp_0.12.15              knitr_1.20               
+#  [3] magrittr_1.5              MASS_7.3-47              
+#  [5] splines_3.4.3             xtable_1.8-2             
+#  [7] lattice_0.20-35           RcppArmadillo_0.8.300.1.0
+#  [9] multcomp_1.4-8            stringr_1.3.0            
+# [11] highr_0.6                 tools_3.4.3              
+# [13] grid_3.4.3                TH.data_1.0-8            
+# [15] htmltools_0.3.6           rbenchmark_1.0.0         
+# [17] yaml_2.1.16               survival_2.41-3          
+# [19] rprojroot_1.3-2           digest_0.6.15            
+# [21] Matrix_1.2-12             microbenchmark_1.4-4     
+# [23] codetools_0.2-15          evaluate_0.10.1          
+# [25] rmarkdown_1.8             sandwich_2.4-0           
+# [27] stringi_1.1.6             compiler_3.4.3           
+# [29] backports_1.1.2           mvtnorm_1.0-7            
+# [31] zoo_1.8-1</code></pre>
 </div>
 <div id="references" class="slide section level2">
 <h2>References</h2>
