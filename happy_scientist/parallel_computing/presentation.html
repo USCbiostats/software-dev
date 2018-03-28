@@ -273,8 +273,8 @@ rbenchmark<span class="op">::</span><span class="kw">benchmark</span>(
   <span class="dt">serial   =</span> <span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, pisim, <span class="dt">nsim=</span>nsim), <span class="dt">replications =</span> <span class="dv">1</span>
 )[,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#       test replications elapsed relative
-# 1 parallel            1    0.52    1.000
-# 2   serial            1    1.45    2.788</code></pre>
+# 1 parallel            1    0.50      1.0
+# 2   serial            1    1.35      2.7</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans_par &lt;-<span class="st"> </span><span class="kw">parSapply</span>(cl, <span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, pisim, <span class="dt">nsim=</span>nsim)
 ans_ser &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, pisim, <span class="dt">nsim=</span>nsim)
 <span class="kw">stopCluster</span>(cl)</code></pre></div>
@@ -319,7 +319,7 @@ result</code></pre></div>
 <ul class="incremental">
 <li><p>Method 1: <code>makeCluster</code> + <code>registerDoParallel</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create cluster</span>
-myCluster &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="st">&quot;# of cores&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;SOCK&quot;</span> or <span class="st">&quot;FORK&quot;</span>)
+myCluster &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="st">&quot;# of cores&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;PSOCK&quot;</span> or <span class="st">&quot;FORK&quot;</span>)
 <span class="co"># Register cluster</span>
 <span class="kw">registerDoParallel</span>(myCluster)</code></pre></div></li>
 <li><p>Method 2: <code>registerDoParallel</code> + <code>cores =</code> option</p>
@@ -334,24 +334,30 @@ myCluster &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<spa
 <ul class="incremental">
 <li><p>By default, Method 2 will create a SOCK cluster on Windows systems and a FORK cluster on Unix systems</p></li>
 <li><p><code>getDoParWorkers()</code> can be used to verify the number of workers (cores)</p></li>
+<li><p>With some extra work and packages (Rmpi, doMPI), we can also use an MPI backend to enable parallelization on multiple nodes</p></li>
 </ul>
 </div>
 <div id="the-foreach-package-combining-results" class="slide section level2">
 <h2>The ‘foreach’ Package: Combining Results</h2>
 <ul class="incremental">
-<li><p>We can change the function used to combine results with the <code>.combine</code> option</p>
+<li><p>The <code>.combine</code> option is used to specify the function used to combine results</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Combine the results in a vector</span>
 <span class="kw">foreach</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">9</span>, <span class="dv">16</span>, <span class="dv">25</span>), <span class="dt">.combine =</span> <span class="st">'c'</span>) <span class="op">%dopar%</span><span class="st"> </span><span class="kw">sqrt</span>(x)</code></pre></div>
 <pre><code># [1] 2 3 4 5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Add the results together</span>
-<span class="kw">foreach</span>(<span class="dt">x =</span> <span class="kw">rep</span>(<span class="dv">10</span>, <span class="dv">6</span>), <span class="dt">.combine =</span> <span class="st">'/'</span>) <span class="op">%dopar%</span><span class="st"> </span>x</code></pre></div>
-<pre><code># [1] 1e-04</code></pre></li>
+<span class="kw">foreach</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">9</span>, <span class="dv">16</span>, <span class="dv">25</span>), <span class="dt">.combine =</span> <span class="st">'+'</span>) <span class="op">%dopar%</span><span class="st"> </span>x</code></pre></div>
+<pre><code># [1] 54</code></pre></li>
 <li><p>By default, <code>.combine</code> assumes that the function accepts two arguments (except for <code>c</code>, <code>cbind</code>, <code>rbind</code>)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Custom combine that creates a running product</span>
 customCombine &lt;-<span class="st"> </span><span class="cf">function</span>(i, j) {
-  <span class="kw">c</span>(i, i[<span class="kw">length</span>(i)] <span class="op">*</span><span class="st"> </span>j)
+    <span class="kw">cat</span>(i, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+    <span class="kw">c</span>(i, i[<span class="kw">length</span>(i)] <span class="op">*</span><span class="st"> </span>j)
 }
 <span class="kw">foreach</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">10</span>), <span class="dt">.combine =</span> customCombine) <span class="op">%dopar%</span><span class="st"> </span>x</code></pre></div>
+<pre><code># 2 
+# 2 8 
+# 2 8 48 
+# 2 8 48 384</code></pre>
 <pre><code># [1]    2    8   48  384 3840</code></pre></li>
 <li><p><code>.multicombine = TRUE</code> specifies that our combine function can accept more than two arguments</p></li>
 <li><p><code>.maxcombine</code> sets the max number of arguments that can be passed to the combine function</p></li>
@@ -364,54 +370,54 @@ customCombine &lt;-<span class="st"> </span><span class="cf">function</span>(i, 
 <li><p><code>iter()</code> is a generic function to create iterators over common R objects (vector, list, data frame)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">myIterator &lt;-<span class="st"> </span><span class="kw">iter</span>(object_to_iterate_over, <span class="dt">by =</span> <span class="st">&quot;How to iterate over object&quot;</span>, <span class="dt">checkFunc =</span> <span class="st">&quot;optional function&quot;</span>, <span class="dt">recycle =</span> <span class="ot">FALSE</span>)</code></pre></div></li>
 <li><p>Example: A simple vector iterator over odd integers</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vector_iterator &lt;-<span class="st"> </span><span class="kw">iter</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">checkFunc =</span> <span class="cf">function</span>(x) x <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vector_iterator &lt;-<span class="st"> </span><span class="kw">iter</span>(<span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>), <span class="dt">checkFunc =</span> <span class="cf">function</span>(x) x <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(vector_iterator)</code></pre></div>
 <pre><code># List of 4
-#  $ state    :&lt;environment: 0x000000001a1a7728&gt; 
+#  $ state    :&lt;environment: 0x000000001a331e08&gt; 
 #  $ length   : int 4
 #  $ checkFunc:function (x)  
-#   ..- attr(*, &quot;srcref&quot;)=Class 'srcref'  atomic [1:8] 1 42 1 64 42 64 1 1
-#   .. .. ..- attr(*, &quot;srcfile&quot;)=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x000000001a133390&gt; 
+#   ..- attr(*, &quot;srcref&quot;)=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
+#   .. .. ..- attr(*, &quot;srcfile&quot;)=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x000000001a0f9218&gt; 
 #  $ recycle  : logi FALSE
 #  - attr(*, &quot;class&quot;)= chr [1:2] &quot;containeriter&quot; &quot;iter&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vector_iterator<span class="op">$</span>state<span class="op">$</span>obj</code></pre></div>
-<pre><code># [1] 1 2 3 4</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nextElem</span>(vector_iterator)</code></pre></div>
-<pre><code># [1] 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nextElem</span>(vector_iterator)</code></pre></div>
-<pre><code># [1] 3</code></pre></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="st">&quot;obj:&quot;</span>, vector_iterator<span class="op">$</span>state<span class="op">$</span>obj, <span class="st">&quot; i:&quot;</span>, vector_iterator<span class="op">$</span>state<span class="op">$</span>i, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
+<pre><code># obj: 5 10 15 20  i: 0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="st">&quot;current element:&quot;</span>, <span class="kw">nextElem</span>(vector_iterator), <span class="st">&quot; i:&quot;</span>, vector_iterator<span class="op">$</span>state<span class="op">$</span>i, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
+<pre><code># current element: 5  i: 1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="st">&quot;current element:&quot;</span>, <span class="kw">nextElem</span>(vector_iterator), <span class="st">&quot; i:&quot;</span>, vector_iterator<span class="op">$</span>state<span class="op">$</span>i, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
+<pre><code># current element: 15  i: 3</code></pre></li>
 </ul>
 </div>
 <div id="foreach-iterators-creating-an-iterator" class="slide section level2">
 <h2>foreach + iterators: Creating An Iterator</h2>
 <ul class="incremental">
 <li><p>An iterator that traverses over blocks of columns of a matrix</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iblkcol &lt;-<span class="st"> </span><span class="cf">function</span>(mat, num_blocks) {  
-  nc &lt;-<span class="st"> </span><span class="kw">ncol</span>(mat)
-  i &lt;-<span class="st"> </span><span class="dv">1</span>
-  next_element &lt;-<span class="st"> </span><span class="cf">function</span>() {
-    <span class="cf">if</span> (num_blocks <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span> <span class="op">||</span><span class="st"> </span>nc <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">stop</span>(<span class="st">'StopIteration'</span>)
-    block_size &lt;-<span class="st"> </span><span class="kw">ceiling</span>(nc <span class="op">/</span><span class="st"> </span>num_blocks)
-    col_idx &lt;-<span class="st"> </span><span class="kw">seq</span>(i, <span class="dt">length =</span> block_size)
-    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span>block_size
-    nc &lt;&lt;-<span class="st"> </span>nc <span class="op">-</span><span class="st"> </span>block_size
-    num_blocks &lt;&lt;-<span class="st"> </span>num_blocks <span class="op">-</span><span class="st"> </span><span class="dv">1</span>
-    mat[, col_idx, drop=<span class="ot">FALSE</span>]
-  }
-  itr &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">nextElem =</span> next_element)
-  <span class="kw">class</span>(itr) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'iblkcol'</span>, <span class="st">'abstractiter'</span>, <span class="st">'iter'</span>)
-  itr
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iblkcol &lt;-<span class="st"> </span><span class="cf">function</span>(mat, num_blocks) {
+    <span class="co"># initialize variables to hold num of cols and current col index</span>
+    nc &lt;-<span class="st"> </span><span class="kw">ncol</span>(mat)
+    i &lt;-<span class="st"> </span><span class="dv">1</span>
+    <span class="co"># define nextElem function </span>
+    next_element &lt;-<span class="st"> </span><span class="cf">function</span>() {
+        <span class="cf">if</span> (num_blocks <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span> <span class="op">||</span><span class="st"> </span>nc <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">stop</span>(<span class="st">'StopIteration'</span>) <span class="co"># stop when we have no more columns</span>
+        block_size &lt;-<span class="st"> </span><span class="kw">ceiling</span>(nc <span class="op">/</span><span class="st"> </span>num_blocks)                <span class="co"># determine block size</span>
+        col_idx &lt;-<span class="st"> </span><span class="kw">seq</span>(i, <span class="dt">length =</span> block_size)                <span class="co"># get indices</span>
+        i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span>block_size                                  <span class="co"># update current col index</span>
+        nc &lt;&lt;-<span class="st"> </span>nc <span class="op">-</span><span class="st"> </span>block_size                                <span class="co"># update num cols remaining</span>
+        num_blocks &lt;&lt;-<span class="st"> </span>num_blocks <span class="op">-</span><span class="st"> </span><span class="dv">1</span>                         <span class="co"># update num blocks remaining</span>
+        mat[, col_idx, drop =<span class="st"> </span><span class="ot">FALSE</span>]                          <span class="co"># return next set of columns</span>
+    }
+    <span class="co"># output list element with necessary class definitions</span>
+    itr &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">nextElem =</span> next_element)
+    <span class="kw">class</span>(itr) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'iblkcol'</span>, <span class="st">'abstractiter'</span>, <span class="st">'iter'</span>)
+    itr
 }
 myMatrix &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">200</span>), <span class="dt">nrow =</span> <span class="dv">2</span>, <span class="dt">ncol =</span> <span class="dv">100</span>)
 splitMatrix &lt;-<span class="st"> </span><span class="kw">iblkcol</span>(myMatrix, <span class="dt">num_blocks =</span> <span class="dv">25</span>)
 <span class="kw">nextElem</span>(splitMatrix)</code></pre></div>
-<pre><code>#           [,1]       [,2]       [,3]      [,4]
-# [1,] 0.8045434 0.72741801 0.08226454 0.5665807
-# [2,] 0.9651406 0.01187498 0.85304835 0.4813925</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">myMatrix[, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
-<pre><code>#           [,1]       [,2]       [,3]      [,4]
-# [1,] 0.8045434 0.72741801 0.08226454 0.5665807
-# [2,] 0.9651406 0.01187498 0.85304835 0.4813925</code></pre></li>
+<pre><code>#           [,1]      [,2]       [,3]      [,4]
+# [1,] 0.1090886 0.9651406 0.01187498 0.8530483
+# [2,] 0.8045434 0.7274180 0.08226454 0.5665807</code></pre></li>
+<li><p>Note: The nextElem() function in splitMatrix is an example of a closure (encloses the environment of its parent function)</p></li>
 </ul>
 </div>
 <div id="foreach-example-bootstrapping" class="slide section level2">
@@ -439,7 +445,7 @@ est &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="dt
     est[i] &lt;-<span class="st"> </span><span class="kw">g</span>(dat[boot_sample])
 }
 
-<span class="co"># Compute standard error of estimate based on bootstrap sample statistics</span>
+<span class="co"># Compute standard error of estimate based on bootstrap samples</span>
 se_est &lt;-<span class="st"> </span><span class="kw">sd</span>(est)</code></pre></div></li>
 </ul>
 </div>
@@ -473,16 +479,16 @@ median_est &lt;-<span class="st"> </span><span class="kw">vector</span>(<span cl
 <div id="foreach-example-bootstrapping-estimating-a-median-1" class="slide section level2">
 <h2>foreach Example: Bootstrapping (Estimating a Median)</h2>
 <ul class="incremental">
-<li><p>To use ‘foreach’, the loop is very similar</p>
+<li><p>The foreach loop is very similar</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">median_est_fe &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">i =</span> <span class="kw">seq.int</span>(num_reps), <span class="dt">.combine =</span> c) <span class="op">%dopar%</span><span class="st"> </span>{
     boot_sample &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span>n, n, <span class="dt">replace =</span> <span class="ot">TRUE</span>)
     <span class="kw">median</span>(dat[boot_sample])
 }
 <span class="kw">mean</span>(median_est_fe)</code></pre></div>
-<pre><code># [1] 1.824205</code></pre>
+<pre><code># [1] 1.820805</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sd</span>(median_est_fe)</code></pre></div>
-<pre><code># [1] 0.7166544</code></pre></li>
-<li><p>Timing</p>
+<pre><code># [1] 0.7340887</code></pre></li>
+<li><p>Timing: foreach is slower due to communication overheard and the low computational burden of the individual tasks</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
         <span class="dt">for_loop =</span> <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>num_reps) {
                             boot_sample &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span>n, n, <span class="dt">replace =</span> <span class="ot">TRUE</span>)
@@ -494,33 +500,35 @@ median_est &lt;-<span class="st"> </span><span class="kw">vector</span>(<span cl
                   },
         <span class="dt">times =</span> <span class="dv">1</span>)
     )[,<span class="kw">c</span>(<span class="st">&quot;expr&quot;</span>,<span class="st">&quot;mean&quot;</span>,<span class="st">&quot;median&quot;</span>)]</code></pre></div>
-<pre><code>#       expr      mean    median
-# 1 for_loop  413.5951  413.5951
-# 2  foreach 2468.3255 2468.3255</code></pre></li>
+<pre><code>#       expr     mean   median
+# 1 for_loop  357.286  357.286
+# 2  foreach 2493.975 2493.975</code></pre></li>
+<li><p>To speed up, you may also consider “chunking” tasks to reduce communication overhead</p></li>
 </ul>
 </div>
 <div id="foreach-example-bootstrapping-logistic-regression" class="slide section level2">
 <h2>foreach Example: Bootstrapping (Logistic Regression)</h2>
 <ul class="incremental">
-<li>We can use the data set ‘bacteria’ from the ‘MASS’ package to analyze the association between bacteria presence and treatment (drug vs. placebo)</li>
-<li><p>To simplify the example, we sample both the outcome and predictors (i.e. case resampling)</p>
+<li>As another example, we analyze the association between bacteria presence and treatment (drug vs. placebo) in the data set ‘bacteria’<br />
+</li>
+<li><p>To simplify the example, we sample both the outcome and predictors (i.e. the entire observation), this is known as case sampling</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(boot)
 <span class="co"># get last observation point for each person (i.e. last time point tested for bacteria)</span>
-bact &lt;-<span class="st"> </span>MASS<span class="op">::</span>bacteria
-bact &lt;-<span class="st"> </span><span class="kw">do.call</span>(rbind, <span class="kw">by</span>(bact, bact<span class="op">$</span>ID, <span class="cf">function</span>(x) x[<span class="kw">which.max</span>(x<span class="op">$</span>week), ]))
+bact &lt;-<span class="st"> </span><span class="kw">do.call</span>(rbind, <span class="kw">by</span>(MASS<span class="op">::</span>bacteria, MASS<span class="op">::</span>bacteria<span class="op">$</span>ID, <span class="cf">function</span>(x) x[<span class="kw">which.max</span>(x<span class="op">$</span>week), ]))
 <span class="co"># function to compute coefficents</span>
 boot_fun &lt;-<span class="st"> </span><span class="cf">function</span>(dat, idx, fmla) {
     <span class="kw">coef</span>(<span class="kw">glm</span>(fmla, <span class="dt">data =</span> dat[idx, ], <span class="dt">family =</span> binomial))
 }</code></pre></div></li>
-<li><p>The ‘boot’ package provides functions to easily apply our function across bootstrap replicates</p>
+<li><p>Rather than write a for loop, the ‘boot’ package provides functions to easily apply our function across bootstrap replicates</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">123</span>)
-<span class="kw">boot</span>(bact, boot_fun, <span class="dt">R =</span> <span class="dv">10000</span>, <span class="dt">fmla =</span> <span class="kw">as.formula</span>(<span class="st">&quot;y ~ ap&quot;</span>))</code></pre></div>
+<span class="kw">boot</span>(bact, boot_fun, <span class="dt">R =</span> <span class="dv">10000</span>, <span class="dt">fmla =</span> <span class="kw">as.formula</span>(y <span class="op">~</span><span class="st"> </span>ap))</code></pre></div>
 <pre><code># 
 # ORDINARY NONPARAMETRIC BOOTSTRAP
 # 
 # 
 # Call:
-# boot(data = bact, statistic = boot_fun, R = 10000, fmla = as.formula(&quot;y ~ ap&quot;))
+# boot(data = bact, statistic = boot_fun, R = 10000, fmla = as.formula(y ~ 
+#     ap))
 # 
 # 
 # Bootstrap Statistics :
@@ -539,7 +547,6 @@ n &lt;-<span class="st"> </span><span class="kw">nrow</span>(bact)
 indices &lt;-<span class="st"> </span><span class="kw">sample.int</span>(n, n <span class="op">*</span><span class="st"> </span><span class="dv">10000</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>)
 <span class="kw">dim</span>(indices) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">10000</span>, n)
 <span class="co"># fit all bootstrap logistic regression models and extract coefficients into a matrix</span>
-<span class="kw">registerDoParallel</span>(<span class="dt">cores =</span> <span class="dv">4</span>)
 results_foreach &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">x =</span> <span class="kw">iter</span>(indices, <span class="dt">by =</span> <span class="st">'row'</span>), <span class="dt">.combine =</span> cbind, <span class="dt">.inorder =</span> <span class="ot">FALSE</span>) <span class="op">%dopar%</span><span class="st"> </span>{
     <span class="kw">coef</span>(<span class="kw">glm</span>(y <span class="op">~</span><span class="st"> </span>ap, <span class="dt">data =</span> bact[x, ], <span class="dt">family =</span> binomial))
 }
@@ -547,9 +554,8 @@ results_foreach &lt;-<span class="st"> </span><span class="kw">foreach</span>(<s
 <span class="kw">apply</span>(results_foreach, <span class="dv">1</span>, sd)</code></pre></div>
 <pre><code># (Intercept)         app 
 #   0.4309512   1.6066249</code></pre></li>
-<li><p>The ‘doRNG’ package allows us to easily handle random number generation (uses “L’Ecuyer-CMRG”)</p>
+<li><p>The ‘doRNG’ package allows us to easily handle random number generation (note that the results will not match the previous)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(doRNG)
-<span class="kw">registerDoParallel</span>(<span class="dt">cores =</span> <span class="dv">4</span>)
 results_foreach &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">i =</span> <span class="kw">seq.int</span>(<span class="dv">10000</span>), <span class="dt">.combine =</span> cbind, <span class="dt">.inorder =</span> <span class="ot">FALSE</span>) <span class="op">%dorng%</span><span class="st"> </span>{
     boot_samp &lt;-<span class="st"> </span><span class="kw">sample.int</span>(n, n, <span class="dt">replace =</span> <span class="ot">TRUE</span>)
     <span class="kw">coef</span>(<span class="kw">glm</span>(y <span class="op">~</span><span class="st"> </span>ap, <span class="dt">data =</span> bact[boot_samp, ], <span class="dt">family =</span> binomial))
@@ -562,7 +568,7 @@ results_foreach &lt;-<span class="st"> </span><span class="kw">foreach</span>(<s
 <div id="foreach-example-bootstrapping-logistic-regression-2" class="slide section level2">
 <h2>foreach Example: Bootstrapping (Logistic Regression)</h2>
 <ul class="incremental">
-<li><p>Timing</p>
+<li><p>Timing: With increased computational burden for each task, we see an improvement by using the parallel approach</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
         <span class="dt">boot =</span> boot<span class="op">::</span><span class="kw">boot</span>(bact, boot_fun, <span class="dt">R =</span> <span class="dv">10000</span>, <span class="dt">fmla =</span> <span class="kw">as.formula</span>(<span class="st">&quot;y ~ ap&quot;</span>)),
         <span class="dt">foreach =</span> <span class="kw">foreach</span>(<span class="dt">i =</span> <span class="kw">seq.int</span>(<span class="dv">10000</span>), <span class="dt">.combine =</span> cbind, <span class="dt">.inorder =</span> <span class="ot">FALSE</span>) <span class="op">%dopar%</span><span class="st"> </span>{
@@ -571,9 +577,10 @@ results_foreach &lt;-<span class="st"> </span><span class="kw">foreach</span>(<s
                   },
         <span class="dt">times =</span> <span class="dv">1</span>, <span class="dt">unit =</span> <span class="st">'s'</span>)
     )[,<span class="kw">c</span>(<span class="st">&quot;expr&quot;</span>,<span class="st">&quot;mean&quot;</span>,<span class="st">&quot;median&quot;</span>)]</code></pre></div>
-<pre><code>#      expr      mean    median
-# 1    boot 16.099843 16.099843
-# 2 foreach  7.577051  7.577051</code></pre></li>
+<pre><code>#      expr     mean   median
+# 1    boot 17.11129 17.11129
+# 2 foreach  8.10648  8.10648</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stopCluster</span>(cl)</code></pre></div></li>
 </ul>
 </div>
 <div id="foreach-example-2-random-forests" class="slide section level2">
@@ -612,24 +619,26 @@ y &lt;-<span class="st"> </span><span class="kw">gl</span>(<span class="dv">2</s
 <h2>foreach example 2: Random Forests (cont.)</h2>
 <ul class="incremental">
 <li><p>Two changes in the call to <code>foreach</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rf &lt;-<span class="st"> </span><span class="kw">randomForest</span>(X, y, <span class="dt">ntree =</span> <span class="dv">1000</span>, <span class="dt">nodesize =</span> <span class="dv">3</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># random forest sequentially</span>
+rf &lt;-<span class="st"> </span><span class="kw">randomForest</span>(X, y, <span class="dt">ntree =</span> <span class="dv">1000</span>, <span class="dt">nodesize =</span> <span class="dv">3</span>)
 
+<span class="co"># random forest parallel (split up tree generation)</span>
 rf_par &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">ntree =</span> <span class="kw">rep</span>(<span class="dv">250</span>, <span class="dv">4</span>), <span class="dt">.combine =</span> combine, <span class="dt">.packages =</span> <span class="st">&quot;randomForest&quot;</span>) <span class="op">%dopar%</span><span class="st"> </span>{
     <span class="kw">randomForest</span>(X, y, <span class="dt">ntree =</span> ntree, <span class="dt">nodesize =</span> <span class="dv">3</span>)
 }</code></pre></div>
 <ul class="incremental">
-<li>The ‘randomForest’ package has its own combine function that we can call with <code>.combine = combine</code></li>
-<li>The <code>.packages</code> option is used to export the ‘randomForest’ package to all the cores</li>
+<li>The ‘randomForest’ package already has a function to combine objects of class randomForest <code>.combine = combine</code></li>
+<li>The <code>.packages</code> option must be used to export the ‘randomForest’ package to all the cores</li>
 </ul></li>
 <li>In the previous examples, we never explicitly export variables to the cores
 <ul class="incremental">
-<li>By default, all objects in the current environment that are refenced in <code>foreach</code> are exported</li>
-<li>‘.export’ and ‘.noexport’ can be used to control which objects are exported</li>
+<li>By default, (almost) all objects in the current scope that are refenced in <code>foreach</code> are exported</li>
+<li><code>.export</code> and <code>.noexport</code> can be used to control which objects are exported</li>
 </ul></li>
 <li><p>Timing</p>
 <pre><code>#          expr     mean   median
-# 1          rf 43.15325 43.15325
-# 2 rf_parallel 13.66006 13.66006</code></pre></li>
+# 1          rf 41.26863 41.26863
+# 2 rf_parallel 13.85913 13.85913</code></pre></li>
 </ul>
 </div>
 <div id="rcpparmadillo-and-openmp" class="slide section level2">
@@ -730,10 +739,10 @@ rbenchmark<span class="op">::</span><span class="kw">benchmark</span>(
   <span class="dt">replications =</span> <span class="dv">1</span>, <span class="dt">order=</span><span class="st">&quot;elapsed&quot;</span>
 )[,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#                      test replications elapsed relative
-# 4 dist_par(x, cores = 10)            1    2.81    1.000
-# 3  dist_par(x, cores = 4)            1    3.82    1.359
-# 2  dist_par(x, cores = 1)            1    7.46    2.655
-# 1                 dist(x)            1    9.32    3.317</code></pre>
+# 4 dist_par(x, cores = 10)            1    2.83    1.000
+# 3  dist_par(x, cores = 4)            1    3.60    1.272
+# 2  dist_par(x, cores = 1)            1    7.39    2.611
+# 1                 dist(x)            1    8.77    3.099</code></pre>
 </div>
 <div id="rcpparmadillo-openmp-example-2-simulating-pi" class="slide section level2">
 <h2>RcppArmadillo + OpenMP example 2: Simulating <span class="math inline">\(\pi\)</span></h2>
@@ -808,9 +817,9 @@ rbenchmark<span class="op">::</span><span class="kw">benchmark</span>(
   <span class="dt">replications =</span> <span class="dv">1</span>
 )[,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#   test replications elapsed relative
-# 1 pi01            1    5.08    1.142
-# 2 pi04            1    4.45    1.000
-# 3 pi10            1    4.52    1.016</code></pre>
+# 1 pi01            1    4.78    1.117
+# 2 pi04            1    4.28    1.000
+# 3 pi10            1    4.28    1.000</code></pre>
 <p>No big speed gains… but at least you know how to use it now :)!</p>
 </div>
 <div id="thanks" class="slide section level2">
@@ -837,11 +846,10 @@ rbenchmark<span class="op">::</span><span class="kw">benchmark</span>(
 # [4] foreach_1.4.4      
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_0.12.15     codetools_0.2-15 snow_0.4-2       digest_0.6.15   
-#  [5] rprojroot_1.3-2  backports_1.1.2  magrittr_1.5     evaluate_0.10.1 
-#  [9] highr_0.6        stringi_1.1.6    rmarkdown_1.8    tools_3.4.3     
-# [13] stringr_1.3.0    yaml_2.1.16      compiler_3.4.3   htmltools_0.3.6 
-# [17] knitr_1.20</code></pre>
+#  [1] Rcpp_0.12.15     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
+#  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
+#  [9] stringi_1.1.6    rmarkdown_1.8    tools_3.4.3      stringr_1.3.0   
+# [13] yaml_2.1.16      compiler_3.4.3   htmltools_0.3.6  knitr_1.20</code></pre>
 </div>
 <div id="references" class="slide section level2">
 <h2>References</h2>

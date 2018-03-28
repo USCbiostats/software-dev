@@ -16,7 +16,7 @@ date: '<br>Department of Preventive Medicine<br>March 23, 2017'
 knitr::opts_chunk$set(echo = TRUE, comment = "#")
 
 # Installing required packages if you don't have it!
-pkgs <- c("devtools", "RcppArmadillo", "foreach", "iterators", "rbenchmark", "microbenchmark",
+pkgs <- c("devtools", "RcppArmadillo", "foreach", "iterators", "doRNG", "rbenchmark", "microbenchmark",
           "snow", "doParallel", "randomForest", "MASS")
 pkgs <- pkgs[which(!(pkgs %in% installed.packages()[,1]))]
 if (length(pkgs)) install.packages(pkgs)
@@ -316,7 +316,7 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
     * Method 1: `makeCluster` + `registerDoParallel`
     ```r
     # Create cluster
-    myCluster <- makeCluster("# of cores", type = "SOCK" or "FORK")
+    myCluster <- makeCluster("# of cores", type = "PSOCK" or "FORK")
     # Register cluster
     registerDoParallel(myCluster)
     ```
@@ -336,28 +336,30 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
     stopCluster(myCluster)
     ```
 
-* By default, Method 2 will create a SOCK cluster on Windows systems and a FORK cluster on Unix systems
+*   By default, Method 2 will create a SOCK cluster on Windows systems and a FORK cluster on Unix systems
 
-* `getDoParWorkers()` can be used to verify the number of workers (cores)
+*   `getDoParWorkers()` can be used to verify the number of workers (cores)
+
+*   With some extra work and packages (Rmpi, doMPI), we can also use an MPI backend to enable parallelization on multiple nodes
 
 ## The 'foreach' Package: Combining Results
 
-*   We can change the function used to combine results with the `.combine` option
+*   The `.combine` option is used to specify the function used to combine results
 
     ```{r, echo = FALSE}
     suppressMessages(library(doParallel))
-    myCluster <- makeCluster(4, type = "SOCK")
+    myCluster <- makeCluster(4, type = "PSOCK")
     registerDoParallel(myCluster)
     ```
     
-    ```{r foreach-combine, cahce = TRUE}
+    ```{r foreach-combine, cache = TRUE}
     # Combine the results in a vector
     foreach(x = c(4, 9, 16, 25), .combine = 'c') %dopar% sqrt(x)
     ```
 
     ```{r foreach-add, cache = TRUE}
     # Add the results together
-    foreach(x = rep(10, 6), .combine = '/') %dopar% x
+    foreach(x = c(4, 9, 16, 25), .combine = '+') %dopar% x
     ```
     
 *   By default, `.combine` assumes that the function accepts two arguments (except for `c`, `cbind`, `rbind`)
@@ -365,7 +367,8 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
     ```{r foreach-custom-combine, cache = TRUE}
     # Custom combine that creates a running product
     customCombine <- function(i, j) {
-      c(i, i[length(i)] * j)
+        cat(i, "\n")
+        c(i, i[length(i)] * j)
     }
     foreach(x = c(2, 4, 6, 8, 10), .combine = customCombine) %dopar% x
     ```
@@ -394,19 +397,19 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
 
 
     ```{r iterators-ex1}
-    vector_iterator <- iter(1:4, checkFunc = function(x) x %% 2 != 0)
+    vector_iterator <- iter(c(5, 10, 15, 20), checkFunc = function(x) x %% 2 != 0)
     ```
 
 
     ```{r iterators-ex1-2}
     str(vector_iterator)
-    vector_iterator$state$obj
+    cat("obj:", vector_iterator$state$obj, " i:", vector_iterator$state$i, "\n")
     ```
 
 
     ```{r iterators-ex1-3}
-    nextElem(vector_iterator)
-    nextElem(vector_iterator)
+    cat("current element:", nextElem(vector_iterator), " i:", vector_iterator$state$i, "\n")
+    cat("current element:", nextElem(vector_iterator), " i:", vector_iterator$state$i, "\n")
     ```
 
 
@@ -415,27 +418,31 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
 *   An iterator that traverses over blocks of columns of a matrix
 
     ```{r iterators-ex2, cache = TRUE}
-    iblkcol <- function(mat, num_blocks) {  
-      nc <- ncol(mat)
-      i <- 1
-      next_element <- function() {
-        if (num_blocks <= 0 || nc <= 0) stop('StopIteration')
-        block_size <- ceiling(nc / num_blocks)
-        col_idx <- seq(i, length = block_size)
-        i <<- i + block_size
-        nc <<- nc - block_size
-        num_blocks <<- num_blocks - 1
-        mat[, col_idx, drop=FALSE]
-      }
-      itr <- list(nextElem = next_element)
-      class(itr) <- c('iblkcol', 'abstractiter', 'iter')
-      itr
+    iblkcol <- function(mat, num_blocks) {
+        # initialize variables to hold num of cols and current col index
+        nc <- ncol(mat)
+        i <- 1
+        # define nextElem function 
+        next_element <- function() {
+            if (num_blocks <= 0 || nc <= 0) stop('StopIteration') # stop when we have no more columns
+            block_size <- ceiling(nc / num_blocks)                # determine block size
+            col_idx <- seq(i, length = block_size)                # get indices
+            i <<- i + block_size                                  # update current col index
+            nc <<- nc - block_size                                # update num cols remaining
+            num_blocks <<- num_blocks - 1                         # update num blocks remaining
+            mat[, col_idx, drop = FALSE]                          # return next set of columns
+        }
+        # output list element with necessary class definitions
+        itr <- list(nextElem = next_element)
+        class(itr) <- c('iblkcol', 'abstractiter', 'iter')
+        itr
     }
     myMatrix <- matrix(runif(200), nrow = 2, ncol = 100)
     splitMatrix <- iblkcol(myMatrix, num_blocks = 25)
     nextElem(splitMatrix)
-    myMatrix[, 1:4]
     ```
+
+* Note: The nextElem() function in splitMatrix is an example of a closure (encloses the environment of its parent function) 
 
 ## foreach Example: Bootstrapping
 
@@ -458,7 +465,7 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
         est[i] <- g(dat[boot_sample])
     }
         
-    # Compute standard error of estimate based on bootstrap sample statistics
+    # Compute standard error of estimate based on bootstrap samples
     se_est <- sd(est)
     ```
 
@@ -491,10 +498,10 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
 
 ## foreach Example: Bootstrapping (Estimating a Median)
 
-*   To use 'foreach', the loop is very similar
+*   The foreach loop is very similar
 
 ```{r, echo = FALSE}
-cl <- makeCluster(4, type = "SOCK")
+cl <- makeCluster(4, type = "PSOCK")
 registerDoParallel(cl)
 ```
 
@@ -507,7 +514,7 @@ registerDoParallel(cl)
     sd(median_est_fe)
     ```
 
-*   Timing
+*   Timing: foreach is slower due to communication overheard and the low computational burden of the individual tasks
     ```{r foreach-median-timing, cache = TRUE}
     summary(microbenchmark::microbenchmark(
             for_loop = for (i in 1:num_reps) {
@@ -526,34 +533,40 @@ registerDoParallel(cl)
 stopCluster(cl)
 ```
 
+*   To speed up, you may also consider "chunking" tasks to reduce communication overhead
 
 ## foreach Example: Bootstrapping (Logistic Regression)
 
-*   We can use the data set 'bacteria' from the 'MASS' package to analyze the association between bacteria presence and treatment (drug vs. placebo) 
-*   To simplify the example, we sample both the outcome and predictors (i.e. case resampling)
+*   As another example, we analyze the association between bacteria presence and treatment (drug vs. placebo) in the data set 'bacteria'  
+*   To simplify the example, we sample both the outcome and predictors (i.e. the entire observation), this is known as case sampling
 
     ```{r boot-reg, message = FALSE, warning = FALSE, cache = TRUE}
     library(boot)
     # get last observation point for each person (i.e. last time point tested for bacteria)
-    bact <- MASS::bacteria
-    bact <- do.call(rbind, by(bact, bact$ID, function(x) x[which.max(x$week), ]))
+    bact <- do.call(rbind, by(MASS::bacteria, MASS::bacteria$ID, function(x) x[which.max(x$week), ]))
     # function to compute coefficents
     boot_fun <- function(dat, idx, fmla) {
         coef(glm(fmla, data = dat[idx, ], family = binomial))
     }
     ```
 
-*   The 'boot' package provides functions to easily apply our function across bootstrap replicates
+*   Rather than write a for loop, the 'boot' package provides functions to easily apply our function across bootstrap replicates
 
     ```{r boot-reg2, cache = TRUE}
     set.seed(123)
-    boot(bact, boot_fun, R = 10000, fmla = as.formula("y ~ ap"))
+    boot(bact, boot_fun, R = 10000, fmla = as.formula(y ~ ap))
     ```
 
 
 ## foreach Example: Bootstrapping (Logistic Regression)
 
 *   We can replicate the results from 'boot' with 'foreach'
+
+    ```{r, echo = FALSE}
+    cl <- makeCluster(4, type = "PSOCK")
+    registerDoParallel(cl)
+    ```
+
     ```{r boot-reg3, cache = TRUE}
     set.seed(123)
     n <- nrow(bact)
@@ -561,7 +574,6 @@ stopCluster(cl)
     indices <- sample.int(n, n * 10000, replace = TRUE)
     dim(indices) <- c(10000, n)
     # fit all bootstrap logistic regression models and extract coefficients into a matrix
-    registerDoParallel(cores = 4)
     results_foreach <- foreach(x = iter(indices, by = 'row'), .combine = cbind, .inorder = FALSE) %dopar% {
         coef(glm(y ~ ap, data = bact[x, ], family = binomial))
     }
@@ -569,10 +581,9 @@ stopCluster(cl)
     apply(results_foreach, 1, sd)
     ```
 
-*   The 'doRNG' package allows us to easily handle random number generation (uses "L'Ecuyer-CMRG")
+*   The 'doRNG' package allows us to easily handle random number generation (note that the results will not match the previous)
     ```{r boot-doRNG, message = FALSE, warning = FALSE, cache = TRUE}
     library(doRNG)
-    registerDoParallel(cores = 4)
     results_foreach <- foreach(i = seq.int(10000), .combine = cbind, .inorder = FALSE) %dorng% {
         boot_samp <- sample.int(n, n, replace = TRUE)
         coef(glm(y ~ ap, data = bact[boot_samp, ], family = binomial))
@@ -582,11 +593,7 @@ stopCluster(cl)
 
 ## foreach Example: Bootstrapping (Logistic Regression)
 
-*   Timing
-
-    ```{r, echo = FALSE}
-    registerDoParallel(4)
-    ```
+*   Timing: With increased computational burden for each task, we see an improvement by using the parallel approach
 
     ```{r boot-regression-timing, cache = TRUE}
     summary(microbenchmark::microbenchmark(
@@ -599,6 +606,9 @@ stopCluster(cl)
         )[,c("expr","mean","median")]
     ```
 
+    ```{r}
+    stopCluster(cl)
+    ```
 
 ## foreach example 2: Random Forests
 
@@ -634,21 +644,24 @@ stopCluster(cl)
 
 *   Two changes in the call to `foreach`
     ```{r randomForest-syntax, eval = FALSE}
+    # random forest sequentially
     rf <- randomForest(X, y, ntree = 1000, nodesize = 3)
-
+    
+    # random forest parallel (split up tree generation)
     rf_par <- foreach(ntree = rep(250, 4), .combine = combine, .packages = "randomForest") %dopar% {
         randomForest(X, y, ntree = ntree, nodesize = 3)
     }
     ```
-    *   The 'randomForest' package has its own combine function that we can call with `.combine = combine`
-    *   The `.packages` option is used to export the 'randomForest' package to all the cores
+    *   The 'randomForest' package already has a function to combine objects of class randomForest `.combine = combine`
+    *   The `.packages` option must be used to export the 'randomForest' package to all the cores
 *   In the previous examples, we never explicitly export variables to the cores
-    *   By default, all objects in the current environment that are refenced in `foreach` are exported
-    *   '.export' and '.noexport' can be used to control which objects are exported
+    *   By default, (almost) all objects in the current scope that are refenced in `foreach` are exported
+    *   `.export` and `.noexport` can be used to control which objects are exported
+
 *   Timing
     ```{r foreach-forest-cluster, echo = FALSE}
     suppressMessages(library(randomForest))
-    cl <- makeCluster(4, type = "SOCK")
+    cl <- makeCluster(4, type = "PSOCK")
     registerDoParallel(cl)
     ```
 
@@ -656,7 +669,7 @@ stopCluster(cl)
     summary(microbenchmark::microbenchmark(
                 rf = randomForest(X, y, ntree = 1000, nodesize = 3),
                 rf_parallel = foreach(ntree = rep(250, 4), .combine = combine, .packages = "randomForest") %dopar% {
-                randomForest(X, y, ntree = ntree, nodesize = 3)},
+                    randomForest(X, y, ntree = ntree, nodesize = 3)},
                 times = 1)
             )[,c("expr","mean","median")]
     ```
