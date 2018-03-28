@@ -478,12 +478,12 @@ c(par = mean(ans_par), ser = mean(ans_ser), R = pi)
 
 ## foreach Example: Bootstrapping (Estimating a Median)
 
-*   Suppose we have the following small sample of 10 observations for which we want to estimate the sample median
+*   Suppose we have the following sample of 100 observations for which we want to estimate the sample median
 
     ```{r boot-median, cache = TRUE}
     set.seed(123)
-    dat <- rnorm(n = 10, mean = 2.3, sd = 1.5)
-    dat
+    dat <- rnorm(n = 100, mean = 2.3, sd = 1.5)
+    dat[1:5]
     ```
 
 *   We can modify the previous code to run 10,000 bootstrap replicates and obtain an estimate of the standard error for the median
@@ -655,7 +655,9 @@ stopCluster(cl)
     rf <- randomForest(X, y, ntree = 1000, nodesize = 3)
     
     # random forest parallel (split up tree generation)
-    rf_par <- foreach(ntree = rep(250, 4), .combine = combine, .packages = "randomForest") %dopar% {
+    rf_par <- foreach(ntree = rep(250, 4), 
+                      .combine = combine, 
+                      .packages = "randomForest") %dopar% {
         randomForest(X, y, ntree = ntree, nodesize = 3)
     }
     ```
@@ -675,10 +677,13 @@ stopCluster(cl)
     ```{r foreach-forest-timing, cache = TRUE, echo = FALSE}
     summary(microbenchmark::microbenchmark(
                 rf = randomForest(X, y, ntree = 1000, nodesize = 3),
-                rf_parallel = foreach(ntree = rep(250, 4), .combine = combine, .packages = "randomForest") %dopar% {
-                    randomForest(X, y, ntree = ntree, nodesize = 3)},
+                rf_parallel = foreach(ntree = rep(250, 4), 
+                                      .combine = combine, 
+                                      .packages = "randomForest") %dopar% {
+                    randomForest(X, y, ntree = ntree, nodesize = 3)
+                },
                 times = 1)
-            )[,c("expr","mean","median")]
+          )[,c("expr","mean","median")]
     ```
 
     ```{r, echo = FALSE}

@@ -9,14 +9,14 @@ output:
     incremental: true
     footer: Vega Yon & Weaver
     keep_md: true
-date: '<br>Department of Preventive Medicine<br>March 23, 2017'
+date: '<br>Department of Preventive Medicine<br>March 29, 2018'
 ---
 
 
 
 ## Agenda
 
-1.  High-Performance: An overview
+1.  High-Performance Computing: An overview
     
 2.  Parallel computing in R
     
@@ -25,6 +25,8 @@ date: '<br>Department of Preventive Medicine<br>March 23, 2017'
     a.  parallel
     b.  iterators+foreach
     c.  RcppArmadillo + OpenMP
+    
+4.  Exercises
 
 
 
@@ -37,6 +39,8 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 2.  Parallel computing: How to take advantage of multiple core systems
 
 3.  Compiled code: Write your own low-level code (if R doesn't has it yet...)
+
+(Checkout [CRAN Task View on HPC](https://cran.r-project.org/web/views/HighPerformanceComputing.html))
 
 
 ## Big Data
@@ -459,11 +463,11 @@ stopCluster(cl)
     
     ```
     # List of 4
-    #  $ state    :<environment: 0x4e71e98> 
+    #  $ state    :<environment: 0x51fbd28> 
     #  $ length   : int 4
     #  $ checkFunc:function (x)  
     #   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
-    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4dc41a0> 
+    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x515bea0> 
     #  $ recycle  : logi FALSE
     #  - attr(*, "class")= chr [1:2] "containeriter" "iter"
     ```
@@ -561,18 +565,17 @@ stopCluster(cl)
 
 ## foreach Example: Bootstrapping (Estimating a Median)
 
-*   Suppose we have the following small sample of 10 observations for which we want to estimate the sample median
+*   Suppose we have the following sample of 100 observations for which we want to estimate the sample median
 
     
     ```r
     set.seed(123)
-    dat <- rnorm(n = 10, mean = 2.3, sd = 1.5)
-    dat
+    dat <- rnorm(n = 100, mean = 2.3, sd = 1.5)
+    dat[1:5]
     ```
     
     ```
-    #  [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144  0.5867664
-    #  [7]  2.5357901 -0.7981109  1.6391797  2.3059299
+    # [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144
     ```
 
 *   We can modify the previous code to run 10,000 bootstrap replicates and obtain an estimate of the standard error for the median
@@ -807,7 +810,9 @@ stopCluster(cl)
     rf <- randomForest(X, y, ntree = 1000, nodesize = 3)
     
     # random forest parallel (split up tree generation)
-    rf_par <- foreach(ntree = rep(250, 4), .combine = combine, .packages = "randomForest") %dopar% {
+    rf_par <- foreach(ntree = rep(250, 4), 
+                      .combine = combine, 
+                      .packages = "randomForest") %dopar% {
         randomForest(X, y, ntree = ntree, nodesize = 3)
     }
     ```
@@ -823,8 +828,8 @@ stopCluster(cl)
     
     ```
     #          expr     mean   median
-    # 1          rf 41.35578 41.35578
-    # 2 rf_parallel 12.12340 12.12340
+    # 1          rf 41.90121 41.90121
+    # 2 rf_parallel 11.57544 11.57544
     ```
 
     
@@ -1105,14 +1110,17 @@ rbenchmark::benchmark(
 # [8] base     
 # 
 # other attached packages:
-# [1] randomForest_4.6-14 doParallel_1.0.11   iterators_1.0.9    
-# [4] foreach_1.4.4      
+# [1] randomForest_4.6-14 doRNG_1.6.6         rngtools_1.2.4     
+# [4] pkgmaker_0.22       registry_0.5        boot_1.3-20        
+# [7] doParallel_1.0.11   iterators_1.0.9     foreach_1.4.4      
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_0.12.16     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
-#  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
-#  [9] stringi_1.1.7    rmarkdown_1.9    tools_3.4.3      stringr_1.3.0   
-# [13] yaml_2.1.18      compiler_3.4.3   htmltools_0.3.6  knitr_1.20
+#  [1] Rcpp_0.12.16         codetools_0.2-15     digest_0.6.15       
+#  [4] rprojroot_1.3-2      xtable_1.8-2         backports_1.1.2     
+#  [7] magrittr_1.5         evaluate_0.10.1      highr_0.6           
+# [10] stringi_1.1.7        rmarkdown_1.9        tools_3.4.3         
+# [13] stringr_1.3.0        yaml_2.1.18          compiler_3.4.3      
+# [16] microbenchmark_1.4-4 htmltools_0.3.6      knitr_1.20
 ```
 
 ## Exercises

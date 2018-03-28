@@ -74,12 +74,12 @@ Garrett Weaver
 </table>
 <p></par></p>
   </p>
-  <p class="date"><br>Department of Preventive Medicine<br>March 23, 2017</p>
+  <p class="date"><br>Department of Preventive Medicine<br>March 29, 2018</p>
 </div>
 <div id="agenda" class="slide section level2">
 <h2>Agenda</h2>
 <ol class="incremental" style="list-style-type: decimal">
-<li><p>High-Performance: An overview</p></li>
+<li><p>High-Performance Computing: An overview</p></li>
 <li><p>Parallel computing in R</p></li>
 <li><p>Examples:</p>
 <ol class="incremental" style="list-style-type: lower-alpha">
@@ -87,6 +87,7 @@ Garrett Weaver
 <li>iterators+foreach</li>
 <li>RcppArmadillo + OpenMP</li>
 </ol></li>
+<li><p>Exercises</p></li>
 </ol>
 </div>
 <div id="high-performance-computing-an-overview" class="slide section level2">
@@ -97,6 +98,7 @@ Garrett Weaver
 <li><p>Parallel computing: How to take advantage of multiple core systems</p></li>
 <li><p>Compiled code: Write your own low-level code (if R doesn’t has it yet…)</p></li>
 </ol>
+<p>(Checkout <a href="https://cran.r-project.org/web/views/HighPerformanceComputing.html">CRAN Task View on HPC</a>)</p>
 </div>
 <div id="big-data" class="slide section level2">
 <h2>Big Data</h2>
@@ -376,11 +378,11 @@ customCombine &lt;-<span class="st"> </span><span class="cf">function</span>(i, 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vector_iterator &lt;-<span class="st"> </span><span class="kw">iter</span>(<span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>), <span class="dt">checkFunc =</span> <span class="cf">function</span>(x) x <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(vector_iterator)</code></pre></div>
 <pre><code># List of 4
-#  $ state    :&lt;environment: 0x4e71e98&gt; 
+#  $ state    :&lt;environment: 0x51fbd28&gt; 
 #  $ length   : int 4
 #  $ checkFunc:function (x)  
 #   ..- attr(*, &quot;srcref&quot;)=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
-#   .. .. ..- attr(*, &quot;srcfile&quot;)=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x4dc41a0&gt; 
+#   .. .. ..- attr(*, &quot;srcfile&quot;)=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x515bea0&gt; 
 #  $ recycle  : logi FALSE
 #  - attr(*, &quot;class&quot;)= chr [1:2] &quot;containeriter&quot; &quot;iter&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="st">&quot;obj:&quot;</span>, vector_iterator<span class="op">$</span>state<span class="op">$</span>obj, <span class="st">&quot; i:&quot;</span>, vector_iterator<span class="op">$</span>state<span class="op">$</span>i, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
@@ -455,12 +457,11 @@ se_est &lt;-<span class="st"> </span><span class="kw">sd</span>(est)</code></pre
 <div id="foreach-example-bootstrapping-estimating-a-median" class="slide section level2">
 <h2>foreach Example: Bootstrapping (Estimating a Median)</h2>
 <ul class="incremental">
-<li><p>Suppose we have the following small sample of 10 observations for which we want to estimate the sample median</p>
+<li><p>Suppose we have the following sample of 100 observations for which we want to estimate the sample median</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">123</span>)
-dat &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="dv">10</span>, <span class="dt">mean =</span> <span class="fl">2.3</span>, <span class="dt">sd =</span> <span class="fl">1.5</span>)
-dat</code></pre></div>
-<pre><code>#  [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144  0.5867664
-#  [7]  2.5357901 -0.7981109  1.6391797  2.3059299</code></pre></li>
+dat &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="dv">100</span>, <span class="dt">mean =</span> <span class="fl">2.3</span>, <span class="dt">sd =</span> <span class="fl">1.5</span>)
+dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</code></pre></div>
+<pre><code># [1]  0.8471109  3.3591636  4.5335320 -0.4226388  2.7956144</code></pre></li>
 <li><p>We can modify the previous code to run 10,000 bootstrap replicates and obtain an estimate of the standard error for the median</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vector to hold estimates across bootstrap samples</span>
 n &lt;-<span class="st"> </span><span class="kw">length</span>(dat)
@@ -626,7 +627,9 @@ y &lt;-<span class="st"> </span><span class="kw">gl</span>(<span class="dv">2</s
 rf &lt;-<span class="st"> </span><span class="kw">randomForest</span>(X, y, <span class="dt">ntree =</span> <span class="dv">1000</span>, <span class="dt">nodesize =</span> <span class="dv">3</span>)
 
 <span class="co"># random forest parallel (split up tree generation)</span>
-rf_par &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">ntree =</span> <span class="kw">rep</span>(<span class="dv">250</span>, <span class="dv">4</span>), <span class="dt">.combine =</span> combine, <span class="dt">.packages =</span> <span class="st">&quot;randomForest&quot;</span>) <span class="op">%dopar%</span><span class="st"> </span>{
+rf_par &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">ntree =</span> <span class="kw">rep</span>(<span class="dv">250</span>, <span class="dv">4</span>), 
+                  <span class="dt">.combine =</span> combine, 
+                  <span class="dt">.packages =</span> <span class="st">&quot;randomForest&quot;</span>) <span class="op">%dopar%</span><span class="st"> </span>{
     <span class="kw">randomForest</span>(X, y, <span class="dt">ntree =</span> ntree, <span class="dt">nodesize =</span> <span class="dv">3</span>)
 }</code></pre></div>
 <ul class="incremental">
@@ -640,8 +643,8 @@ rf_par &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class
 </ul></li>
 <li><p>Timing</p>
 <pre><code>#          expr     mean   median
-# 1          rf 41.35578 41.35578
-# 2 rf_parallel 12.12340 12.12340</code></pre></li>
+# 1          rf 41.90121 41.90121
+# 2 rf_parallel 11.57544 11.57544</code></pre></li>
 </ul>
 </div>
 <div id="rcpparmadillo-and-openmp" class="slide section level2">
@@ -858,14 +861,17 @@ rbenchmark<span class="op">::</span><span class="kw">benchmark</span>(
 # [8] base     
 # 
 # other attached packages:
-# [1] randomForest_4.6-14 doParallel_1.0.11   iterators_1.0.9    
-# [4] foreach_1.4.4      
+# [1] randomForest_4.6-14 doRNG_1.6.6         rngtools_1.2.4     
+# [4] pkgmaker_0.22       registry_0.5        boot_1.3-20        
+# [7] doParallel_1.0.11   iterators_1.0.9     foreach_1.4.4      
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_0.12.16     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
-#  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
-#  [9] stringi_1.1.7    rmarkdown_1.9    tools_3.4.3      stringr_1.3.0   
-# [13] yaml_2.1.18      compiler_3.4.3   htmltools_0.3.6  knitr_1.20</code></pre>
+#  [1] Rcpp_0.12.16         codetools_0.2-15     digest_0.6.15       
+#  [4] rprojroot_1.3-2      xtable_1.8-2         backports_1.1.2     
+#  [7] magrittr_1.5         evaluate_0.10.1      highr_0.6           
+# [10] stringi_1.1.7        rmarkdown_1.9        tools_3.4.3         
+# [13] stringr_1.3.0        yaml_2.1.18          compiler_3.4.3      
+# [16] microbenchmark_1.4-4 htmltools_0.3.6      knitr_1.20</code></pre>
 </div>
 <div id="exercises" class="slide section level2">
 <h2>Exercises</h2>
