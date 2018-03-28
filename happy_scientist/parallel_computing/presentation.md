@@ -65,14 +65,17 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 <p class="caption">[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)</p>
 </div>
 
-**Why are we still using CPUs instead of GPUs?**
+*   **Why are we still using CPUs instead of GPUs?**
+    
+    > GPUs have far more processor cores than CPUs, but because each GPU core runs
+      significantly slower than a CPU core and do not have the features needed for
+      modern operating systems, they are not appropriate for performing most of the
+      processing in everyday computing. They are most suited to compute-intensive
+      operations such as video processing and physics simulations.
+      ([bwDraco at superuser](https://superuser.com/questions/308771/why-are-we-still-using-cpus-instead-of-gpus))
 
-> GPUs have far more processor cores than CPUs, but because each GPU core runs
-  significantly slower than a CPU core and do not have the features needed for
-  modern operating systems, they are not appropriate for performing most of the
-  processing in everyday computing. They are most suited to compute-intensive
-  operations such as video processing and physics simulations.
-  ([bwDraco at superuser](https://superuser.com/questions/308771/why-are-we-still-using-cpus-instead-of-gpus))
+*   Why use OpenMP if GPU is _suited to compute-intensive operations_? Well, mostly because
+    OpenMP is **VERY** easy to implement (easier than CUDA, which is the easiest way to use GPU).
 
 ## When is it a good idea?
 
@@ -275,8 +278,8 @@ rbenchmark::benchmark(
 
 ```
 #       test replications elapsed relative
-# 1 parallel            1    0.50      1.0
-# 2   serial            1    1.35      2.7
+# 1 parallel            1   0.455    1.000
+# 2   serial            1   1.842    4.048
 ```
 
 
@@ -456,11 +459,11 @@ stopCluster(cl)
     
     ```
     # List of 4
-    #  $ state    :<environment: 0x000000001a331e08> 
+    #  $ state    :<environment: 0x4e71e98> 
     #  $ length   : int 4
     #  $ checkFunc:function (x)  
     #   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
-    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x000000001a0f9218> 
+    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4dc41a0> 
     #  $ recycle  : logi FALSE
     #  - attr(*, "class")= chr [1:2] "containeriter" "iter"
     ```
@@ -617,7 +620,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 1.820805
+    # [1] 1.811854
     ```
     
     ```r
@@ -625,7 +628,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.7340887
+    # [1] 0.7306325
     ```
 
 *   Timing: foreach is slower due to communication overheard and the low computational burden of the individual tasks
@@ -645,9 +648,9 @@ stopCluster(cl)
     ```
     
     ```
-    #       expr     mean   median
-    # 1 for_loop  357.286  357.286
-    # 2  foreach 2493.975 2493.975
+    #       expr      mean    median
+    # 1 for_loop  389.4132  389.4132
+    # 2  foreach 3288.3632 3288.3632
     ```
 
 
@@ -754,9 +757,9 @@ stopCluster(cl)
     ```
     
     ```
-    #      expr     mean   median
-    # 1    boot 17.11129 17.11129
-    # 2 foreach  8.10648  8.10648
+    #      expr      mean    median
+    # 1    boot 18.381147 18.381147
+    # 2 foreach  9.703243  9.703243
     ```
 
     
@@ -820,8 +823,8 @@ stopCluster(cl)
     
     ```
     #          expr     mean   median
-    # 1          rf 41.26863 41.26863
-    # 2 rf_parallel 13.85913 13.85913
+    # 1          rf 41.35578 41.35578
+    # 2 rf_parallel 12.12340 12.12340
     ```
 
     
@@ -838,7 +841,8 @@ stopCluster(cl)
 *   Use `arma` objects, e.g. `arma::mat`, `arma::vec`, etc. Or, if you are used to them
     `std::vector` objects as these are thread safe.
 
-*   Pseudo Random Number Generation is not very straight forward.
+*   Pseudo Random Number Generation is not very straight forward... But C++11 has
+    a [nice set of functions](http://en.cppreference.com/w/cpp/numeric/random) that can be used together with OpenMP
 
 *   Need to think about how processors work, cache memory, etc. Otherwise you could
     get into trouble... if your code is slower when run in parallel, then you probably
@@ -960,10 +964,10 @@ rbenchmark::benchmark(
 
 ```
 #                      test replications elapsed relative
-# 4 dist_par(x, cores = 10)            1    2.83    1.000
-# 3  dist_par(x, cores = 4)            1    3.60    1.272
-# 2  dist_par(x, cores = 1)            1    7.39    2.611
-# 1                 dist(x)            1    8.77    3.099
+# 4 dist_par(x, cores = 10)            1   0.512    1.000
+# 3  dist_par(x, cores = 4)            1   1.180    2.305
+# 2  dist_par(x, cores = 1)            1   2.358    4.605
+# 1                 dist(x)            1   5.463   10.670
 ```
 
 
@@ -977,8 +981,11 @@ using namespace Rcpp;
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::plugins(openmp)]]
 
+// C++11 provides several RNGs algorithms that can be set up to be thread safe.
+// [[Rcpp::plugins(cpp11)]]
+
 // [[Rcpp::export]]
-double sim_pi(int m, int cores = 1) {
+double sim_pi(int m, int cores = 1, int seed = 100) {
   
   // Setting the cores
   omp_set_num_threads(cores);
@@ -989,24 +996,32 @@ double sim_pi(int m, int cores = 1) {
   double piest;
   int i;
   
-  // Pseudo RNG is not easy in OMP
-  arma::mat points(m, 2);
-  for (i = 0;i< (int) points.n_rows; i++)
-    points.at(i, 0) = unif_rand()*2.0 - 1,
-      points.at(i, 1) = unif_rand()*2.0 - 1;
-  
-#pragma omp parallel default(none) shared(ans, cores, points) \
-  firstprivate(val, n, m) \
+#pragma omp parallel default(none) shared(ans, cores) \
+  firstprivate(val, n, m, seed) \
   private(piest, i, d)
 {
     
   // Which core are we
   int core_num = omp_get_thread_num();
     
+  // Setting up the RNG
+  // - The first line creates an engine that uses the 64-bit Mersenne Twister by
+  //   Matsumoto and Nishimura, 2000. One seed per core.
+  // - The second line creates a function based on the real uniform between -1
+  //   and 1. This receives as argument the engine
+  std::mt19937_64 engine((core_num + seed)*10);
+  std::uniform_real_distribution<double> my_runif(-1.0, 1.0);
+  
+  double p0, p1;
+    
   piest = 0.0;
   for (i = n*core_num; i < (n + n*core_num); i++) {
     
-    d = sqrt(pow(points.at(i, 0), 2.0) + pow(points.at(i, 1), 2.0));
+    // Random number generation (see how we pass the engine)
+    p0 = my_runif(engine);
+    p1 = my_runif(engine);
+    
+    d = sqrt(pow(p0, 2.0) + pow(p1, 2.0));
     
     if (d <= 1.0)
       piest += val;
@@ -1030,20 +1045,20 @@ double sim_pi(int m, int cores = 1) {
 # Compiling c++
 Rcpp::sourceCpp("simpi.cpp")
 
-# Running in 1 or 10 cores should be the same
-set.seed(1); sim_pi(1e5, 1)
+# Does the seed work?
+sim_pi(1e5, cores = 4, seed = 50)
 ```
 
 ```
-# [1] 3.14532
+# [1] 3.1478
 ```
 
 ```r
-set.seed(1); sim_pi(1e5, 10)
+sim_pi(1e5, cores = 4, seed = 50)
 ```
 
 ```
-# [1] 3.14532
+# [1] 3.1478
 ```
 
 ```r
@@ -1059,44 +1074,54 @@ rbenchmark::benchmark(
 
 ```
 #   test replications elapsed relative
-# 1 pi01            1    4.78    1.117
-# 2 pi04            1    4.28    1.000
-# 3 pi10            1    4.28    1.000
+# 1 pi01            1   2.578    6.095
+# 2 pi04            1   0.915    2.163
+# 3 pi10            1   0.423    1.000
 ```
 
-No big speed gains... but at least you know how to use it now :)!
+~~No big speed gains... but at least you know how to use it now :)!~~ Nice speed gains!
 
 ## Thanks!
 
 
 ```
 # R version 3.4.3 (2017-11-30)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 10 x64 (build 16299)
+# Platform: x86_64-redhat-linux-gnu (64-bit)
+# Running under: CentOS Linux 7 (Core)
 # 
 # Matrix products: default
+# BLAS/LAPACK: /usr/lib64/R/lib/libRblas.so
 # 
 # locale:
-# [1] LC_COLLATE=English_United States.1252 
-# [2] LC_CTYPE=English_United States.1252   
-# [3] LC_MONETARY=English_United States.1252
-# [4] LC_NUMERIC=C                          
-# [5] LC_TIME=English_United States.1252    
+#  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+#  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+#  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+# [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 # 
 # attached base packages:
 # [1] parallel  stats     graphics  grDevices utils     datasets  methods  
 # [8] base     
 # 
 # other attached packages:
-# [1] randomForest_4.6-12 doParallel_1.0.11   iterators_1.0.9    
+# [1] randomForest_4.6-14 doParallel_1.0.11   iterators_1.0.9    
 # [4] foreach_1.4.4      
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_0.12.15     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
+#  [1] Rcpp_0.12.16     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
 #  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
-#  [9] stringi_1.1.6    rmarkdown_1.8    tools_3.4.3      stringr_1.3.0   
-# [13] yaml_2.1.16      compiler_3.4.3   htmltools_0.3.6  knitr_1.20
+#  [9] stringi_1.1.7    rmarkdown_1.9    tools_3.4.3      stringr_1.3.0   
+# [13] yaml_2.1.18      compiler_3.4.3   htmltools_0.3.6  knitr_1.20
 ```
+
+## Exercises
+
+1.  Generating multivariate normal random samples using parallel and foreach ([`random-mvn.R`](random-mvn.R) for pseudo-code, and `random-mvn-solution.R` for the implementation).
+
+2.  Fibonacci with Rcpp ([`fib.R`](fib.R) for pseudo-code, and [`fib-solution.R`](fib-solution.R) for the implementation).
+
+3.  Rewriting the `scale` function using Rcpp and OpenMP ([`scale.cpp`](scale.cpp) for pseudo-code, and [`scale-solution.cpp`](scale-solution.cpp) for the implementation).
 
 ## References
 

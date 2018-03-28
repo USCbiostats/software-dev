@@ -9,7 +9,7 @@ output:
     incremental: true
     footer: Vega Yon & Weaver
     keep_md: true
-date: '<br>Department of Preventive Medicine<br>March 23, 2017'
+date: '<br>Department of Preventive Medicine<br>March 29, 2018'
 ---
 
 ```{r setup, include=FALSE, fig.align='center', warning=FALSE, message=FALSE}
@@ -24,7 +24,7 @@ if (length(pkgs)) install.packages(pkgs)
 
 ## Agenda
 
-1.  High-Performance: An overview
+1.  High-Performance Computing: An overview
     
 2.  Parallel computing in R
     
@@ -33,6 +33,8 @@ if (length(pkgs)) install.packages(pkgs)
     a.  parallel
     b.  iterators+foreach
     c.  RcppArmadillo + OpenMP
+    
+4.  Exercises
 
 
 
@@ -45,6 +47,8 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 2.  Parallel computing: How to take advantage of multiple core systems
 
 3.  Compiled code: Write your own low-level code (if R doesn't has it yet...)
+
+(Checkout [CRAN Task View on HPC](https://cran.r-project.org/web/views/HighPerformanceComputing.html))
 
 
 ## Big Data
@@ -71,14 +75,17 @@ knitr::include_graphics("flynnsTaxonomy.gif")
 knitr::include_graphics("cpuvsgpu.jpg")
 ```
 
-**Why are we still using CPUs instead of GPUs?**
+*   **Why are we still using CPUs instead of GPUs?**
+    
+    > GPUs have far more processor cores than CPUs, but because each GPU core runs
+      significantly slower than a CPU core and do not have the features needed for
+      modern operating systems, they are not appropriate for performing most of the
+      processing in everyday computing. They are most suited to compute-intensive
+      operations such as video processing and physics simulations.
+      ([bwDraco at superuser](https://superuser.com/questions/308771/why-are-we-still-using-cpus-instead-of-gpus))
 
-> GPUs have far more processor cores than CPUs, but because each GPU core runs
-  significantly slower than a CPU core and do not have the features needed for
-  modern operating systems, they are not appropriate for performing most of the
-  processing in everyday computing. They are most suited to compute-intensive
-  operations such as video processing and physics simulations.
-  ([bwDraco at superuser](https://superuser.com/questions/308771/why-are-we-still-using-cpus-instead-of-gpus))
+*   Why use OpenMP if GPU is _suited to compute-intensive operations_? Well, mostly because
+    OpenMP is **VERY** easy to implement (easier than CUDA, which is the easiest way to use GPU).
 
 ## When is it a good idea?
 
@@ -690,7 +697,8 @@ stopCluster(cl)
 *   Use `arma` objects, e.g. `arma::mat`, `arma::vec`, etc. Or, if you are used to them
     `std::vector` objects as these are thread safe.
 
-*   Pseudo Random Number Generation is not very straight forward.
+*   Pseudo Random Number Generation is not very straight forward... But C++11 has
+    a [nice set of functions](http://en.cppreference.com/w/cpp/numeric/random) that can be used together with OpenMP
 
 *   Need to think about how processors work, cache memory, etc. Otherwise you could
     get into trouble... if your code is slower when run in parallel, then you probably
@@ -812,8 +820,11 @@ using namespace Rcpp;
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::plugins(openmp)]]
 
+// C++11 provides several RNGs algorithms that can be set up to be thread safe.
+// [[Rcpp::plugins(cpp11)]]
+
 // [[Rcpp::export]]
-double sim_pi(int m, int cores = 1) {
+double sim_pi(int m, int cores = 1, int seed = 100) {
   
   // Setting the cores
   omp_set_num_threads(cores);
@@ -824,24 +835,32 @@ double sim_pi(int m, int cores = 1) {
   double piest;
   int i;
   
-  // Pseudo RNG is not easy in OMP
-  arma::mat points(m, 2);
-  for (i = 0;i< (int) points.n_rows; i++)
-    points.at(i, 0) = unif_rand()*2.0 - 1,
-      points.at(i, 1) = unif_rand()*2.0 - 1;
-  
-#pragma omp parallel default(none) shared(ans, cores, points) \
-  firstprivate(val, n, m) \
+#pragma omp parallel default(none) shared(ans, cores) \
+  firstprivate(val, n, m, seed) \
   private(piest, i, d)
 {
     
   // Which core are we
   int core_num = omp_get_thread_num();
     
+  // Setting up the RNG
+  // - The first line creates an engine that uses the 64-bit Mersenne Twister by
+  //   Matsumoto and Nishimura, 2000. One seed per core.
+  // - The second line creates a function based on the real uniform between -1
+  //   and 1. This receives as argument the engine
+  std::mt19937_64 engine((core_num + seed)*10);
+  std::uniform_real_distribution<double> my_runif(-1.0, 1.0);
+  
+  double p0, p1;
+    
   piest = 0.0;
   for (i = n*core_num; i < (n + n*core_num); i++) {
     
-    d = sqrt(pow(points.at(i, 0), 2.0) + pow(points.at(i, 1), 2.0));
+    // Random number generation (see how we pass the engine)
+    p0 = my_runif(engine);
+    p1 = my_runif(engine);
+    
+    d = sqrt(pow(p0, 2.0) + pow(p1, 2.0));
     
     if (d <= 1.0)
       piest += val;
@@ -864,9 +883,9 @@ double sim_pi(int m, int cores = 1) {
 # Compiling c++
 Rcpp::sourceCpp("simpi.cpp")
 
-# Running in 1 or 10 cores should be the same
-set.seed(1); sim_pi(1e5, 1)
-set.seed(1); sim_pi(1e5, 10)
+# Does the seed work?
+sim_pi(1e5, cores = 4, seed = 50)
+sim_pi(1e5, cores = 4, seed = 50)
 
 # Benchmarking
 nsim <- 1e8
@@ -879,13 +898,21 @@ rbenchmark::benchmark(
 
 ```
 
-No big speed gains... but at least you know how to use it now :)!
+~~No big speed gains... but at least you know how to use it now :)!~~ Nice speed gains!
 
 ## Thanks!
 
 ```{r session, echo=FALSE}
 sessionInfo()
 ```
+
+## Exercises
+
+1.  Generating multivariate normal random samples using parallel and foreach ([`random-mvn.R`](random-mvn.R) for pseudo-code, and `random-mvn-solution.R` for the implementation).
+
+2.  Fibonacci with Rcpp ([`fib.R`](fib.R) for pseudo-code, and [`fib-solution.R`](fib-solution.R) for the implementation).
+
+3.  Rewriting the `scale` function using Rcpp and OpenMP ([`scale.cpp`](scale.cpp) for pseudo-code, and [`scale-solution.cpp`](scale-solution.cpp) for the implementation).
 
 ## References
 

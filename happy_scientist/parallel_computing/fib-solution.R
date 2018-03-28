@@ -1,3 +1,5 @@
+library(Rcpp)
+
 #' Fibonacci numbers https://en.wikipedia.org/wiki/Fibonacci_number
 #' {\displaystyle F_{n}=F_{n-1}+F_{n-2},}
 #' 
@@ -20,7 +22,10 @@ barplot(ans, names.arg = ans, las=2)
 
 fibRcpp <- Rcpp::cppFunction("
 double fibRcpp(int n, double f1 = 1, double f2 = 0) {
-  // ALMOST EXACTLY THE SAME AS IN R
+  if (n > 0)
+    return fibRcpp(n - 1, f1 + f2, f1);
+  else
+    return f1;
 }
 ")
 
