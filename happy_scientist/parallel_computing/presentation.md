@@ -1,5 +1,5 @@
 ---
-title: 'The "Happy Scientist" Seminar Series #5<br>A brief introduction to using R for high-performance computing'
+title: 'The "Happy Scientist" Workshop #1<br>An introduction to high-performance computing using R'
 author: '<par><table style="text-align:center;width:100%"><tr><td>George Vega Yon</td><td>Garrett Weaver</td></tr><tr><td>vegayon@usc.edu</td><td>gmweaver@usc.edu</tb></tr></table></par>'
 output: 
   slidy_presentation:
@@ -7,10 +7,11 @@ output:
     highlight: haddock
     duration: 45
     incremental: true
-    footer: Vega Yon & Weaver
+    footer: Vega Yon & Weaver, USC IMAGE
     keep_md: true
-date: '<br>Department of Preventive Medicine<br>March 29, 2018'
+date: '<br>USC Integrative Methods of Analysis for Genomic Epidemiology (IMAGE)<br>Department of Preventive Medicine<br>March 29, 2018'
 ---
+
 
 
 
@@ -25,6 +26,7 @@ date: '<br>Department of Preventive Medicine<br>March 29, 2018'
     a.  parallel
     b.  iterators+foreach
     c.  RcppArmadillo + OpenMP
+    d.  RcppArmadillo + OpenMP + Slurm
     
 4.  Exercises
 
@@ -41,6 +43,8 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 3.  Compiled code: Write your own low-level code (if R doesn't has it yet...)
 
 (Checkout [CRAN Task View on HPC](https://cran.r-project.org/web/views/HighPerformanceComputing.html))
+
+
 
 
 ## Big Data
@@ -282,8 +286,8 @@ rbenchmark::benchmark(
 
 ```
 #       test replications elapsed relative
-# 1 parallel            1    0.47    1.000
-# 2   serial            1    1.34    2.851
+# 1 parallel            1   0.455    1.000
+# 2   serial            1   1.842    4.048
 ```
 
 
@@ -463,11 +467,11 @@ stopCluster(cl)
     
     ```
     # List of 4
-    #  $ state    :<environment: 0x000000001a12c8f8> 
+    #  $ state    :<environment: 0x4449468> 
     #  $ length   : int 4
     #  $ checkFunc:function (x)  
     #   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
-    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x000000001a0a14a8> 
+    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4252b20> 
     #  $ recycle  : logi FALSE
     #  - attr(*, "class")= chr [1:2] "containeriter" "iter"
     ```
@@ -596,7 +600,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 2.238624
+    # [1] 1.820074
     ```
     
     ```r
@@ -604,7 +608,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.1871364
+    # [1] 0.7335949
     ```
 
 ## foreach Example: Bootstrapping (Estimating a Median)
@@ -623,7 +627,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 2.238222
+    # [1] 1.811854
     ```
     
     ```r
@@ -631,7 +635,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.188434
+    # [1] 0.7306325
     ```
 
 *   Timing: foreach is slower due to communication overheard and the low computational burden of the individual tasks
@@ -651,9 +655,9 @@ stopCluster(cl)
     ```
     
     ```
-    #       expr     mean   median
-    # 1 for_loop  416.624  416.624
-    # 2  foreach 2567.996 2567.996
+    #       expr      mean    median
+    # 1 for_loop  389.4132  389.4132
+    # 2  foreach 3288.3632 3288.3632
     ```
 
 
@@ -761,8 +765,8 @@ stopCluster(cl)
     
     ```
     #      expr      mean    median
-    # 1    boot 16.716193 16.716193
-    # 2 foreach  7.661397  7.661397
+    # 1    boot 18.381147 18.381147
+    # 2 foreach  9.703243  9.703243
     ```
 
     
@@ -828,8 +832,8 @@ stopCluster(cl)
     
     ```
     #          expr     mean   median
-    # 1          rf 40.43248 40.43248
-    # 2 rf_parallel 13.59818 13.59818
+    # 1          rf 41.90121 41.90121
+    # 2 rf_parallel 11.57544 11.57544
     ```
 
     
@@ -969,10 +973,10 @@ rbenchmark::benchmark(
 
 ```
 #                      test replications elapsed relative
-# 4 dist_par(x, cores = 10)            1    2.81    1.000
-# 3  dist_par(x, cores = 4)            1    3.71    1.320
-# 2  dist_par(x, cores = 1)            1    7.24    2.577
-# 1                 dist(x)            1    8.62    3.068
+# 4 dist_par(x, cores = 10)            1   0.512    1.000
+# 3  dist_par(x, cores = 4)            1   1.180    2.305
+# 2  dist_par(x, cores = 1)            1   2.358    4.605
+# 1                 dist(x)            1   5.463   10.670
 ```
 
 
@@ -1079,43 +1083,83 @@ rbenchmark::benchmark(
 
 ```
 #   test replications elapsed relative
-# 1 pi01            1    2.59    5.511
-# 2 pi04            1    0.71    1.511
-# 3 pi10            1    0.47    1.000
+# 1 pi01            1   2.578    6.095
+# 2 pi04            1   0.915    2.163
+# 3 pi10            1   0.423    1.000
 ```
 
 ~~No big speed gains... but at least you know how to use it now :)!~~ Nice speed gains!
+
+## RcppArmadillo + OpenMP + Slurm: Using the `rslurm` package
+
+*   The [`rslurm` package (Marchand, 2017)](https://CRAN.R-project.org/package=rslurm) provides a wrapper of Slurm in R.
+
+*   Without the need of knowing much about the syntax of `slurm`, this R package does the following:
+    
+    1.  Writes an R source file that sets up each node with your current config (packages, libpath, etc.). The outputs are stored in a known folder so these can be fetched out later.
+    
+    2.  Writes a bash file with the call to `sbatch` (you can specify options).
+    
+    3.  Executes the bash file and returns the jobid (you can query its status interatively).
+        
+        Here is a simple example with our `sim_pi` function (so we are mixing OpenMP with Slurm!):
+        
+        ```r
+        library(rslurm)
+        
+        nnodes <- 2L
+        
+        sjob <- slurm_apply(
+          f = function(n) {
+            # Compiling Rcpp
+            Rcpp::sourceCpp("~/simpi.cpp")
+        
+            # Returning pi
+            sim_pi(1e9, cores = 8, seed = n*100)
+          },
+          params        = data.frame(n = 1:nnodes), jobname = "sim-pi",
+          cpus_per_node = 1,
+          slurm_options = list(`cpus-per-task` = 8),
+          nodes         = nnodes,
+          submit        = TRUE
+        )
+        
+        save.image("~/sim-pi.rda")
+        ```
+
 
 ## Thanks!
 
 
 ```
 # R version 3.4.3 (2017-11-30)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 10 x64 (build 16299)
+# Platform: x86_64-redhat-linux-gnu (64-bit)
+# Running under: CentOS Linux 7 (Core)
 # 
 # Matrix products: default
+# BLAS/LAPACK: /usr/lib64/R/lib/libRblas.so
 # 
 # locale:
-# [1] LC_COLLATE=English_United States.1252 
-# [2] LC_CTYPE=English_United States.1252   
-# [3] LC_MONETARY=English_United States.1252
-# [4] LC_NUMERIC=C                          
-# [5] LC_TIME=English_United States.1252    
+#  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+#  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+#  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+# [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 # 
 # attached base packages:
 # [1] parallel  stats     graphics  grDevices utils     datasets  methods  
 # [8] base     
 # 
 # other attached packages:
-# [1] randomForest_4.6-12 doParallel_1.0.11   iterators_1.0.9    
+# [1] randomForest_4.6-14 doParallel_1.0.11   iterators_1.0.9    
 # [4] foreach_1.4.4      
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_0.12.15     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
+#  [1] Rcpp_0.12.16     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
 #  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
-#  [9] stringi_1.1.6    rmarkdown_1.8    tools_3.4.3      stringr_1.3.0   
-# [13] yaml_2.1.16      compiler_3.4.3   htmltools_0.3.6  knitr_1.20
+#  [9] stringi_1.1.7    rmarkdown_1.9    tools_3.4.3      stringr_1.3.0   
+# [13] yaml_2.1.18      compiler_3.4.3   htmltools_0.3.6  knitr_1.20
 ```
 
 ## Exercises
@@ -1125,6 +1169,8 @@ rbenchmark::benchmark(
 2.  Fibonacci with Rcpp ([`fib.R`](fib.R) for pseudo-code, and [`fib-solution.R`](fib-solution.R) for the implementation).
 
 3.  Rewriting the `scale` function using Rcpp and OpenMP ([`scale.cpp`](scale.cpp) for pseudo-code, and [`scale-solution.cpp`](scale-solution.cpp) for the implementation).
+
+Another example is provided in the file [`wordcount.R`](wordcount.R) (you'll need the dataset [`ulysses.txt`](ulysses.txt))
 
 ## References
 

@@ -1,8 +1,32 @@
+/***
+ * Exercise 3: Rewriting the scale function using Rcpp and OpenMP
+ * Write down a C++ function using RcppArmadillo and OpenMP that centers and
+ * scales each column of a matrix as the `scale` function in R does.
+ * 
+ * The R function provides an alternative implementation of the `scale` function.
+ * This is included just to show that sometimes we don't need that much fancy
+ * code to speed up things.
+ * 
+ * The C++ function `scaleRcpp` provides a starting point. This very same function
+ * with the name `scaleRcpp_omp` is the one that you need to modify in order to
+ * use OpenMP.
+ * 
+ * Besides of modifying the function, recall including the header, and telling
+ * Rcpp to link it to openmp.
+ * 
+ * Author: GEORGE G VEGA YON
+ * Date  : 2018-03-29
+ * 
+ */
+
 #include <RcppArmadillo.h>
+
+// 3a) INLCUDE THE OPENMP LIBRARY ----------------------------------------------
 #include <omp.h>
 using namespace Rcpp;
 
 // [[Rcpp::depends(RcppArmadillo)]]
+// 3b) LOAD THE OPENMP PLUGIN --------------------------------------------------
 // [[Rcpp::plugins(openmp)]]
 
 // [[Rcpp::export]]
@@ -26,11 +50,13 @@ arma::mat scaleRcpp(const arma::mat & A) {
 arma::mat scaleRcpp_omp(const arma::mat & A, int cores = 1) {
   
   arma::mat ans(A);
-  
-  // Setting the cores
-  omp_set_num_threads(cores);
   int n = (int) A.n_rows, K = (int) A.n_cols;
   
+  // Setting the cores
+// 3c) SET UP THE NUMBER OF CORES ----------------------------------------------
+  omp_set_num_threads(cores);
+
+// 3d) HERE GOES PRAGMA --------------------------------------------------------
 #pragma omp parallel for shared(ans) default(none) schedule(static) \
   firstprivate(n, K)
   for (int k = 0; k < K; k++) {

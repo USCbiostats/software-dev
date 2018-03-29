@@ -1,22 +1,33 @@
 /***
- * EXERCISE:
+ * Exercise 3: Rewriting the scale function using Rcpp and OpenMP
  * Write down a C++ function using RcppArmadillo and OpenMP that centers and
  * scales each column of a matrix as the `scale` function in R does.
  * 
- * For this task you'll have to fill in the components
+ * The R function provides an alternative implementation of the `scale` function.
+ * This is included just to show that sometimes we don't need that much fancy
+ * code to speed up things.
  * 
- * RESULT:
- * A function that uses RcppArmadillo and OpenMP to rescale large matrices.
+ * The C++ function `scaleRcpp` provides a starting point. This very same function
+ * with the name `scaleRcpp_omp` is the one that you need to modify in order to
+ * use OpenMP.
+ * 
+ * Besides of modifying the function, recall including the header, and telling
+ * Rcpp to link it to openmp.
+ * 
+ * Author: GEORGE G VEGA YON
+ * Date  : 2018-03-29
+ * 
  */
 
 #include <RcppArmadillo.h>
 
-// (1) INLCUDE THE OPENMP LIBRARY ----------------------------------------------
+// 3a) INLCUDE THE OPENMP LIBRARY ----------------------------------------------
 
 using namespace Rcpp;
 
 // [[Rcpp::depends(RcppArmadillo)]]
-// (2) LOAD THE OPENMP PLUGIN --------------------------------------------------
+// 3b) LOAD THE OPENMP PLUGIN --------------------------------------------------
+
 
 // [[Rcpp::export]]
 arma::mat scaleRcpp(const arma::mat & A) {
@@ -39,13 +50,15 @@ arma::mat scaleRcpp(const arma::mat & A) {
 arma::mat scaleRcpp_omp(const arma::mat & A, int cores = 1) {
   
   arma::mat ans(A);
-  
   int n = (int) A.n_rows, K = (int) A.n_cols;
   
   // Setting the cores
-// (3) SET UP THE NUMBER OF CORES ----------------------------------------------
+// 3c) SET UP THE NUMBER OF CORES ----------------------------------------------
+
   
-// (4) HERE GOES PRAGMA --------------------------------------------------------
+// 3d) HERE GOES PRAGMA --------------------------------------------------------
+
+
   for (int k = 0; k < K; k++) {
     ans.col(k) -= arma::mean(ans.col(k));
     ans.col(k) /= pow(arma::accu(pow(ans.col(k), 2.0))/(n - 1), 0.5); 
@@ -73,7 +86,7 @@ A <- matrix(rnorm(100*100), ncol = 100)
 
 ans_R    <- scale2(A)
 ans_Rcpp <- scaleRcpp(A)
-ans_Rcpp_omp <- scaleRcpp_omp(A, 10)
+ans_Rcpp_omp <- scaleRcpp_omp(A, 4)
 
 all.equal(ans_R, ans_Rcpp) # TRUE
 all.equal(ans_R, ans_Rcpp_omp) # TRUE
@@ -96,7 +109,7 @@ microbenchmark::microbenchmark(
   OMP2  = scaleRcpp_omp(A, cores = 2),
   OMP4  = scaleRcpp_omp(A, cores = 4),
   OMP8  = scaleRcpp_omp(A, cores = 8),
-  OMP12  = scaleRcpp_omp(A, cores = 12),
+  # OMP12  = scaleRcpp_omp(A, cores = 12),
   times = 10,
   unit  = "relative"
 )

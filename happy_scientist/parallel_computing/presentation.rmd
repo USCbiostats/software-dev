@@ -1,5 +1,5 @@
 ---
-title: 'The "Happy Scientist" Seminar Series #5<br>A brief introduction to using R for high-performance computing'
+title: 'The "Happy Scientist" Workshop #1<br>An introduction to high-performance computing using R'
 author: '<par><table style="text-align:center;width:100%"><tr><td>George Vega Yon</td><td>Garrett Weaver</td></tr><tr><td>vegayon@usc.edu</td><td>gmweaver@usc.edu</tb></tr></table></par>'
 output: 
   slidy_presentation:
@@ -7,10 +7,11 @@ output:
     highlight: haddock
     duration: 45
     incremental: true
-    footer: Vega Yon & Weaver
+    footer: Vega Yon & Weaver, USC IMAGE
     keep_md: true
-date: '<br>Department of Preventive Medicine<br>March 29, 2018'
+date: '<br>USC Integrative Methods of Analysis for Genomic Epidemiology (IMAGE)<br>Department of Preventive Medicine<br>March 29, 2018'
 ---
+
 
 ```{r setup, include=FALSE, fig.align='center', warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE, comment = "#")
@@ -33,6 +34,7 @@ if (length(pkgs)) install.packages(pkgs)
     a.  parallel
     b.  iterators+foreach
     c.  RcppArmadillo + OpenMP
+    d.  RcppArmadillo + OpenMP + Slurm
     
 4.  Exercises
 
@@ -49,6 +51,8 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 3.  Compiled code: Write your own low-level code (if R doesn't has it yet...)
 
 (Checkout [CRAN Task View on HPC](https://cran.r-project.org/web/views/HighPerformanceComputing.html))
+
+
 
 
 ## Big Data
@@ -905,6 +909,56 @@ rbenchmark::benchmark(
 
 ~~No big speed gains... but at least you know how to use it now :)!~~ Nice speed gains!
 
+## RcppArmadillo + OpenMP + Slurm: Using the `rslurm` package
+
+*   The [`rslurm` package (Marchand, 2017)](https://CRAN.R-project.org/package=rslurm) provides a wrapper of Slurm in R.
+
+*   Without the need of knowing much about the syntax of `slurm`, this R package does the following:
+    
+    1.  Writes an R source file that sets up each node with your current config (packages, libpath, etc.). The outputs are stored in a known folder so these can be fetched out later.
+    
+    2.  Writes a bash file with the call to `sbatch` (you can specify options).
+    
+    3.  Executes the bash file and returns the jobid (you can query its status interatively).
+        
+        Here is a simple example with our `sim_pi` function (so we are mixing OpenMP with Slurm!):
+        
+        ```r
+        library(rslurm)
+        
+        # How many nodes are we going to be using
+        nnodes <- 2L
+        
+        # The slurm_apply function is what makes all the work
+        sjob <- slurm_apply(
+          # We first define the job as a function
+          f = function(n) {
+            
+            # Compiling Rcpp
+            Rcpp::sourceCpp("~/simpi.cpp")
+            
+            # Returning pi
+            sim_pi(1e9, cores = 8, seed = n*100)
+            
+          },
+          # The parameters that `f` receives must be passed as a data.frame
+          params        = data.frame(n = 1:nnodes), jobname = "sim-pi",
+          
+          # How many cpus we want to use (this when calling mcapply)
+          cpus_per_node = 1,
+          
+          # Here we are asking for nodes with 8 CPUS
+          slurm_options = list(`cpus-per-task` = 8),
+          nodes         = nnodes,
+          submit        = TRUE
+        )
+        
+        # We save the image so that later we can use the `sjob` object to retrieve the
+        # results
+        save.image("~/sim-pi.rda")
+        ```
+
+
 ## Thanks!
 
 ```{r session, echo=FALSE}
@@ -918,6 +972,8 @@ sessionInfo()
 2.  Fibonacci with Rcpp ([`fib.R`](fib.R) for pseudo-code, and [`fib-solution.R`](fib-solution.R) for the implementation).
 
 3.  Rewriting the `scale` function using Rcpp and OpenMP ([`scale.cpp`](scale.cpp) for pseudo-code, and [`scale-solution.cpp`](scale-solution.cpp) for the implementation).
+
+Another example is provided in the file [`wordcount.R`](wordcount.R) (you'll need the dataset [`ulysses.txt`](ulysses.txt))
 
 ## References
 
