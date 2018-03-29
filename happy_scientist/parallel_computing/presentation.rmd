@@ -913,7 +913,7 @@ sessionInfo()
 
 ## Exercises
 
-1.  Generating multivariate normal random samples using parallel and foreach ([`random-mvn.R`](random-mvn.R) for pseudo-code, and `random-mvn-solution.R` for the implementation).
+1.  Generating multivariate normal random samples using parallel and foreach ([`random-mvn.R`](random-mvn.R) for pseudo-code, and [`random-mvn-solution.R`](random-mvn-solution.R) for the implementation).
 
 2.  Fibonacci with Rcpp ([`fib.R`](fib.R) for pseudo-code, and [`fib-solution.R`](fib-solution.R) for the implementation).
 
