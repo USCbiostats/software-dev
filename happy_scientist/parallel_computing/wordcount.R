@@ -17,7 +17,7 @@ system.time(wordResults <- foreach(x = ireadLines(con, n = 1000)) %do% {
 close.connection(con)
 
 con <- file("ulysses.txt", open = "r", encoding = "UTF-8")
-registerDoParallel(4)
+registerDoParallel(6)
 system.time(wordResults <- foreach(x = ireadLines(con, n = 1000)) %dopar% {
     countWords(x)
 })
