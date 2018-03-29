@@ -33,6 +33,9 @@ The Happy Scientist Semminars are educational seminars sponsored by Cores C and 
 4.  *Yet Another 'Writing R packages' tutorial* ([materials](happy_scientist/rpkgs))
 5.  *A brief introduction to using R for high-performance computing* ([materials](happy_scientist/parallel_computing))
 
+6.  *The "Happy Scientist" Workshop #1
+An introduction to high-performance computing using R* ([presentation](https://cdn.rawgit.com/USCbiostats/software-dev/d8c534f2/happy_scientist/parallel_computing/presentation.html) and [materials](happy_scientist/parallel_computing))
+
 # USCbiostats R packages
 
 *  [aphylo](https://github.com/USCbiostats/aphylo) Statistical inference of genetic functions in phylogenetic trees
