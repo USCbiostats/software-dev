@@ -3,7 +3,6 @@ title: 'The "Happy Scientist" Workshop #1<br>An introduction to high-performance
 author: '<par><table style="text-align:center;width:100%"><tr><td>George Vega Yon</td><td>Garrett Weaver</td></tr><tr><td>vegayon@usc.edu</td><td>gmweaver@usc.edu</tb></tr></table></par>'
 output: 
   slidy_presentation:
-    theme: journal
     highlight: haddock
     duration: 45
     incremental: true
@@ -15,7 +14,7 @@ date: '<br>USC Integrative Methods of Analysis for Genomic Epidemiology (IMAGE)<
 
 
 
-## Agenda
+# Agenda
 
 1.  High-Performance Computing: An overview
     
@@ -32,7 +31,7 @@ date: '<br>USC Integrative Methods of Analysis for Genomic Epidemiology (IMAGE)<
 
 
 
-## High-Performance Computing: An overview
+# High-Performance Computing: An overview
 
 Loosely, from R's perspective, we can think of HPC in terms of two, maybe three things:
 
@@ -47,7 +46,7 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 
 
 
-## Big Data
+# Big Data
 
 *   Buy a bigger computer/RAM memory (not the best solution!)
     
@@ -59,17 +58,17 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 *   Store it more efficiently, e.g.: Sparse Matrices (take a look at the `dgCMatrix` objects
     from the [Matrix](https://CRAN.R-project.org/package=Matrix) R package)
 
-## Parallel computing
+# Parallel computing
 
 <div class="figure" style="text-align: center">
 <img src="flynnsTaxonomy.gif" alt="Flynn's Classical Taxonomy ([Introduction to Parallel Computing, Blaise Barney, Lawrence Livermore National Laboratory](https://computing.llnl.gov/tutorials/parallel_comp/#Whatis))"  />
 <p class="caption">Flynn's Classical Taxonomy ([Introduction to Parallel Computing, Blaise Barney, Lawrence Livermore National Laboratory](https://computing.llnl.gov/tutorials/parallel_comp/#Whatis))</p>
 </div>
 
-## GPU vs CPU
+# GPU vs CPU
 
 <div class="figure" style="text-align: center">
-<img src="cpuvsgpu.jpg" alt="[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)"  />
+<img src="cpuvsgpu.jpg" alt="[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)" width="416" />
 <p class="caption">[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)</p>
 </div>
 
@@ -85,7 +84,7 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 *   Why use OpenMP if GPU is _suited to compute-intensive operations_? Well, mostly because
     OpenMP is **VERY** easy to implement (easier than CUDA, which is the easiest way to use GPU).
 
-## When is it a good idea?
+# When is it a good idea?
 
 <div class="figure" style="text-align: center">
 <img src="when_to_parallel.svg" alt="Ask yourself these questions before jumping into HPC!"  />
@@ -93,7 +92,7 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 </div>
 
 
-## Parallel computing in R
+# Parallel computing in R
 
 While there are several alternatives (just take a look at the
 [High-Performance Computing Task View](https://cran.r-project.org/web/views/HighPerformanceComputing.html)),
@@ -128,7 +127,7 @@ programmer not to worry about parallelization, e.g. such as
 [**gpuR**](https://cran.r-project.org/package=gpuR) for Matrix manipulation using
 GPU.
 
-## Parallel workflow
+# Parallel workflow
 
 1.  Create a cluster:
     
@@ -160,7 +159,7 @@ GPU.
     
 4.  Stop the cluster with `clusterStop`
     
-## parallel example 1: Parallel RNG
+# parallel example 1: Parallel RNG
 
 
 ```r
@@ -199,7 +198,7 @@ all.equal(ans0, ans1) # All equal!
 stopCluster(cl)
 ```
 
-## parallel example 1: Parallel RNG (cont.)
+# parallel example 1: Parallel RNG (cont.)
 
 In the case of `makeForkCluster`
 
@@ -234,7 +233,7 @@ ans0 - ans1 # A matrix of zeros
 stopCluster(cl)
 ```
 
-## parallel example 2: Simulating $\pi$
+# parallel example 2: Simulating $\pi$
 
 
 *   We know that $\pi = \frac{A}{r^2}$. We approximate it by randomly adding
@@ -260,7 +259,7 @@ pisim <- function(i, nsim) {  # Notice we don't use the -i-
 }
 ```
 
-## parallel example 2: Simulating $\pi$ (cont.)
+# parallel example 2: Simulating $\pi$ (cont.)
 
 
 ```r
@@ -286,8 +285,8 @@ rbenchmark::benchmark(
 
 ```
 #       test replications elapsed relative
-# 1 parallel            1   0.455    1.000
-# 2   serial            1   1.842    4.048
+# 1 parallel            1   0.668     1.00
+# 2   serial            1   1.169     1.75
 ```
 
 
@@ -304,7 +303,7 @@ stopCluster(cl)
 ```
 
 
-## The 'foreach' Package
+# The 'foreach' Package
 
 *   The 'foreach' package provides a looping construct to execute R code repeatedly in parallel
 
@@ -352,7 +351,7 @@ stopCluster(cl)
     ```
 
 
-## Setting Up Parallel Execution With 'foreach'
+# Setting Up Parallel Execution With 'foreach'
 
 * The steps to create the parallel backend are similar to the 'parallel' package
 
@@ -386,7 +385,7 @@ stopCluster(cl)
 
 *   With some extra work and packages (Rmpi, doMPI), we can also use an MPI backend to enable parallelization on multiple nodes
 
-## The 'foreach' Package: Combining Results
+# The 'foreach' Package: Combining Results
 
 *   The `.combine` option is used to specify the function used to combine results
 
@@ -441,7 +440,7 @@ stopCluster(cl)
 
     
 
-## foreach + iterators
+# foreach + iterators
 
 *   The 'iterators' package provides functions to generate: "A special type of object that supplies data on demand, one element at a time."
 
@@ -467,11 +466,11 @@ stopCluster(cl)
     
     ```
     # List of 4
-    #  $ state    :<environment: 0x4449468> 
+    #  $ state    :<environment: 0x471c650> 
     #  $ length   : int 4
     #  $ checkFunc:function (x)  
     #   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
-    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4252b20> 
+    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x469f468> 
     #  $ recycle  : logi FALSE
     #  - attr(*, "class")= chr [1:2] "containeriter" "iter"
     ```
@@ -503,7 +502,7 @@ stopCluster(cl)
     ```
 
 
-## foreach + iterators: Creating An Iterator
+# foreach + iterators: Creating An Iterator
 
 *   An iterator that traverses over blocks of columns of a matrix
 
@@ -541,7 +540,7 @@ stopCluster(cl)
 
 * Note: The nextElem() function in splitMatrix is an example of a closure (encloses the environment of its parent function) 
 
-## foreach Example: Bootstrapping
+# foreach Example: Bootstrapping
 
 *   Bootstrapping (Efron, 1979) uses the sample to learn about the sampling distribution of a statistic
     *   "The population is to the sample as the sample is to the bootstrap samples"
@@ -567,7 +566,7 @@ stopCluster(cl)
     se_est <- sd(est)
     ```
 
-## foreach Example: Bootstrapping (Estimating a Median)
+# foreach Example: Bootstrapping (Estimating a Median)
 
 *   Suppose we have the following sample of 100 observations for which we want to estimate the sample median
 
@@ -600,7 +599,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 1.820074
+    # [1] 2.238624
     ```
     
     ```r
@@ -608,10 +607,10 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.7335949
+    # [1] 0.1871364
     ```
 
-## foreach Example: Bootstrapping (Estimating a Median)
+# foreach Example: Bootstrapping (Estimating a Median)
 
 *   The foreach loop is very similar
 
@@ -627,7 +626,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 1.811854
+    # [1] 2.241246
     ```
     
     ```r
@@ -635,7 +634,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.7306325
+    # [1] 0.1876245
     ```
 
 *   Timing: foreach is slower due to communication overheard and the low computational burden of the individual tasks
@@ -656,15 +655,15 @@ stopCluster(cl)
     
     ```
     #       expr      mean    median
-    # 1 for_loop  389.4132  389.4132
-    # 2  foreach 3288.3632 3288.3632
+    # 1 for_loop  377.5746  377.5746
+    # 2  foreach 2002.6306 2002.6306
     ```
 
 
 
 *   To speed up, you may also consider "chunking" tasks to reduce communication overhead
 
-## foreach Example: Bootstrapping (Logistic Regression)
+# foreach Example: Bootstrapping (Logistic Regression)
 
 *   As another example, we analyze the association between bacteria presence and treatment (drug vs. placebo) in the data set 'bacteria'  
 *   To simplify the example, we sample both the outcome and predictors (i.e. the entire observation), this is known as case sampling
@@ -705,7 +704,7 @@ stopCluster(cl)
     ```
 
 
-## foreach Example: Bootstrapping (Logistic Regression)
+# foreach Example: Bootstrapping (Logistic Regression)
 
 *   We can replicate the results from 'boot' with 'foreach'
 
@@ -747,7 +746,7 @@ stopCluster(cl)
     #   0.4349333   1.6874428
     ```
 
-## foreach Example: Bootstrapping (Logistic Regression)
+# foreach Example: Bootstrapping (Logistic Regression)
 
 *   Timing: With increased computational burden for each task, we see an improvement by using the parallel approach
 
@@ -765,8 +764,8 @@ stopCluster(cl)
     
     ```
     #      expr      mean    median
-    # 1    boot 18.381147 18.381147
-    # 2 foreach  9.703243  9.703243
+    # 1    boot 14.235225 14.235225
+    # 2 foreach  6.640386  6.640386
     ```
 
     
@@ -774,7 +773,7 @@ stopCluster(cl)
     stopCluster(cl)
     ```
 
-## foreach example 2: Random Forests
+# foreach example 2: Random Forests
 
 *   A number of statistical/learning methods involve computational steps that can be done in parallel
 *   Random forests, an ensemble method that involves generating a large number of decision trees, is one such example
@@ -805,7 +804,7 @@ stopCluster(cl)
     y <- gl(2, 750)
     ```
 
-## foreach example 2: Random Forests (cont.)
+# foreach example 2: Random Forests (cont.)
 
 *   Two changes in the call to `foreach`
     
@@ -832,14 +831,14 @@ stopCluster(cl)
     
     ```
     #          expr     mean   median
-    # 1          rf 41.90121 41.90121
-    # 2 rf_parallel 11.57544 11.57544
+    # 1          rf 35.63308 35.63308
+    # 2 rf_parallel 12.15518 12.15518
     ```
 
     
 
 
-## RcppArmadillo and OpenMP
+# RcppArmadillo and OpenMP
 
 *   Friendlier than [**RcppParallel**](http://rcppcore.github.io/RcppParallel/)...
     at least for 'I-use-Rcpp-but-don't-actually-know-much-about-C++' users (like myself!).
@@ -866,7 +865,7 @@ stopCluster(cl)
 
 
 
-## RcppArmadillo and OpenMP workflow
+# RcppArmadillo and OpenMP workflow
 
 1.  Add the following to your C++ source code to use OpenMP, and tell Rcpp that
     you need to include that in the compiler:
@@ -896,7 +895,7 @@ stopCluster(cl)
     
 3.  Compile!
 
-## RcppArmadillo + OpenMP example 1: Distance matrix
+# RcppArmadillo + OpenMP example 1: Distance matrix
 
 ```cpp
 #include <omp.h>
@@ -937,7 +936,7 @@ arma::mat dist_par(arma::mat X, int cores = 1) {
 }
 ```
 
-## RcppArmadillo + OpenMP example 1: Distance matrix (cont.)
+# RcppArmadillo + OpenMP example 1: Distance matrix (cont.)
 
 
 ```r
@@ -973,14 +972,14 @@ rbenchmark::benchmark(
 
 ```
 #                      test replications elapsed relative
-# 4 dist_par(x, cores = 10)            1   0.512    1.000
-# 3  dist_par(x, cores = 4)            1   1.180    2.305
-# 2  dist_par(x, cores = 1)            1   2.358    4.605
-# 1                 dist(x)            1   5.463   10.670
+# 4 dist_par(x, cores = 10)            1   1.099    1.000
+# 3  dist_par(x, cores = 4)            1   1.745    1.588
+# 2  dist_par(x, cores = 1)            1   3.532    3.214
+# 1                 dist(x)            1   5.823    5.298
 ```
 
 
-## RcppArmadillo + OpenMP example 2: Simulating $\pi$
+# RcppArmadillo + OpenMP example 2: Simulating $\pi$
 
 ```cpp
 #include <omp.h>
@@ -1047,7 +1046,7 @@ double sim_pi(int m, int cores = 1, int seed = 100) {
 }
 ```
 
-## RcppArmadillo + OpenMP example 2: Simulating $\pi$ (cont.)
+# RcppArmadillo + OpenMP example 2: Simulating $\pi$ (cont.)
 
 
 ```r
@@ -1083,14 +1082,14 @@ rbenchmark::benchmark(
 
 ```
 #   test replications elapsed relative
-# 1 pi01            1   2.578    6.095
-# 2 pi04            1   0.915    2.163
-# 3 pi10            1   0.423    1.000
+# 1 pi01            1   2.284    4.709
+# 2 pi04            1   0.630    1.299
+# 3 pi10            1   0.485    1.000
 ```
 
 ~~No big speed gains... but at least you know how to use it now :)!~~ Nice speed gains!
 
-## RcppArmadillo + OpenMP + Slurm: Using the `rslurm` package
+# RcppArmadillo + OpenMP + Slurm: Using the `rslurm` package
 
 *   The [`rslurm` package (Marchand, 2017)](https://CRAN.R-project.org/package=rslurm) provides a wrapper of Slurm in R.
 
@@ -1107,37 +1106,50 @@ rbenchmark::benchmark(
         ```r
         library(rslurm)
         
+        # How many nodes are we going to be using
         nnodes <- 2L
         
+        # The slurm_apply function is what makes all the work
         sjob <- slurm_apply(
+          # We first define the job as a function
           f = function(n) {
+            
             # Compiling Rcpp
             Rcpp::sourceCpp("~/simpi.cpp")
-        
+            
             # Returning pi
             sim_pi(1e9, cores = 8, seed = n*100)
+            
           },
+          # The parameters that `f` receives must be passed as a data.frame
           params        = data.frame(n = 1:nnodes), jobname = "sim-pi",
+          
+          # How many cpus we want to use (this when calling mcapply)
           cpus_per_node = 1,
+          
+          # Here we are asking for nodes with 8 CPUS
           slurm_options = list(`cpus-per-task` = 8),
           nodes         = nnodes,
           submit        = TRUE
         )
         
+        # We save the image so that later we can use the `sjob` object to retrieve the
+        # results
         save.image("~/sim-pi.rda")
         ```
 
 
-## Thanks!
+# Thanks!
 
 
 ```
-# R version 3.4.3 (2017-11-30)
-# Platform: x86_64-redhat-linux-gnu (64-bit)
-# Running under: CentOS Linux 7 (Core)
+# R version 3.4.4 (2018-03-15)
+# Platform: x86_64-pc-linux-gnu (64-bit)
+# Running under: Ubuntu 14.04.5 LTS
 # 
 # Matrix products: default
-# BLAS/LAPACK: /usr/lib64/R/lib/libRblas.so
+# BLAS: /usr/lib/libblas/libblas.so.3.0
+# LAPACK: /usr/lib/lapack/liblapack.so.3.0
 # 
 # locale:
 #  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -1158,11 +1170,12 @@ rbenchmark::benchmark(
 # loaded via a namespace (and not attached):
 #  [1] Rcpp_0.12.16     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
 #  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
-#  [9] stringi_1.1.7    rmarkdown_1.9    tools_3.4.3      stringr_1.3.0   
-# [13] yaml_2.1.18      compiler_3.4.3   htmltools_0.3.6  knitr_1.20
+#  [9] stringi_1.1.7    rmarkdown_1.9    tools_3.4.4      stringr_1.3.0   
+# [13] jpeg_0.1-8       yaml_2.1.18      compiler_3.4.4   htmltools_0.3.6 
+# [17] knitr_1.20
 ```
 
-## Exercises
+# Exercises
 
 1.  Generating multivariate normal random samples using parallel and foreach ([`random-mvn.R`](random-mvn.R) for pseudo-code, and [`random-mvn-solution.R`](random-mvn-solution.R) for the implementation).
 
@@ -1172,7 +1185,7 @@ rbenchmark::benchmark(
 
 Another example is provided in the file [`wordcount.R`](wordcount.R) (you'll need the dataset [`ulysses.txt`](ulysses.txt))
 
-## References
+# References
 
 *   [Package parallel](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf) 
 *   [Using the iterators package](https://cran.r-project.org/web/packages/iterators/vignettes/iterators.pdf)
