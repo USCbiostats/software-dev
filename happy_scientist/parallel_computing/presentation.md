@@ -68,7 +68,7 @@ Loosely, from R's perspective, we can think of HPC in terms of two, maybe three 
 # GPU vs CPU
 
 <div class="figure" style="text-align: center">
-<img src="cpuvsgpu.jpg" alt="[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)" width="416" />
+<img src="cpuvsgpu.jpg" alt="[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)"  />
 <p class="caption">[NVIDIA Blog](http://www.nvidia.com/object/what-is-gpu-computing.html)</p>
 </div>
 
@@ -285,8 +285,8 @@ rbenchmark::benchmark(
 
 ```
 #       test replications elapsed relative
-# 1 parallel            1   0.668     1.00
-# 2   serial            1   1.169     1.75
+# 1 parallel            1   0.455    1.000
+# 2   serial            1   1.842    4.048
 ```
 
 
@@ -466,11 +466,11 @@ stopCluster(cl)
     
     ```
     # List of 4
-    #  $ state    :<environment: 0x471c650> 
+    #  $ state    :<environment: 0x3d2d748> 
     #  $ length   : int 4
     #  $ checkFunc:function (x)  
     #   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 1 55 1 77 55 77 1 1
-    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x469f468> 
+    #   .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3dc5c58> 
     #  $ recycle  : logi FALSE
     #  - attr(*, "class")= chr [1:2] "containeriter" "iter"
     ```
@@ -599,7 +599,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 2.238624
+    # [1] 1.820074
     ```
     
     ```r
@@ -607,7 +607,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.1871364
+    # [1] 0.7335949
     ```
 
 # foreach Example: Bootstrapping (Estimating a Median)
@@ -626,7 +626,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 2.241246
+    # [1] 1.811854
     ```
     
     ```r
@@ -634,7 +634,7 @@ stopCluster(cl)
     ```
     
     ```
-    # [1] 0.1876245
+    # [1] 0.7306325
     ```
 
 *   Timing: foreach is slower due to communication overheard and the low computational burden of the individual tasks
@@ -655,8 +655,8 @@ stopCluster(cl)
     
     ```
     #       expr      mean    median
-    # 1 for_loop  377.5746  377.5746
-    # 2  foreach 2002.6306 2002.6306
+    # 1 for_loop  389.4132  389.4132
+    # 2  foreach 3288.3632 3288.3632
     ```
 
 
@@ -764,8 +764,8 @@ stopCluster(cl)
     
     ```
     #      expr      mean    median
-    # 1    boot 14.235225 14.235225
-    # 2 foreach  6.640386  6.640386
+    # 1    boot 18.381147 18.381147
+    # 2 foreach  9.703243  9.703243
     ```
 
     
@@ -831,8 +831,8 @@ stopCluster(cl)
     
     ```
     #          expr     mean   median
-    # 1          rf 35.63308 35.63308
-    # 2 rf_parallel 12.15518 12.15518
+    # 1          rf 41.90121 41.90121
+    # 2 rf_parallel 11.57544 11.57544
     ```
 
     
@@ -972,10 +972,10 @@ rbenchmark::benchmark(
 
 ```
 #                      test replications elapsed relative
-# 4 dist_par(x, cores = 10)            1   1.099    1.000
-# 3  dist_par(x, cores = 4)            1   1.745    1.588
-# 2  dist_par(x, cores = 1)            1   3.532    3.214
-# 1                 dist(x)            1   5.823    5.298
+# 4 dist_par(x, cores = 10)            1   0.512    1.000
+# 3  dist_par(x, cores = 4)            1   1.180    2.305
+# 2  dist_par(x, cores = 1)            1   2.358    4.605
+# 1                 dist(x)            1   5.463   10.670
 ```
 
 
@@ -1082,9 +1082,9 @@ rbenchmark::benchmark(
 
 ```
 #   test replications elapsed relative
-# 1 pi01            1   2.284    4.709
-# 2 pi04            1   0.630    1.299
-# 3 pi10            1   0.485    1.000
+# 1 pi01            1   2.578    6.095
+# 2 pi04            1   0.915    2.163
+# 3 pi10            1   0.423    1.000
 ```
 
 ~~No big speed gains... but at least you know how to use it now :)!~~ Nice speed gains!
@@ -1143,13 +1143,12 @@ rbenchmark::benchmark(
 
 
 ```
-# R version 3.4.4 (2018-03-15)
-# Platform: x86_64-pc-linux-gnu (64-bit)
-# Running under: Ubuntu 14.04.5 LTS
+# R version 3.4.3 (2017-11-30)
+# Platform: x86_64-redhat-linux-gnu (64-bit)
+# Running under: CentOS Linux 7 (Core)
 # 
 # Matrix products: default
-# BLAS: /usr/lib/libblas/libblas.so.3.0
-# LAPACK: /usr/lib/lapack/liblapack.so.3.0
+# BLAS/LAPACK: /usr/lib64/R/lib/libRblas.so
 # 
 # locale:
 #  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -1170,9 +1169,8 @@ rbenchmark::benchmark(
 # loaded via a namespace (and not attached):
 #  [1] Rcpp_0.12.16     codetools_0.2-15 digest_0.6.15    rprojroot_1.3-2 
 #  [5] backports_1.1.2  magrittr_1.5     evaluate_0.10.1  highr_0.6       
-#  [9] stringi_1.1.7    rmarkdown_1.9    tools_3.4.4      stringr_1.3.0   
-# [13] jpeg_0.1-8       yaml_2.1.18      compiler_3.4.4   htmltools_0.3.6 
-# [17] knitr_1.20
+#  [9] stringi_1.1.7    rmarkdown_1.9    tools_3.4.3      stringr_1.3.0   
+# [13] yaml_2.1.18      compiler_3.4.3   htmltools_0.3.6  knitr_1.20
 ```
 
 # Exercises
