@@ -24,9 +24,9 @@ We do have some direct guidelines developed as issue templates [here](templates)
 *   [iterators+foreach](../../wiki/HPC-in-R#foreach)
 *   [RcppArmadillo + OpenMP](../../wiki/HPC-in-R#rcpparmadillo-and-openmp)
 
-# Happy Scientist Semminars
+# Happy Scientist Seminars
 
-The Happy Scientist Semminars are educational seminars sponsored by Cores C and D of the Biostats Program Project award. This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Paul Marjoram at (pmarjora@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
+The Happy Scientist Seminars are educational seminars sponsored by Cores C and D of the Biostats Program Project award. This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Paul Marjoram at (pmarjora@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
 
 1.  *Seminar 1: Introduction to Collaborating with GitHub* ([materials](https://github.com/USCbiostats/HappyScientist))
 2.  *R Package Template* ([materials](https://github.com/USCbiostats/RPackageTemplate))
@@ -44,7 +44,7 @@ The Happy Scientist Semminars are educational seminars sponsored by Cores C and 
 *  [rphyloxml](https://github.com/USCbiostats/rphyloxml) Read and write phyloXML files in R
 *  [partition](https://github.com/USCbiostats/partition) 
 *  [LUCid](https://github.com/USCbiostats/LUCid) Latent and Unknown Cluster Analysis using Integrated Data
-*  [jsPhyloSVG](https://github.com/USCbiostats/jsPhyloSVG) htmlwidgets for the jsPhyloSVG javascript library
+*  [jsPhyloSVG](https://github.com/USCbiostats/jsPhyloSVG) htmlwidgets for the jsPhyloSVG JavaScript library
 *  [MergeBinaryDosage](https://github.com/USCbiostats/MergeBinaryDosage) R package for merging binary dosage files
 *  [polygons](https://github.com/USCbiostats/polygons)
 *  [BinaryDosage](https://github.com/USCbiostats/BinaryDosage) Converts VCF files to a binary format
