@@ -28,12 +28,7 @@ We do have some direct guidelines developed as issue templates [here](templates)
 
 The Happy Scientist Seminars are educational seminars sponsored by Cores C and D of the Biostats Program Project award. This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Paul Marjoram at (pmarjora@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
 
-1.  *Seminar 1: Introduction to Collaborating with GitHub* ([materials](https://github.com/USCbiostats/HappyScientist))
-2.  *R Package Template* ([materials](https://github.com/USCbiostats/RPackageTemplate))
-3.  *Yet Another 'Writing R packages' tutorial* ([materials](happy_scientist/rpkgs))
-4.  *A brief introduction to using R for high-performance computing* ([materials](happy_scientist/parallel_computing))
-
-5.  *The "Happy Scientist" Workshop 1 An introduction to high-performance computing using R* ([presentation](https://cdn.rawgit.com/USCbiostats/software-dev/a44b9bd8/happy_scientist/parallel_computing/presentation.html) and [materials](happy_scientist/parallel_computing))
+List of past seminars with material can be found [here](/happy_scientist/).
 
 # USCbiostats R packages
 
