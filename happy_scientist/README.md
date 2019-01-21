@@ -5,6 +5,16 @@ The Happy Scientist Seminars are educational seminars sponsored by Cores C and D
 
 # Past Seminars
 
+## 2019
+
+**RStudio and R Resources**
+
+Happy Scientist Seminars, 2019: #1  
+Title: RStudio and R Resources  
+Time: 12:30pm-1:30pm, Tuesday January 22nd 2019  
+Location: Soto (SSB) 114  
+Materials can be found [here](seminars/2019-01_rstudio-and-r/)  
+
 ## 2018
 
 **#1 An introduction to high-performance computing using R**
