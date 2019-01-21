@@ -38,7 +38,7 @@ List of past seminars with material can be found [here](/happy_scientist/).
 *  [amcmc](https://github.com/USCbiostats/amcmc) Adaptive and other Markov Chain Monte Carlo methods
 *  [rphyloxml](https://github.com/USCbiostats/rphyloxml) Read and write phyloXML files in R
 *  [partition](https://github.com/USCbiostats/partition) 
-*  [LUCid](https://github.com/USCbiostats/LUCid) Latent and Unknown Cluster Analysis using Integrated Data
+*  [LUCIDus](https://github.com/USCbiostats/LUCid) Latent and Unknown Cluster Analysis using Integrated Data
 *  [jsPhyloSVG](https://github.com/USCbiostats/jsPhyloSVG) htmlwidgets for the jsPhyloSVG JavaScript library
 *  [MergeBinaryDosage](https://github.com/USCbiostats/MergeBinaryDosage) R package for merging binary dosage files
 *  [polygons](https://github.com/USCbiostats/polygons)
