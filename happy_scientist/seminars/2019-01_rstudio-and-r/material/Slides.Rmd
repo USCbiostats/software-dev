@@ -371,7 +371,7 @@ round(b[1], digits = 1)` in the output.
 
 ---
 
-<iframe src="https://rawcdn.githack.com/USCbiostats/software-dev/master/happy_scientist/seminars/2019-01_rstudio-and-r/slides.html" width="100%" height="100%" frameBorder="0"></iframe>
+<iframe src="https://rawcdn.githack.com/USCbiostats/software-dev/master/happy_scientist/seminars/2019-01_rstudio-and-r/material/Slides.html" width="100%" height="100%" frameBorder="0"></iframe>
 
 ---
 
