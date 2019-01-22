@@ -1,0 +1,518 @@
+---
+title: "RStudio and R Resources"
+subtitle: "Happy Scientist Seminar"
+author: "Emil Hvitfeldt"
+date: "2019-1-22"
+output:
+  xaringan::moon_reader:
+    css: ["default", "theme.css"]
+    lib_dir: libs
+    nature:
+      beforeInit: "macros.js"
+      ratio: "4:3"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: [center, middle]
+---
+
+```{r include=FALSE}
+library(knitr)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+  lines <- options$output.lines
+  if (is.null(lines)) {
+    return(hook_output(x, options))  # pass to default hook
+  }
+  x <- unlist(strsplit(x, "\n"))
+  more <- "..."
+  if (length(lines) == 1) {        # first n lines
+    if (length(x) > lines) {
+      # truncate the output, but add ....
+      x <- c(head(x, lines), more)
+    }
+  } else {
+    x <- c(more, x[lines], more)
+  }
+  # paste these lines together
+  x <- paste(c(x, ""), collapse = "\n")
+  hook_output(x, options)
+})
+```
+
+# Motivation
+
+We will talk about what you are able to do in RStudio with R and where to find information and rescources to do it great.
+
+---
+
+
+
+
+.pull-left[
+![](images/RStudio-Logo.png)
+- Data analysis scripts
+- Interactive web applications
+- Documents
+- Reports
+- Graphs
+- more
+]
+
+.pull-right[
+- Syntax highlighting
+- code completion
+- smart indentation
+- Integrated R help
+- data viewer
+- Version control with Git
+]
+
+---
+
+.center[![:scale 100%](images/gui-view.png)]
+
+---
+
+.center[![:scale 100%](images/gui-source.png)]
+
+---
+
+![](images/gui-history.png)
+
+---
+
+![](images/gui-console.png)
+
+---
+
+![](images/gui-plots.png)
+
+---
+
+# Packages
+
+Idea -> Code -> Package -> Share -> Happiness
+
+If you want to do something, chance has it someone have worked on it before
+
+---
+
+## CRAN (The Comprehensive R Archive Network)
+
+![](images/cran.png)
+
+.center[https://cran.r-project.org/]
+
+---
+
+.center[https://cran.r-project.org/web/packages/available_packages_by_name.html]
+
+![](images/cran-package-alphabet.png)
+
+---
+
+.center[https://cran.r-project.org/web/views/]
+
+![](images/cran-task-view.png)
+
+---
+
+.center[https://www.bioconductor.org/]
+
+![](images/bioconducter.png)
+
+---
+
+.center[https://www.bioconductor.org/packages/release/BiocViews.html#___Software]
+
+![](images/bioconducter-packages.png)
+
+---
+
+# R Markdown <img src='https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/rmarkdown.png' align="right" height="139" />
+
+
+- Compile a single R Markdown document to a report in different formats, such as PDF, HTML, or Word.
+- Make slides for presentations (HTML5, LaTeX Beamer, or PowerPoint).
+- Build interactive applications based on Shiny.
+- Write journal articles.
+- Much more.
+
+---
+
+# Creating a R Markdown file
+
+.center[![:scale 60%](images/create-document.png)]
+
+---
+
+# Creating a R Markdown file
+
+.center[![:scale 50%](images/new-document-document.png)]
+
+---
+
+# Creating a R Markdown file
+
+.center[![:scale 50%](images/new-document-presentation.png)]
+
+---
+
+# Creating a R Markdown file
+
+.center[![:scale 50%](images/new-document-shiny.png)]
+
+---
+
+# Creating a R Markdown file
+
+.center[![:scale 50%](images/new-document-template.png)]
+
+---
+
+.pull-left[
+```
+---
+title: "Amazing Document"
+author: "Emil Hvitfeldt"
+date: "1/20/2019"
+output: html_document
+---
+```
+]
+
+.pull-right[
+### YAML (optional)
+]
+
+---
+
+.pull-left[
+```
+---
+title: "Amazing Document"
+author: "Emil Hvitfeldt"
+date: "1/20/2019"
+output: html_document
+---
+```
+]
+
+.pull-right[
+### YAML: YAML Ain't Markup Language
+]
+
+---
+
+.pull-left[
+```
+---
+title: "Amazing Document"
+author: "Emil Hvitfeldt"
+date: "1/20/2019"
+output: html_document
+---
+```
+
+<br>
+
+**Chunks** of code surrounded by ` ``` `
+]
+
+.pull-right[
+### YAML (optional)
+
+<br><br>
+
+### The R in R Markdown
+]
+
+---
+.pull-left[
+```
+---
+title: "Amazing Document"
+author: "Emil Hvitfeldt"
+date: "1/20/2019"
+output: html_document
+---
+```
+
+<br>
+
+**Chunks** of code surrounded by ` ``` `  
+
+<br>
+
+Text with simple text formating.
+]
+
+.pull-right[
+### YAML (optional)
+
+<br><br>
+
+### The R in R Markdown
+
+<br>
+
+### The Markdown in R Markdown
+]
+
+---
+
+.pull-left[
+**What we write**
+````
+---
+author: "Emil Hvitfeldt"
+date: "1/20/2019"
+output: html_document
+---
+
+We built a **linear** regression model.
+
+```{r}`r ''`
+fit <- lm(mpg ~ disp, data = mtcars)
+b   <- coef(fit)
+plot(mpg ~ disp, mtcars)
+```
+
+The slope of the regression is `r
+round(b[1], digits = 1)` in the output.
+````
+]
+ 
+--
+
+.pull-right[
+**What we get**  
+![](images/rmarkdown-html_document.png)
+]
+
+---
+
+.pull-left[
+**What we write**
+````
+---
+author: "Emil Hvitfeldt"
+date: "1/20/2019"
+output: pdf_document
+---
+
+We built a **linear** regression model.
+
+```{r}`r ''`
+fit <- lm(mpg ~ disp, data = mtcars)
+b   <- coef(fit)
+plot(mpg ~ disp, mtcars)
+```
+
+The slope of the regression is `r
+round(b[1], digits = 1)` in the output.
+````
+]
+
+--
+
+.pull-right[
+**What we get**  
+![](images/rmarkdown-pdf_document.png)
+]
+
+---
+
+# Build-in Formats
+
+.pull-left[
+- github_document
+- html_document
+- latex_document
+- md_document
+- odt_document
+- pdf_document
+- rtf_document
+- word_document
+]
+
+.pull-right[
+- ioslides_presentation
+- powerpoint_presentation
+- slidy_presentation
+- beamer_presentation
+]
+
+---
+
+# Notable Extensions
+
+--
+
+- xaringan
+--
+
+- flexdashboard
+--
+
+- learnr
+--
+
+- rticles
+
+---
+
+![](images/xaringan-github.png)
+
+<br>
+
+.center[https://github.com/yihui/xaringan]
+
+---
+
+<iframe src="https://rawcdn.githack.com/USCbiostats/software-dev/master/happy_scientist/seminars/2019-01_rstudio-and-r/material/Slides.html" width="100%" height="100%" frameBorder="0"></iframe>
+
+---
+
+![](images/flexdashboard-github.png)
+
+---
+
+<iframe src="https://beta.rstudioconnect.com/jjallaire/htmlwidgets-highcharter/htmlwidgets-highcharter.html" width="100%" height="100%" frameBorder="0"></iframe>
+
+---
+
+![](images/learnr-github.png)
+
+---
+
+<iframe src="https://jjallaire.shinyapps.io/learnr-tutorial-03a-data-manip-filter/" width="100%" height="100%" frameBorder="0"></iframe>
+
+---
+
+![](images/rticles-github.png)
+
+---
+
+# Shiny <img src='https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/shiny.png' align="right" height="139" />
+
+Combines the computational power of R with the interactivity of the modern web.
+
+Powerful web framework.
+
+---
+
+ .center[https://gallery.shinyapps.io/050-kmeans-example/]
+
+<iframe src="https://gallery.shinyapps.io/050-kmeans-example/" width="100%" height="100%" frameBorder="0"></iframe>
+
+---
+
+ .center[https://gallery.shinyapps.io/082-word-cloud/]
+
+<iframe src="https://gallery.shinyapps.io/082-word-cloud/" width="100%" height="100%" frameBorder="0"></iframe>
+
+---
+
+ .center[https://gallery.shinyapps.io/086-bus-dashboard/]
+
+<iframe src="https://gallery.shinyapps.io/086-bus-dashboard/" width="100%" height="100%" frameBorder="0"></iframe>
+
+---
+
+ .center[https://apps.garrickadenbuie.com/rstudioconf-2019/]
+
+<iframe src="https://apps.garrickadenbuie.com/rstudioconf-2019/" width="100%" height="100%" frameBorder="0"></iframe>
+
+---
+
+ .center[http://www.dataseries.org/]
+
+
+<iframe src="http://www.dataseries.org/" width="100%" height="100%" frameBorder="0"></iframe>
+
+---
+
+# Where do I go for more information?
+
+- Cheatsheets
+- Books
+- rweekly.org
+- Forums
+- USCbiostats/software-dev
+
+---
+
+# Have a question? Google it
+
+![](images/google-logo.gif)
+
+.center[https://www.google.com/]
+
+---
+
+![](images/parsnip-google.png)
+
+---
+
+ .center[https://rseek.org/]
+
+![](images/rseek.png)
+
+---
+
+ .center[https://rseek.org/]
+
+![](images/parsnip-rseek.png)
+
+---
+
+# Cheatsheets
+
+.pull-left[
+![](images/cheatsheets-small-1.png)
+]
+
+.pull-right[
+![](images/cheatsheet-small-2.png)
+]
+
+.center[https://www.rstudio.com/resources/cheatsheets/]
+---
+
+# Books
+
+.center[https://bookdown.org/]
+
+![](images/bookdown-head.png)
+
+---
+
+# Books
+
+![](images/bookdown-show.png)
+
+---
+
+ .center[https://www.rweekly.org/]
+ 
+![](images/rweekly.png)
+
+---
+
+![](images/rstudio-community-logo.png)
+
+.center[https://community.rstudio.com/]
+
+<br>
+
+![](images/stackoverflow-logo.png)
+
+.center[https://stackoverflow.com/]
+
+---
+
+ .center[https://github.com/USCbiostats/software-dev]
+ 
+![](images/usc-dev.png)
