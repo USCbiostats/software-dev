@@ -10,6 +10,8 @@
 Slides can be found
 [here](https://rawcdn.githack.com/USCbiostats/software-dev/master/happy_scientist/seminars/2019-01_rstudio-and-r/material/Slides.html).
 
+PDF can be found [here](slides.pdf)
+
 ## Rstudio
 
 **RStudio IDE**  
