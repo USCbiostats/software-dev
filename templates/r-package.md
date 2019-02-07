@@ -27,4 +27,26 @@ Once the project is on git, following checkmarks
 - [ ] The project is built using Continuous Integration services as [Travis-ci](https://travis-ci.org) and [Appveyor](https://ci.appveyor.com/) (use the [usethis](http://usethis.r-lib.org/) package to set it up, eg: `usethis::use_travis`).
 - [ ] The package includes a vignette with an extended example and, if needed, references on the package.
 - [ ] The package has a website (suggest using [pkgdown](https://pkgdown.r-lib.org))
-- [ ] The package has been uploaded to CRAN or BioC.
+
+## Sending package to CRAN
+
+Prepare for release:
+
+* [ ] `devtools::check_win_devel()`
+* [ ] `rhub::check_for_cran()`
+* [ ] `revdepcheck::revdep_check(num_workers = 4)`
+* [ ] [Polish NEWS](http://style.tidyverse.org/news.html#before-release)
+* [ ] If new failures, update `email.yml` then `revdepcheck::revdep_email_maintainers()`
+
+Perform release:
+
+* [ ] Bump version (in DESCRIPTION and NEWS)
+* [ ] `devtools::check_win_devel()` (again!)
+* [ ] `devtools::submit_cran()`
+* [ ] `pkgdown::build_site()`
+* [ ] Approve email
+
+Wait for CRAN...
+
+* [ ] Tag release
+* [ ] Bump dev version
