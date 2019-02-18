@@ -32,15 +32,15 @@ List of past seminars with material can be found [here](/happy_scientist/).
 
 # USCbiostats R packages
 
+*  [amcmc](https://github.com/USCbiostats/amcmc) Adaptive and other Markov Chain Monte Carlo methods
 *  [aphylo](https://github.com/USCbiostats/aphylo) Statistical inference of genetic functions in phylogenetic trees
+*  [BinaryDosage](https://github.com/USCbiostats/BinaryDosage) Converts VCF files to a binary format
 *  [fdrci](https://github.com/USCbiostats/fdrci) Permutation-Based FDR Point and Confidence Interval Estimation
 *  [GxEScanR](https://github.com/USCbiostats/GxEScanR) R version of GxEScan
-*  [amcmc](https://github.com/USCbiostats/amcmc) Adaptive and other Markov Chain Monte Carlo methods
+*  [jsPhyloSVG](https://github.com/USCbiostats/jsPhyloSVG) htmlwidgets for the jsPhyloSVG JavaScript library
+*  [LUCIDus](https://github.com/USCbiostats/LUCid) Latent and Unknown Cluster Analysis using Integrated Data
+*  [MergeBinaryDosage](https://github.com/USCbiostats/MergeBinaryDosage) R package for merging binary dosage files
 *  [rphyloxml](https://github.com/USCbiostats/rphyloxml) Read and write phyloXML files in R
 *  [partition](https://github.com/USCbiostats/partition) 
-*  [LUCIDus](https://github.com/USCbiostats/LUCid) Latent and Unknown Cluster Analysis using Integrated Data
-*  [jsPhyloSVG](https://github.com/USCbiostats/jsPhyloSVG) htmlwidgets for the jsPhyloSVG JavaScript library
-*  [MergeBinaryDosage](https://github.com/USCbiostats/MergeBinaryDosage) R package for merging binary dosage files
 *  [polygons](https://github.com/USCbiostats/polygons)
-*  [BinaryDosage](https://github.com/USCbiostats/BinaryDosage) Converts VCF files to a binary format
-
+*  [xrnet](https://github.com/USCbiostats/xrnet) R Package for Hierarchical Regularized Regression
