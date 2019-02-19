@@ -15,6 +15,14 @@ Time: 12:30pm-1:30pm, Tuesday January 22nd 2019
 Location: Soto (SSB) 114  
 Materials can be found [here](seminars/2019-01_rstudio-and-r/)  
 
+RStudio and R Resources
+
+Happy Scientist Seminars, 2019: #2
+Title: Debugging and Profiling
+Time: 12:00-1:00pm, Tuesday February 19th 2019
+Location: Soto (SSB) 116
+Materials can be found [here](seminars/2019-02_debugging-and-profiling/)
+
 ## 2018
 
 **#1 An introduction to high-performance computing using R**

@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Debugging and Profiling in R</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Emil Hvitfeldt" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="theme.css" type="text/css" />
+    <link rel="stylesheet" href="colors.css" type="text/css" />
+    <link rel="stylesheet" href="text-sizing.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, title-slide
+
+# Debugging and Profiling in R
+### Emil Hvitfeldt
+### 2019-2-19
+
+---
+
+
+
+
+## Fix performance
+
+### Debugging
+
+## Measure performance
+
+### Profiling / Benchmarking
+
+## Improve performance
+
+### Code improvements
+
+---
+
+.center[
+## The Art of identifying the right line(s) of code
+]
+
+--
+
+&lt;br&gt;
+
+### Identify bottlenecks
+
+--
+
+&lt;br&gt;
+
+### Isolate problem
+
+--
+
+&lt;br&gt;
+
+### Create reproducible example
+
+---
+
+.center[
+![](https://imgs.xkcd.com/comics/is_it_worth_the_time.png)
+]
+
+???
+
+Time is dynamic
+
+---
+
+# Debugging
+
+&lt;br&gt;
+
+&gt; Debugging is like being the detective in a crime movie where you're also the murderer.
+
+
+.right[Filipe Fortes]
+
+---
+
+# There are 2 types of errors
+
+### Getting an error
+
+.hidden[Getting a warning]  
+.hidden[R crashes]  
+
+### Don't get expected outcome
+
+.hidden[Test failed]  
+.hidden[no outcome]  
+
+---
+
+# There are ~~2~~ many types of errors
+
+### Getting an error
+
+Getting a warning  
+R crashes
+
+### Don't get expected outcome
+
+Test failed  
+no outcome
+
+---
+
+# Plan of attack
+
+### google the error message
+
+Very real chance that someone elser had the same problem you just had.
+
+### Isolate the problem
+
+Your problem will most likely be confined to one area of your code.
+
+### Make it repeatable
+
+Work towards a minimal reproducible error.
+
+---
+
+# Call/Ask a friend &lt;img src='https://vignette.wikia.nocookie.net/millionaire/images/8/88/ClassicPAF.png/revision/latest?cb=20160407180816' align="right" height="139" /&gt;
+
+It can be hard to google something if you don't know the name of the thing you want or have a hard time describing it concisely.
+
+### Problem
+
+I have a list of numbers and I want to add each number to all the previous numbers in a list.
+
+### Solution
+
+&gt; you are thinking of a cumulative sum, implemented in R as `cumsum()`.
+.right[friend]
+
+---
+
+![](long-nose.png)
+
+---
+
+![](elephant.png)
+
+---
+
+# Hunting tools
+
+## traceback()
+
+## debug()
+
+## breakpoints
+
+## broswer()
+
+---
+
+# Urn simulation
+
+
+```r
+main_function &lt;- function(n_max, n_black, balls, n) {
+  check_input(n_max, n_black, balls, n)
+  x_prep &lt;- prep_data(n_black, balls) 
+  
+  res &lt;- numeric(n)
+  for(i in seq_len(n)) {
+    data &lt;- simulate_data(x_prep, n_max)
+    res[i] &lt;- analyse_results(data)
+  }
+  res
+}
+```
+
+---
+
+
+```r
+check_input &lt;- function(n_max, n_black, balls, n) {
+  if(!is.numeric(n_max)) 
+    stop("`n_max` must be numeric.")
+  if(!is.numeric(n_black)) 
+    stop("`n_black` must be numeric.")
+  if(!is.numeric(balls)) 
+    stop("`balls` must be a numeric.")
+  if(!is.numeric(n)) 
+    stop("`n` must be a numeric.")
+  
+    if(length(n_max) != 1) 
+    stop("`n_max` must have length 1.")
+  if(!is.numeric(n_black)) 
+    stop("`n_black` must have length 1.")
+  if(!is.numeric(n)) 
+    stop("`n` must have length 1.")
+}
+```
+
+---
+
+
+```r
+prep_data &lt;- function(n_black, balls) {
+  c(rep(0, n_black), ball_create(balls))
+}
+
+ball_create &lt;- function(balls) {
+  ball_id &lt;- seq_len(balls)
+  res &lt;- numeric()
+  for(i in ball_id) {
+    res &lt;- c(res, rep(ball_id[i], balls[i]))
+  }
+  res
+}
+```
+
+
+```r
+simulate_data &lt;- function(urn, n_max) {
+  for (j in length(urn):n_max) {
+    draw &lt;- sample(urn, 1)
+    if(draw == 0) {
+      urn &lt;- c(urn, max(urn) + 1)
+    } else {
+      urn &lt;- c(urn, draw)
+    }  
+  }
+  urn
+}
+```
+
+
+```r
+analyse_results &lt;- function(x) sum(x == 1)
+```
+
+---
+
+
+
+
+```r
+options(warn = 2)
+main_function(n_max = 50, n_black = 1, balls = c(1, 1), n = 100)
+traceback()
+```
+
+```
+## 7: doWithOneRestart(return(expr), restart)
+## 6: withOneRestart(expr, restarts[[1L]])
+## 5: withRestarts({
+##        .Internal(.signalCondition(simpleWarning(msg, call), msg, 
+##            call))
+##        .Internal(.dfltWarn(msg, call))
+##    }, muffleWarning = function() NULL)
+## 4: .signalSimpleWarning("first element used of `length.out` argument", 
+##        quote(seq_len(balls))) at #2
+## 3: ball_create(balls) at #2
+## 2: prep_data(n_black, balls) at #3
+## 1: main_function(n_max = 50, n_black = 1, balls = c(1, 1), n = 100)
+```
+
+---
+
+# Using browser() and breakpoints
+
+&lt;br&gt;
+&lt;br&gt;
+
+.center[
+.large[
+# Live Demo
+]
+]
+.center[
+urn_code.R
+]
+
+???
+
+Using browser inside urn code
+Show conditional browser
+
+---
+
+## debug() and debugonce() 
+
+
+
+```r
+debug(ball_create)
+main_function(n_max = 50, n_black = 1, balls = c(1, 1), n = 100)
+
+debugonce(simulate_data)
+main_function(n_max = 50, n_black = 1, balls = c(1, 1), n = 100)
+```
+
+---
+
+# Write tests for your code
+
+&lt;br&gt;
+
+## For every fixed bug
+
+---
+
+# Benchmarking
+
+&lt;br&gt;
+
+&gt; Don't fix something that is running fast enough.
+.right[Unknown]
+
+---
+
+# 2 types of benchmarking
+
+## Slow (time &gt; 1 sec)
+
+`system.time()`  
+
+*tictoc* package
+
+## Fast (time &lt; 1 sec)
+
+Microbenchmarking  
+*bench* package
+
+---
+
+# Timing slow code
+
+
+```r
+fibonacci &lt;- function(n) {
+  if(n == 0) {
+    return(0)
+  }
+  if(n == 1) {
+    return(1)
+  }
+  fibonacci(n - 1) + fibonacci(n - 2)
+}
+```
+
+--
+
+
+```r
+system.time(
+  fibonacci(30)
+)
+```
+
+```
+##    user  system elapsed 
+##   0.850   0.001   0.851
+```
+
+---
+
+# Timing slow code
+
+
+```r
+fibonacci &lt;- function(n) {
+  if(n == 0) {
+    return(0)
+  }
+  if(n == 1) {
+    return(1)
+  }
+  fibonacci(n - 1) + fibonacci(n - 2)
+}
+```
+
+
+```r
+system.time(
+  fibonacci(1)
+)
+```
+
+```
+##    user  system elapsed 
+##       0       0       0
+```
+
+---
+
+# tictoc package for timing
+
+
+```r
+library(tictoc)
+
+tic()
+X &lt;- fibonacci(5)
+toc()
+```
+
+```
+## 0.005 sec elapsed
+```
+
+
+```r
+tic("fibonacci with n = 5")
+X &lt;- fibonacci(5)
+toc()
+```
+
+```
+## fibonacci with n = 5: 0.002 sec elapsed
+```
+
+
+---
+
+# tictoc package for timing
+
+
+```r
+library(tictoc)
+
+tic("Total")
+  tic("n = 4")
+  X &lt;- fibonacci(4)
+  toc()
+  
+  tic("n = 5")
+  X &lt;- fibonacci(5)
+  toc()
+  
+  tic("n = 6")
+  X &lt;- fibonacci(6)
+  toc()
+toc()
+```
+
+```
+## n = 4: 0.002 sec elapsed
+## n = 5: 0.002 sec elapsed
+## n = 6: 0.001 sec elapsed
+## Total: 0.008 sec elapsed
+```
+
+---
+
+# Microbenchmarking with bench package
+
+.center[
+.large[
+# Live Demo
+]
+]
+
+???
+
+library(magrittr)
+x &lt;- runif(100)
+
+bench::mark(
+  sqrt(x),
+  x ^ 0.5,
+  x ^ (1 / 2)
+) %&gt;% plot()
+
+---
+
+# Notice the units
+
+- 1 ms, then one thousand calls takes a second.
+- 1 µs, then one million calls takes a second.
+- 1 ns, then one billion calls takes a second.
+
+---
+
+# Profiling
+
+&lt;br&gt;
+
+&gt; Never mess with someone who has more spare time than you do[.]
+
+.right[Fredrik Backman, My Grandmother Asked Me to Tell You She's Sorry]
+
+---
+
+&lt;br&gt;
+
+.center[
+.large[
+# Live Demo
+]
+]
+
+.center[
+urn_profile.R
+]
+
+---
+
+# Profiler information
+
+R uses a sampling/statistical profiler  
+
+### Memory  
+left - allocated  
+right - freed
+
+---
+
+# `&lt;GC&gt;` Garbage collection
+
+Indication lots of small objects are being created
+
+
+```r
+x &lt;- numeric(50000)
+for(i in seq_len(50000)) {
+  x &lt;- c(x, i)
+}
+```
+
+### R uses copy-on-modify
+
+???
+R has a variable-sized workspace.  
+R maintains separate areas for fixed and variable sized objects.  
+350k cons cells and 6Mb of vector heap
+
+a name "has" an object  
+ `rm("x")` doesn't remove the object, it removes the name  
+(the gc then cleans up the underlying object if it detects no 'names' point to that object later on)
+
+---
+
+![](50000.png)
+
+???
+R has a variable-sized workspace.  
+R maintains separate areas for fixed and variable sized objects.  
+350k cons cells and 6Mb of vector heap
+
+a name "has" an object  
+ `rm("x")` doesn't remove the object, it removes the name  
+(the gc then cleans up the underlying object if it detects no 'names' point to that object later on)
+
+---
+
+![](500000.png)
+
+???
+R has a variable-sized workspace.  
+R maintains separate areas for fixed and variable sized objects.  
+350k cons cells and 6Mb of vector heap
+
+a name "has" an object  
+ `rm("x")` doesn't remove the object, it removes the name  
+(the gc then cleans up the underlying object if it detects no 'names' point to that object later on)
+
+---
+
+# flexibility and functionality &gt; speed
+
+
+```r
+var
+```
+
+```
+## function (x, y = NULL, na.rm = FALSE, use) 
+## {
+##     if (missing(use)) 
+##         use &lt;- if (na.rm) 
+##             "na.or.complete"
+##         else "everything"
+##     na.method &lt;- pmatch(use, c("all.obs", "complete.obs", "pairwise.complete.obs", 
+##         "everything", "na.or.complete"))
+##     if (is.na(na.method)) 
+##         stop("invalid 'use' argument")
+##     if (is.data.frame(x)) 
+##         x &lt;- as.matrix(x)
+##     else stopifnot(is.atomic(x))
+##     if (is.data.frame(y)) 
+##         y &lt;- as.matrix(y)
+##     else stopifnot(is.atomic(y))
+##     .Call(C_cov, x, y, na.method, FALSE)
+## }
+## &lt;bytecode: 0x7f7f84616ea0&gt;
+## &lt;environment: namespace:stats&gt;
+```
+
+---
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-19-1.png" width="700px" height="99%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Code improvements
+
+&lt;br&gt;
+
+&gt; “ The first 90% of the code accounts for the first 90% of the development time. The remaining 10% of the code accounts for the other 90% of the development time. ”  
+
+.right[ Tom Cargill]
+
+---
+
+# 4 ways to speed up code
+
+## Buy a bigger computer
+
+## Optimize R code
+
+## Parallelize
+
+## Rewrite code in c++
+
+---
+
+# 4 ways to speed up code
+
+## .light[Buy a bigger computer]
+
+## Optimize R code
+    
+## .light[Parallelize]
+
+## .light[Rewrite code in c++]
+---
+
+# Pattern recogniction &amp; trial and error
+
+&lt;br&gt;
+
+## Gain speed by doing less
+
+&lt;br&gt;
+
+More examples at https://github.com/USCbiostats/software-dev/tree/master/Slow_patterns
+
+---
+
+# unlist()
+
+
+```r
+list_obj &lt;- list(a = 1, b = 2, c = 3)
+
+bench::mark(check = FALSE,
+  unlist(list_obj),
+  unlist(list_obj, use.names = FALSE)
+)[c("expression", "min", "mean", "max", "itr/sec")]
+```
+
+```
+## # A tibble: 2 x 5
+##   expression                               min     mean      max `itr/sec`
+##   &lt;chr&gt;                               &lt;bch:tm&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;
+## 1 unlist(list_obj)                       619ns    685ns   22.9µs  1459071.
+## 2 unlist(list_obj, use.names = FALSE)    463ns    558ns   28.3µs  1791728.
+```
+
+---
+
+# table vs tabulate
+
+
+```r
+x &lt;- sample(x = 1:6, size = 100, replace = TRUE)
+```
+
+
+```r
+table(x)
+```
+
+```
+## x
+##  1  2  3  4  5  6 
+## 13 15 16 17 17 22
+```
+
+```r
+tabulate(x)
+```
+
+```
+## [1] 13 15 16 17 17 22
+```
+
+---
+
+
+```r
+bench::mark(check = FALSE,
+  table(x),
+  tabulate(x)
+) %&gt;% plot()
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-23-1.png" width="700px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Use matrix algebra
+
+Calculate the magnitude of each point `sqrt(x^2 + y^2)`
+
+
+```r
+x &lt;- matrix(rnorm(20), ncol = 2)
+colnames(x) &lt;- c("x", "y")
+```
+
+
+```r
+x
+```
+
+```
+##                x           y
+##  [1,]  2.3991606 -0.14660420
+##  [2,]  0.6249790 -0.34205853
+##  [3,]  0.7698679  0.45751096
+##  [4,]  0.7754097  0.04068578
+##  [5,]  0.7782949 -0.10098925
+##  [6,] -0.8197612  2.28329483
+##  [7,]  0.4573175 -0.82314245
+##  [8,]  0.8881661 -1.04656812
+##  [9,] -0.1437705 -0.92939910
+## [10,] -0.1813523 -0.38265007
+```
+
+---
+
+# Use matrix algebra
+
+.pull-left[
+
+```r
+x[, 1, drop = FALSE] + x[, 2, drop = FALSE]
+```
+
+```
+##                x
+##  [1,]  2.2525564
+##  [2,]  0.2829204
+##  [3,]  1.2273789
+##  [4,]  0.8160955
+##  [5,]  0.6773056
+##  [6,]  1.4635336
+##  [7,] -0.3658250
+##  [8,] -0.1584020
+##  [9,] -1.0731696
+## [10,] -0.5640023
+```
+
+]
+
+.pull-right[
+
+```r
+y &lt;- matrix(c(1, 1), ncol = 1)
+x %*% y
+```
+
+```
+##             [,1]
+##  [1,]  2.2525564
+##  [2,]  0.2829204
+##  [3,]  1.2273789
+##  [4,]  0.8160955
+##  [5,]  0.6773056
+##  [6,]  1.4635336
+##  [7,] -0.3658250
+##  [8,] -0.1584020
+##  [9,] -1.0731696
+## [10,] -0.5640023
+```
+
+]
+
+---
+
+# Use matrix algebra
+
+
+```r
+x &lt;- matrix(rnorm(20), ncol = 2)
+bench::mark(
+  subset = x[, 1, drop = FALSE] + x[, 2, drop = FALSE],
+  matrix = {
+    y &lt;- matrix(c(1, 1), ncol = 1)
+    x %*% y
+  }
+)[c("expression", "min", "mean", "max", "itr/sec")]
+```
+
+```
+## # A tibble: 2 x 5
+##   expression      min     mean      max `itr/sec`
+##   &lt;chr&gt;      &lt;bch:tm&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;
+## 1 subset       1.02µs   1.37µs    229µs   729534.
+## 2 matrix       1.45µs   1.79µs   12.5µs   559247.
+```
+
+
+---
+
+# Use matrix algebra
+
+
+```r
+bench::press(
+  size = c(20, 200, 2000, 20000),
+  {
+    x &lt;- matrix(rnorm(size), ncol = 2)
+    bench::mark(
+      matrix = {
+        y &lt;- matrix(c(1, 1), ncol = 1)
+        x %*% y
+      },
+      subset = x[, 1, drop = FALSE] + x[, 2, drop = FALSE]
+    )
+  }
+) %&gt;%
+  plot()
+```
+
+---
+
+# Use matrix algebra
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-30-1.png" width="700px" style="display: block; margin: auto;" /&gt;
+
+---
+
+.large[
+.center[
+# Size Matters
+]
+]
+
+--
+
+&lt;br&gt;
+
+.center[
+## Sometimes
+]
+
+--
+
+&lt;br&gt;
+
+.center[
+## Always benchmark changes
+]
+
+--
+
+&lt;br&gt;
+
+.center[
+## Save all attempts
+]
+
+--
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
