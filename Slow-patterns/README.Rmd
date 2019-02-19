@@ -1,0 +1,230 @@
+---
+output: github_document
+---
+
+# Slow R patterns
+
+```{r}
+library(magrittr)
+```
+
+
+This document serves as a starting point for code optimizations. It includes possible optimization strategies.
+
+All code here is being benchmarked using the [bench](http://bench.r-lib.org/) package.
+
+## For loops vs apply
+
+Imagine you have a matrix of numbers and you want to compute the row-wise variance. This can be done using a for loop, or using the apply function. You will most likely not see any big speed improvements, but the lines of codes can sometimes be considerably be improved.
+
+```{r}
+data <- matrix(rnorm(100000), nrow = 1000)
+
+rowVars <- function(x) {
+  x_length <- nrow(x)
+  res <- numeric(x_length)
+  for (i in seq_len(x_length)) {
+    res[i] <- var(x[i, ])
+  }
+  res
+}
+
+bench::mark(
+  rowVars(data),
+  apply(data, 1, var)
+)
+```
+
+
+## Apply Sums
+
+If you are about to use `apply` with `FUN = mean` or `sum` you might take a look at `rowSums`, `colsums`, `rowMeans` and `colMeans`. They will do the same but faster (NaN and NA are handled slightly different to tread lightly). the `.rowSums` is a faster variant that only works on numeric matrices and do not name the result.
+
+```{r}
+data <- matrix(rnorm(10000), nrow = 100, ncol = 100)
+
+bench::mark(
+  apply(data, 1, sum),
+  rowSums(data),
+  .rowSums(data, 100, 100)
+) %>% plot()
+
+data <- matrix(rnorm(1000000), nrow = 1000, ncol = 1000)
+
+bench::mark(
+  apply(data, 1, sum),
+  rowSums(data),
+  .rowSums(data, 1000, 1000)
+) %>% plot()
+
+bench::mark(
+  apply(data, 1, mean),
+  rowMeans(data)
+) %>% plot()
+```
+
+## sapply vs vapply
+
+```{r}
+bench::mark(
+  sapply(mtcars, sum),
+  vapply(mtcars, sum, FUN.VALUE = numeric(1))
+) %>% plot()
+```
+
+## any all function
+
+If you want to see if a vector contains a value, using `any(data == 10)` can be faster then `10 %in% data`. The speed will depend on the length of your vector and how frequent the value is.
+
+```{r}
+bench::press(
+  nval = c(10, 100, 1000),
+  {
+    data <- rpois(nval, 1)
+    bench::mark(
+      5 %in% data,
+      any(data == 5)
+    )
+  }
+) %>% print() %>% plot()
+```
+
+## cut vs findInterval
+
+Many times when you want to use `cut`, to split a vector into bins, it will be faster to replace cut with findInterval as it does less work by not creating a factor.
+
+```{r}
+x <- rnorm(10000)
+bench::mark(check = FALSE,
+  cut(x, c(-Inf, 0, Inf)),
+  findInterval(x, c(-Inf, 0, Inf))
+) %>%  print() %>% plot()
+```
+
+## unlist
+
+`unlist` can be be speed up by setting `use.names = FALSE`, this will stop the returned object from being names, saving time.
+
+```{r}
+bench::mark(check = FALSE,
+  unlist(mtcars),
+  unlist(mtcars, use.names = FALSE)
+)
+```
+
+## cumulative function and other math group functions
+
+If you have any mathematical calculations you need to have done, it is worth your time to check if they are implemented in R already `?Math`.
+
+## How many times does Y appear in X
+
+Here we have some object which could be a vector, matrix or array. we would like to know how many times the number 0 appear.
+
+```{r}
+x_vector <- rpois(10000, 1)
+
+bench::mark(
+  unname(table(x_vector)["0"]),
+  sum(x_vector == 0)
+)
+```
+
+## table vs tabulate
+
+If you need counts of integer-valued vectors, you will gain a big speedup by using the `tabulate()` function. Notice that tabulate will ignore non-positive integers, so 0s would not be counted. tabulate will manually place the number of counts of 8 in the 8th place in its output.
+
+```{r}
+x <- sample(1:10, 1000, TRUE)
+
+table(x)
+tabulate(x)
+
+bench::mark(check = FALSE,
+  table(x),
+  tabulate(x)
+)
+```
+
+## Using pipes
+
+Use of the pipe operator `%>%` can make your code more readable, but it will also result in (slightly) slower code. If speed is very important you might want to reconsider using pipes. This will be a trade-off between readability and speed. 
+
+```{r}
+library(magrittr)
+x <- rpois(1000, 1)
+
+bench::mark(
+  x %>% identity(),
+  identity(x)
+) %>% 
+  print() %>% 
+  plot()
+```
+
+## Summing weights
+
+```{r}
+x <- matrix(rnorm(1000), ncol = 1)
+w <- matrix(rnorm(10000), ncol = 10)
+
+bench::mark(
+  t(x) %*% w,
+  crossprod(x, w)
+)
+```
+
+## pmax and pmin
+
+pmin is a nice shorthand, but you can gain some speed with some rewriting.
+
+```{r}
+x <- runif(1000, -0.5)
+
+bench::mark(
+  pmax(x, 0),
+  {
+    i <- x < 0
+    x[i] <- 0
+    x
+  }
+)
+```
+
+## lm
+
+If you are doing linear regression, and you already have the data as matrices you can benefit greatly from using the `.lm.fit` function. This function will not do any checking for you. Just the calculations.
+
+```{r}
+
+y <- mtcars$mpg
+
+x <- as.matrix(mtcars[, c("disp", "cyl")])
+
+bench::mark(check = FALSE,
+  lm(mpg ~ disp + cyl - 1, mtcars),
+  .lm.fit(x, y)
+)
+
+```
+
+## using : for creating sequences
+
+Creating a sequence from 1 to n.
+
+```{r}
+n <- 100000
+
+bench::mark(
+  seq(1, n),
+  seq.int(1, n),
+  1:n,
+  seq_len(n)
+)
+```
+
+Not only is `seq_len()` faster, but it is also safer as it as it works well when `n = 0`.
+
+```{r}
+1:0
+seq_len(0)
+```
