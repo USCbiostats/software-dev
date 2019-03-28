@@ -37,6 +37,7 @@ List of past seminars with material can be found [here](/happy_scientist/).
 *  [BinaryDosage](https://github.com/USCbiostats/BinaryDosage) Converts VCF files to a binary format
 *  [fdrci](https://github.com/USCbiostats/fdrci) Permutation-Based FDR Point and Confidence Interval Estimation
 *  [GxEScanR](https://github.com/USCbiostats/GxEScanR) R version of GxEScan
+*  [HiLDA](https://github.com/USCbiostats/HiLDA) R package to investigate differences in mutational signatures
 *  [jsPhyloSVG](https://github.com/USCbiostats/jsPhyloSVG) htmlwidgets for the jsPhyloSVG JavaScript library
 *  [LUCIDus](https://github.com/USCbiostats/LUCid) Latent and Unknown Cluster Analysis using Integrated Data
 *  [MergeBinaryDosage](https://github.com/USCbiostats/MergeBinaryDosage) R package for merging binary dosage files
