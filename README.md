@@ -42,6 +42,7 @@ List of past seminars with material can be found [here](/happy_scientist/).
 *  [LUCIDus](https://github.com/USCbiostats/LUCid) Latent and Unknown Cluster Analysis using Integrated Data
 *  [MergeBinaryDosage](https://github.com/USCbiostats/MergeBinaryDosage) R package for merging binary dosage files
 *  [rphyloxml](https://github.com/USCbiostats/rphyloxml) Read and write phyloXML files in R
+*  [sluRm](https://github.com/USCbiostats/sluRm) 
 *  [partition](https://github.com/USCbiostats/partition) 
 *  [polygons](https://github.com/USCbiostats/polygons) Flexible functions for computing polygons coordinates in R 
 *  [xrnet](https://github.com/USCbiostats/xrnet) R Package for Hierarchical Regularized Regression
