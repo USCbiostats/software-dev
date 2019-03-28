@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Building R Packages</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Emil Hvitfeldt" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="theme.css" type="text/css" />
+    <link rel="stylesheet" href="colors.css" type="text/css" />
+    <link rel="stylesheet" href="text-sizing.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, title-slide
+
+# Building R Packages
+### Emil Hvitfeldt
+### 2019-3-28
+
+---
+
+
+
+
+# Slides and material
+
+Slides are up now  
+https://github.com/USCbiostats/software-dev
+
+Chapter will be up by end of week  
+https://github.com/USCbiostats/handbook
+
+---
+
+# Overview
+
+- Motivation
+- Minimal R Package
+- Not so minimal R package
+- Live demo
+
+---
+
+# Motivation
+
+.center[
+![:scale 80%](screenshots/drob.png)
+]
+
+---
+
+# What is a R package?
+
+- Packages are collections of R functions, data, and compiled code in a well-defined format.
+
+R comes pre-installed with some packages (base packages)
+
+
+```r
+rownames(installed.packages(priority = "base"))
+```
+
+```
+##  [1] "base"      "compiler"  "datasets"  "graphics"  "grDevices"
+##  [6] "grid"      "methods"   "parallel"  "splines"   "stats"    
+## [11] "stats4"    "tcltk"     "tools"     "utils"
+```
+
+And some are loaded automatically
+
+
+```r
+getOption("defaultPackages")
+```
+
+```
+## [1] "datasets"  "utils"     "grDevices" "graphics"  "stats"     "methods"
+```
+
+---
+
+# Why create a R package?
+
+## Saving yourself time
+
+## Sharing
+
+## Organization
+
+## Collaboration
+
+## Credit
+
+???
+
+R packages comes with conventions so you don't have to invent the wheel
+
+---
+
+# Deployment
+
+## Personal
+
+### It never have to leave your computer
+
+## Open-source it 
+
+### Put it on Github/Gitlab
+
+## CRAN / Bioconductor
+
+???
+
+Mention ehlib
+CRAN doesn't like class specific packages
+If it is not on CRAN it doesn't need to follow as strict standards.
+
+---
+
+# Package Manuals
+
+## Light
+
+https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/
+
+## Medium
+
+https://r-pkgs.org/
+
+## Heavy
+
+https://cran.r-project.org/doc/manuals/R-exts.html
+
+???
+
+Hilarys includes 1.150 words
+
+CRAN includes 50.000 words
+
+CRAN includes 85.000 words
+
+---
+
+.center[
+![](screenshots/hilaryparker.png)
+]
+
+---
+
+.center[
+![:scale 80%](screenshots/rpkgs.png)
+]
+
+---
+
+.center[
+![](screenshots/cpp11.png)
+]
+
+---
+
+# Getting started
+
+You will need the following packages
+
+
+```r
+install.packages(c("devtools", "roxygen2", "testthat", "knitr"))
+```
+
+Developmental version of **devtools** and **usethis**.
+
+
+```r
+devtools::install_github("r-lib/devtools")
+devtools::install_github("r-lib/usethis")
+```
+
+On Windows, download and install Rtools  
+On Mac, download and install XCode  
+On Linux, download and install the R development tools
+
+???
+
+Everything that can be automated, must be automated
+
+---
+
+# Creating a minimal R package - Name
+
+
+Must be Googleable and avaliable.  
+https://github.com/ropenscilabs/available
+
+Can be
+
+- Informative name, (goodpractice, microbenchmark)
+- A play on words, (dplyr, strapgod, wibble)
+- An Abriviation, (ergm, mcmc)
+- Add an extra R, (lintr, purrr)
+- No connection (shiny)
+
+---
+
+# Create a minimal R package
+
+![](screenshots/creation.png)
+
+---
+
+.pull-left[
+![](screenshots/minimal-package.png)
+]
+
+.pull-right[
+# We are done!
+]
+
+---
+
+# DESCRIPTION file
+
+```{}
+Package: package
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Emil",
+           family = "Hvitfeldt",
+           role = c("aut", "cre"),
+           email = "emilhhvitfeldt@gmail.com")
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    dplyr
+Suggests:
+    ggplot2
+```
+
+---
+
+# R/ - adding functions
+
+Create `fibonacci.R` file with `use_r("fibonacci")`
+
+
+```r
+fibonacci &lt;- function(n) {
+  if(n == 0) return(0)
+  if(n == 1) return(1)
+  
+  fibonacci(n - 1) + fibonacci(n - 2)
+}
+```
+
+---
+
+# R/ - adding documentations
+
+
+```r
+#' Calculates the fibonacci numbers
+#'
+#' This function takes in a number and returns the corresponding 
+#' fibonacci number.
+#'
+#' @param n A number
+#'
+#' @return A number
+#' @export
+#'
+#' @examples
+#' fibonacci(10)
+fibonacci &lt;- function(n) {
+  if(n == 0) return(0)
+  if(n == 1) return(1)
+  
+  fibonacci(n - 1) + fibonacci(n - 2)
+}
+```
+
+---
+
+
+```r
+devtools::document()
+```
+
+![](screenshots/document.png)
+
+Automatically populate the `man/` folder
+
+---
+
+# R/ - adding documentations
+
+.center[
+![:scale 80%](screenshots/man.png)
+]
+
+---
+
+# Namespace
+
+![](screenshots/namespace.png)
+
+???
+
+Now we are technically done with minimal package
+
+---
+
+# Dependencies
+
+```{}
+Package: package
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Emil",
+           family = "Hvitfeldt",
+           role = c("aut", "cre"),
+           email = "emilhhvitfeldt@gmail.com")
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    dplyr
+Suggests:
+    ggplot2
+```
+
+---
+
+# Dependencies
+
+- `Imports` are packages that your package to work.
+- `Suggests` are packages that your package can use but doesn't need.
+- `LinkingTo` packages listed here rely on C or C++ code in another package.
+
+???
+Talk about number of dependencies.  
+The main difference is that where `Imports` just loads the package, `Depends` attaches it.
+
+---
+
+# How to distribute
+
+- Self-use
+
+
+```r
+devtools::install() # Installs locally
+devtools::build()   # Creates package.tar.gz file
+```
+
+- Github + git
+
+
+```r
+usethis::use_github()
+```
+
+- CRAN
+
+
+```r
+devtools::release()
+```
+
+???
+
+Git will not be mentioned in this talk, refer to previous and later Happy scientists and handbook.
+
+---
+
+# Additional components
+
+.pull-left[
+- Package name
+- README
+- Documentation
+- Documentation website
+- Authorship
+- License
+- Data
+]
+
+.pull-right[
+- Tests
+- Vignettes
+- Continuous integration
+- News
+- codecov
+- Dependencies
+- Examples
+]
+
+---
+
+# Checking
+
+`R CMD check`
+
+Run a bunch of sanity checks.
+
+run
+
+
+```r
+devtools::check()
+```
+
+or Ctrl/Cmd + Shift + E in RStudio
+
+---
+
+# Readme
+
+.center[
+![:scale 70%](screenshots/readme.png)
+]
+
+---
+
+# Readme
+
+Will generally be first point of contact for developers.
+
+Contains:
+
+- The package name
+- Badges for continuous integration and test coverage
+- Short description of goals of package
+- Installation instructions
+- Brief demonstration usage
+- Citation information
+
+---
+
+# Readme - creation
+
+Simply type
+
+
+```r
+use_readme_rmd()
+```
+
+## Workflow
+
+- Modify
+- Knit (crtl/cmd + k)
+- repeat
+
+---
+
+# Licenses
+
+## Officially Authorized
+
+![:scale 70%](screenshots/licenses.png)
+
+---
+
+# Licenses
+
+(I'm not a lawyer!)
+
+- MIT (simple and permissive)
+- GPL-2 or GPL-3 (anti-capitalism)   
+- CC0 (freely be used for any purpose)
+
+
+```r
+use_mit_license("My Name")
+use_gpl3_license("My Name")
+use_cc0_license("Ny Name")
+```
+
+???
+
+It lets people use and freely distribute your code subject to only one restriction: the license must always be distributed with the code.  
+
+These are “copy-left” licenses. This means that anyone who distributes your code in a bundle must license the whole bundle in a GPL-compatible way. Additionally, anyone who distributes modified versions of your code (derivative works) must also make the source code available.  
+
+It relinquishes all your rights on the code and data so that it can be freely used by anyone for any purpose. This is sometimes called putting it in the public domain, a term which is neither well-defined nor meaningful in all countries.
+
+---
+
+# Vignettes
+
+Long form documentation.
+
+Perfect for longer examples that doesn't fit in examples.
+
+
+```r
+use_vignette("Awesome vignette")
+```
+
+---
+
+# News
+
+More granular details regarding the changes to the package
+
+
+```r
+use_news_md()
+```
+
+---
+.center[
+![:scale 70%](screenshots/news.png)
+]
+
+---
+
+# Data
+
+We want to include the data generation process.
+
+
+```r
+use_data_raw()
+```
+
+```
+## Next:
+```
+
+```
+## ● Add data creation scripts in 'data-raw/'
+## ● Use `usethis::use_data()` to add data to package
+```
+
+In `data-raw`
+
+
+```r
+fib5 &lt;- c(1, 1, 2, 3, 5, 8)
+use_data(fib5)
+```
+
+---
+
+# Data - documentation
+
+Create data R file
+
+
+```r
+use_r("data")
+```
+
+Document as normal. Do not @export.
+
+
+```r
+#' First 5 fibonacci numbers
+#'
+#' A vector with the first 5 fibonacci numbers.
+#'
+#' @format A vector of length 5
+"fib5"
+```
+
+---
+
+# Compiled Code (c++)
+
+Start by setting up package to work with compiled code
+
+
+```r
+use_rcpp()
+```
+
+Create file: File -&gt; New File -&gt; C++ file
+
+- Write code
+- Document with Ctrl/Cmd + Shift + D
+- Build &amp; Reload Ctrl/Cmd + Shift + B
+- repeat
+
+???
+
+Create a src/ directory to hold your .cpp files.
+
+Add Rcpp to the LinkingTo and Imports fields in the DESCRIPTION.
+
+Set up a .gitignore file to make sure you don’t accidentally check in any compiled files (learn more about this in git).
+
+Tell you the two roxygen tags you need to add to your package:
+
+---
+
+# Testing
+
+Use a testing framework, we will use the testthat package
+
+
+```r
+use_testthat()
+```
+
+add a test
+
+
+```r
+use_test("fibonacci")
+```
+
+---
+
+# Testing
+
+
+```r
+context("test-fibonacci")
+
+
+
+test_that("fibonacci work as intended", {
+  expect_equal(fibonacci(6), 8)
+})
+
+
+
+test_that("fibonacci complains when n is not numeric scalar", {
+  expect_error(fibonacci("six"))
+  expect_warning(fibonacci(c(1, 2, 3, 4)))
+})
+```
+
+---
+
+# Using Continuous Integration (CI)
+
+&gt; The idea behind continuous integration is that CI will automatically run R CMD check (along with your tests, etc.) every time you push a commit to GitHub.
+
+
+```r
+use_travis()
+```
+
+## Code coverage
+
+
+```r
+use_coverage()
+```
+
+---
+
+# Badges
+
+![](screenshots/badges.png)
+
+---
+
+# Live demo
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
