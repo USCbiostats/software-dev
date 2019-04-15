@@ -533,7 +533,7 @@ use_news_md()
 
 We want to include the data generation process.
 
-```{r}
+```{r, eval=FALSE}
 use_data_raw()
 ```
 
