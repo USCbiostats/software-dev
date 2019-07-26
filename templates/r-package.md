@@ -65,5 +65,5 @@ Perform release:
 
 * [ ] Bump version (in DESCRIPTION and NEWS) which triggers the submission
 * [ ] Receive emails about successfully building your package without errors or warnings. 
-* [ ] a technical review provided by a Bioconductor team member 
+* [ ] A technical review provided by a Bioconductor team member 
 * [ ] Approve email
