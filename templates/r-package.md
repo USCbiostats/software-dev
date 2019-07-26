@@ -50,3 +50,20 @@ Wait for CRAN...
 
 * [ ] Tag release
 * [ ] Bump dev version
+
+## Sending package to Bioconductor
+
+Prepare for release:
+
+* [ ] Pass `R CMD check` and `R CMD Biocheck`
+* [ ] Go visit this guidance [site](https://github.com/Bioconductor/Contributions)
+* [ ] Add SSH public key(s) to your GitHub account
+* [ ] Add a webhook to your repository
+* [ ] Submit by opening a new issue in the Bioconductor [Contributions](https://github.com/Bioconductor/Contributions/issues/new) repository.
+
+Perform release:
+
+* [ ] Bump version (in DESCRIPTION and NEWS) which triggers the submission
+* [ ] Receive emails about successfully building your package without errors or warnings. 
+* [ ] a technical review provided by a Bioconductor team member 
+* [ ] Approve email
