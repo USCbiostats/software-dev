@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>part1.utf8.md</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">HPC with Slurm, R and the slurmR package</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="part1.html">Part 1: Slurm fundamentals</a>
+</li>
+<li>
+  <a href="part2.html">Part 2: Simulating pi (again)</a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<div id="beginning-with-usc-hpc-cluster" class="section level2">
+<h2>Beginning with USC HPC cluster</h2>
+<ol style="list-style-type: decimal">
+<li><p>Log-in using ssh. In the case of Windows users, download the Putty</p></li>
+<li><p>Voilá! You should see something like this</p></li>
+</ol>
+</div>
+<div id="using-r-on-the-hpc" class="section level2">
+<h2>Using R on the HPC</h2>
+<ol style="list-style-type: decimal">
+<li><p>The HPC has several preinstalled pieces of software. R is one of those.</p></li>
+<li><p>It has multiple versions of R installed. Use your favorite one by running</p>
+<pre class="bash"><code>source /usr/usc/R/[version number]/setup.sh</code></pre>
+<p>Where <code>[version number]</code> can be 2.5, 2.6, …, 3.5, and up to 3.6 (the latest update)</p></li>
+<li><p>It is never a good idea to use your home directory to install R packages, that’s why you should try using a <a href="">symbolic link instead</a>, like this</p>
+<pre class="bash"><code>cd ~
+mkdir -p /path/to/a/project/with/lots/of/space/R
+ln -s /path/to/a/project/with/lots/of/space/R R</code></pre>
+<p>This way, whenever you install your R packages, R will default to that location</p></li>
+<li><p>You can run interactive sessions on HPC, but this recommended to be done using the <code>salloc</code> function in Slurm, in other words, NEVER EVER USE R (OR ANY SOFTWARE) TO DO DATA ANALYSIS IN THE HEAD NODES! The options passed to salloc are the same options that can be passed to <code>sbatch</code> (see the next section.) For example, if need to do some analyses in the <code>thomas</code> partition (which is private and I have access to), I would type something like</p>
+<pre class="bash"><code>salloc --account=lc_pdt --partition=thomas --time=02:00:00 --mem-per-cpu=2G</code></pre>
+<p>This would put me in a single node allocating 2 gigs of memory for a maximum of 2 hours. coud</p></li>
+</ol>
+</div>
+<div id="the-slurm-options-they-forgot-to-tell-you-about" class="section level2">
+<h2>The Slurm options they forgot to tell you about…</h2>
+<p>First of all, you have to be aware that the only thing Slurm does is allocate resources. If your application uses parallel computing or not, that’s another story.</p>
+<p>Here some options that you need to be aware of:</p>
+<ul>
+<li><p><code>ntasks</code> (default 1) This tells Slurm how many processes you will have running. Notice that processes need not to be in the same node (so Slurm may reserve space in multiple nodes)</p></li>
+<li><p><code>cpus-per-task</code> (defatult 1) This is how many CPUs each task will be using. This is what you need to use if you are using OpenMP (or a package that uses that), or anything you need to keep within the same node.</p></li>
+<li><p><code>nodes</code> the number of nodes you want to use in your job. This is useful mostly if you care about the maximum (I would say) number of nodes you want your job to work. So, for example, if you want to use 8 cores for a single task and force it to be in the same node, you would add the option <code>--nodes=1/1</code>.</p></li>
+<li><p><code>mem-per-cpu</code> (default 1GB) This is the MINIMUM amount of memory you want Slurm to allocate for the task. Not a hard barrier, so your process can go above that</p></li>
+<li><p><code>memory</code> (default NA) This is a hard limit, meaning that, if your job goes above that amount of memory, Slurm will kill it.</p></li>
+<li><p><code>time</code> (default 30min) This is a hard limit as well, so if you job takes more than the specified time, Slurm will kill it.</p></li>
+<li><p><code>partition</code> (default &quot;“) and <code>account</code> (default”&quot;) these two options go along together, this tells Slurm what resources to use. Besides of the private resources we have the following:</p>
+<ul>
+<li><p><strong>quick partition</strong>: Any job that is small enough (in terms of time and memory) will go this way. This is usually the default if you don’t specify any memory or time options.</p></li>
+<li><p><strong>main partition</strong>: Jobs that require more resources will go in this line.</p></li>
+<li><p><strong>scavenge partition</strong>: If you need a massive number resources, and have a job that shouldn’t, in principle, take too long to finalize (less than a couple of hours), and <strong>you are OK with someone killing it</strong>, then this queue is for you. The Scavenge partition uses all the idle resources of the private partitions, so if any of the owners requests the resources, Slurm will cancel your job, i.e. you have no priority (see <a href="https://hpcc.usc.edu/support/documentation/scavenge/" target="_blank">more</a>).</p></li>
+<li><p><strong>largemem partition</strong>: If you need lots of memory, we have 4 1TB nodes for that.</p></li>
+</ul>
+<p>More information about the partitions <a href="https://hpcc.usc.edu/support/infrastructure/node-allocation/" target="_blank">here</a></p></li>
+</ul>
+</div>
+<div id="good-practices-recomendations" class="section level2">
+<h2>Good practices (recomendations)</h2>
+<p>This is what you should use as a minimum:</p>
+<pre><code>#SBATCH --output=simulation.out
+#SBATCH --job-name=simulation
+#SBATCH --time=04:00:00
+#SBATCH --mail-user=[you]@usc.edu
+#SBATCH --mail-type=END,FAIL</code></pre>
+<ul>
+<li><p><code>output</code> is the name of the logfile to which Slurm will write.</p></li>
+<li><p><code>job-name</code> is that, the name of the job. You can use this to either kill or at least be able to identify what is what you are running when you use <code>myqueue</code></p></li>
+<li><p><code>time</code> Try always to set a time estimate (plus a little more) for your job.</p></li>
+<li><p><code>mail-user</code>, <code>mail-type</code> so Slurm notifies you when things happen</p></li>
+</ul>
+<p>Also, in your R code</p>
+<ul>
+<li>Any I/O should be done to either Scratch (<code>Sys.getenv(&quot;SCRATCHDIR&quot;)</code>), Tmp <code>Sys.getenv(&quot;TMPDIR&quot;)</code>, or Staging (<code>/staging/[you, perhaps]/</code>).</li>
+</ul>
+</div>
+<div id="nonos-when-using-r" class="section level2">
+<h2>NoNos when using R</h2>
+<ul>
+<li><p>Do computation on the head node (compile stuff is OK)</p></li>
+<li><p>Request a number of nodes (unless you know what you are doing)</p></li>
+<li><p>Use your home directory for I/O</p></li>
+<li><p>Save important information in Staging/Scratch</p></li>
+</ul>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
