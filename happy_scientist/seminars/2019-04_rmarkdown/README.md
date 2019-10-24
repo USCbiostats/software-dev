@@ -2,17 +2,17 @@
 
 ## About the talk
 
-**Abstract** On this edition of the “Happy Scientist”, we will discuss about practices and tools that you may, and probably should, include in your research pipeline. The presentation will be mostly focused on summarizing and showing resources for the modern researcher, most of which have been developed in-house by our division.
+**Abstract** Description: R has made it easy for us to wrangle data and build models. With the power of the R Markdown family packages, your analysis can be easily turned into high-quality reproducible documents including reports, presentations, posters, webpages, dashboards, scientific articles, websites and more. We will look at a couple of real-life case studies in which R Markdown helps a graduate student navigate scientific research and career development.
 
-**Date**: October 24th, 2019
+**Date**: October 17th, 2019
 
-**Speaker**: [George G. Vega Yon](https://ggvy.cl)
+**Speaker**: [Zhi Yang](https://zhiyang.netlify.com/) [@zhiiiyang](https://twitter.com/zhiiiyang)
 
-The slides can be view directly [here](https://rawcdn.githack.com/USCbiostats/software-dev/master/happy_scientist/seminars/2019-06_research-pipelines/index.html)
+The slides can be view directly [here](https://uscbiostats-rmarkdown.netlify.com/#1)
+The demos can be accessed [here](https://rstudio.cloud/project/623430)
 
 ## Featured Happy Scientist
 
-<img src="https://eberlin.cm.utexas.edu/wp-content/uploads/2019/02/Liv-Headshot1-greyBG-1.jpg" width="200px"/>
+<img src="happy_scientist/seminars/2019-04_rmarkdown/image.jpg"/>
 
-Livia Schiavinato Eberlin is a Brazilian analytical chemist who won a MacArthur "Genius" Fellowship for her research on the use of mass spectrometry to detect cancerous tissue. In her research, she developed a pen-like device, "The Cancer Pen", that she claims can detect cancerous tissue by touching it during surgery, freezing and slicing it, and examining the slices under a microscope ([wiki](https://en.wikipedia.org/wiki/Livia_S._Eberlin))
-
+Marie-Anne Paulze Lavoisier (1758 – 1836) was a French chemist and noble. She was the wife of Antonie Lavoisier and has helped him to accurately and precisely sketching diagrams of experimental designs, translating documents, and publishing the book, which ultimately helped his research to be widely understood and used by the scientific community. ([wiki](https://en.wikipedia.org/wiki/Marie-Anne_Paulze_Lavoisier))
