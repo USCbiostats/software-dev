@@ -1,5 +1,5 @@
-# Happy Scientist Seminar: Research Pipelines
-
+# Happy Scientist Seminar: How R Markdown helped me thrive in scientific research 📚 and advance my career development 
+👔
 ## About the talk
 
 **Abstract** Description: R has made it easy for us to wrangle data and build models. With the power of the R Markdown family packages, your analysis can be easily turned into high-quality reproducible documents including reports, presentations, posters, webpages, dashboards, scientific articles, websites and more. We will look at a couple of real-life case studies in which R Markdown helps a graduate student navigate scientific research and career development.
