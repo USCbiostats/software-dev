@@ -1,0 +1,41 @@
+---
+title: HPC with Slurm, R and the slurmR package
+output: html_document
+---
+
+# Contents
+
+- [Part 1: Slurm fundamentals](part1.html) (source code [here](part1.Rmd){target="_blank"})
+
+- [Part 2: Simulating pi (again)](part2.html) (source code [here](part2.Rmd){target="_blank"})
+
+# Materials
+
+All the contents of this repository can be downloaded from the following 
+github repository
+
+https://github.com/USCbiostats/slurmR-workshop
+
+You can also download all the contents of this repository (including R and bash
+scripts) using git:
+
+```bash
+git clone https://github.com/USCbiostats/slurmr-workshop.git
+```
+
+# Misc
+
+All the examples here can be execued using GNU make. The command line entries
+used to run each one of the tasks follow (see the [Makefile](Makefile){target="_blank"}):
+
+```{r echo=FALSE, comment= ""}
+make <- readLines("Makefile")
+make <- make[grepl("^[^a-zA-Z0-9]", make)]
+make <- gsub("(^\\s+|\\s*&.*$)", "", make, perl = TRUE)
+cat(make, sep="\n")
+```
+
+
+# Speaker
+
+[**George G Vega Yon**, *Research Programmer/Ph.D. Student BioStats*](https://ggvy.cl)

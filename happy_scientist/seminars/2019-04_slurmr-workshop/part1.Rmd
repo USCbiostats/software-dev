@@ -1,0 +1,148 @@
+---
+# title: 'Part 1: Slurm and R fundamentals'
+output:
+    html_document:
+        toc: true
+        toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Beginning with USC HPC cluster
+
+1.  Log-in using ssh. In the case of Windows users, download the Putty
+
+2.  Voilá! You should see something like this
+
+## Using R on the HPC
+
+1.  The HPC has several preinstalled pieces of software. R is one of those.
+
+2.  It has multiple versions of R installed. Use your favorite one by running
+    
+    ```bash
+    source /usr/usc/R/[version number]/setup.sh
+    ```
+    
+    Where `[version number]` can be 2.5, 2.6, ..., 3.5, and up to 3.6 (the latest update)
+
+3.  It is never a good idea to use your home directory to install R packages, that's
+why you should try using a [symbolic link instead](), like this
+    
+    ```bash
+    cd ~
+    mkdir -p /path/to/a/project/with/lots/of/space/R
+    ln -s /path/to/a/project/with/lots/of/space/R R
+    ```
+    
+    This way, whenever you install your R packages, R will default to that location
+    
+4.  You can run interactive sessions on HPC, but this recommended to be done using
+    the `salloc` function in Slurm, in other words, NEVER EVER USE R (OR ANY SOFTWARE)
+    TO DO DATA ANALYSIS IN THE HEAD NODES! The options passed to salloc are the same
+    options that can be passed to `sbatch` (see the next section.) For example,
+    if need to do some analyses in the `thomas` partition (which is private and
+    I have access to), I would type something like
+    
+    ```bash
+    salloc --account=lc_pdt --partition=thomas --time=02:00:00 --mem-per-cpu=2G
+    ```
+    
+    This would put me in a single node allocating 2 gigs of memory for a maximum
+    of 2 hours.
+    coud
+    
+## The Slurm options they forgot to tell you about...
+
+First of all, you have to be aware that the only thing Slurm does is allocate
+resources. If your application uses parallel computing or not, that's another
+story.
+
+Here some options that you need to be aware of:
+
+- `ntasks` (default 1) This tells Slurm how many processes you will have running.
+  Notice that processes need not to be in the same node (so Slurm may reserve
+  space in multiple nodes)
+
+- `cpus-per-task` (defatult 1) This is how many CPUs each task will be using. 
+  This is what you need to use if you are using OpenMP (or a package that uses
+  that), or anything you need to keep within the same node.
+  
+-  `nodes` the number of nodes you want to use in your job. This is useful mostly
+  if you care about the maximum (I would say) number of nodes you want your job
+  to work. So, for example, if you want to use 8 cores for a single task and 
+  force it to be in the same node, you would add the option `--nodes=1/1`.
+
+- `mem-per-cpu` (default 1GB) This is the MINIMUM amount of memory you want Slurm
+  to allocate for the task. Not a hard barrier, so your process can go above that
+
+- `memory` (default NA) This is a hard limit, meaning that, if your job goes
+  above that amount of memory, Slurm will kill it.
+
+- `time` (default 30min) This is a hard limit as well, so if you job takes more
+  than the specified time, Slurm will kill it.
+
+- `partition` (default "") and `account` (default "") these two options go along
+  together, this tells Slurm what resources to use. Besides of the private resources
+  we have the following:
+  
+  *  **quick partition**: Any job that is small enough (in terms of time and memory) will
+     go this way. This is usually the default if you don't specify any memory or
+     time options.
+     
+  *  **main partition**: Jobs that require more resources will go in this line.
+  
+  *  **scavenge partition**: If you need a massive number resources, and have a job that
+     shouldn't, in principle, take too long to finalize (less than a couple of
+     hours), and **you are OK with someone killing it**, then this queue is for
+     you. The Scavenge partition uses all the idle resources of the private partitions,
+     so if any of the owners requests the resources, Slurm will cancel your job,
+     i.e. you have no priority (see [more](https://hpcc.usc.edu/support/documentation/scavenge/){target="_blank"}).
+     
+  * **largemem partition**: If you need lots of memory, we have 4 1TB nodes for
+    that.
+
+  More information about the partitions [here](https://hpcc.usc.edu/support/infrastructure/node-allocation/){target="_blank"}
+
+
+## Good practices (recomendations)
+
+This is what you should use as a minimum:
+
+```
+#SBATCH --output=simulation.out
+#SBATCH --job-name=simulation
+#SBATCH --time=04:00:00
+#SBATCH --mail-user=[you]@usc.edu
+#SBATCH --mail-type=END,FAIL
+```
+
+-  `output` is the name of the logfile to which Slurm will write.
+
+-  `job-name` is that, the name of the job. You can use this to either kill or
+   at least be able to identify what is what you are running when you use `myqueue`
+   
+-  `time` Try always to set a time estimate (plus a little more) for your job.
+
+-  `mail-user`, `mail-type` so Slurm notifies you when things happen
+
+Also, in your R code
+
+-  Any I/O should be done to either Scratch (`Sys.getenv("SCRATCHDIR")`), Tmp
+   `Sys.getenv("TMPDIR")`, or Staging (`/staging/[you, perhaps]/`).
+   
+
+
+## NoNos when using R
+
+-  Do computation on the head node (compile stuff is OK)
+
+-  Request a number of nodes (unless you know what you are doing)
+
+-  Use your home directory for I/O
+
+-  Save important information in Staging/Scratch
+
+

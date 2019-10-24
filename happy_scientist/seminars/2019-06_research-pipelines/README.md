@@ -8,7 +8,7 @@
 
 **Speaker**: [George G. Vega Yon](https://ggvy.cl)
 
-The slides can be view directly [here](https://rawcdn.githack.com/USCbiostats/software-dev/master/happy_scientist/seminars/2019-06_rearch-pipelines/index.html)
+The slides can be view directly [here](https://rawcdn.githack.com/USCbiostats/software-dev/master/happy_scientist/seminars/2019-06_research-pipelines/index.html)
 
 ## Featured Happy Scientist
 

@@ -1,0 +1,12 @@
+name: slurmr-workshop
+include: ["part1.Rmd", "part2.Rmd", "*.R", "Makefile"]
+navbar:
+  title: HPC with Slurm, R and the slurmR package
+  right:
+    - text: "Home"
+      href: index.html
+    - text: "Part 1: Slurm fundamentals"
+      href: part1.html
+    - text: "Part 2: Simulating pi (again)"
+      href: part2.html
+output_dir: docs
