@@ -32,28 +32,28 @@ Materials can be found [here](seminars/2019_03_building-r-packages/)
 
 **HPC with Slurm, R, and the slurmR package**
 
-Happy Scientist Seminars, 2019: #4
-Title: HPC with Slurm, R, and the slurmR package
-Time: 12:00pm-1:00pm, Thursday 15th 2019
-Location: Soto (SSB) 117 
+Happy Scientist Seminars, 2019: #4<br>
+Title: HPC with Slurm, R, and the slurmR package<br>
+Time: 12:00pm-1:00pm, Thursday 15th 2019<br>
+Location: Soto (SSB) 117 <br>
 Materials can be found [here](seminars/2019-04_slurmr-workshop/) 
 
 
 **How R Markdown helped me thrive in scientific research and advance my career development**
 
-Happy Scientist Seminars, 2019: #5
-Title: How R Markdown helped me thrive in scientific research and advance my career development
-Time: 12:00pm-1:00pm, Thursday 17th 2019
-Location: Soto (SSB) 114 
+Happy Scientist Seminars, 2019: #5<br>
+Title: How R Markdown helped me thrive in scientific research and advance my career development<br>
+Time: 12:00pm-1:00pm, Thursday 17th 2019<br>
+Location: Soto (SSB) 114 <br>
 Materials can be found [here](seminars/2019-04_rmarkdown/) 
 
 
 **Research Pipelines**
 
-Happy Scientist Seminars, 2019: #6
-Title: Research Pipelines  
-Time: 12:00pm-1:00pm, Thursday 24nd 2019  
-Location: Soto (SSB) 114  
+Happy Scientist Seminars, 2019: #6<br>
+Title: Research Pipelines  <br>
+Time: 12:00pm-1:00pm, Thursday 24nd 2019  <br>
+Location: Soto (SSB) 114  <br>
 Materials can be found [here](seminars/2019-06_research-pipelines/)  
 
 
