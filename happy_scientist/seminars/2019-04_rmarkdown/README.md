@@ -9,10 +9,11 @@
 **Speaker**: [Zhi Yang](https://zhiyang.netlify.com/) [@zhiiiyang](https://twitter.com/zhiiiyang)
 
 The slides can be view directly [here](https://uscbiostats-rmarkdown.netlify.com/#1)
+
 The demos can be accessed [here](https://rstudio.cloud/project/623430)
 
 ## Featured Happy Scientist
 
-<img src="happy_scientist/seminars/2019-04_rmarkdown/image.jpg"/>
+<img src="https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2019-04_rmarkdown/image.jpg" width="30%">
 
 Marie-Anne Paulze Lavoisier (1758 – 1836) was a French chemist and noble. She was the wife of Antonie Lavoisier and has helped him to accurately and precisely sketching diagrams of experimental designs, translating documents, and publishing the book, which ultimately helped his research to be widely understood and used by the scientific community. ([wiki](https://en.wikipedia.org/wiki/Marie-Anne_Paulze_Lavoisier))
