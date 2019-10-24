@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Research pipelines</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="George G Vega Yon" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Research pipelines
+### George G Vega Yon
+### USC IMAGE project
+### 2019/10/24
+
+---
+
+
+# Today's talk
+
+## Reproducible Research
+
+## Tools to eaze your work
+
+We will spend most time looking at other people's work
+
+---
+background-image: url("http://giphygifs.s3.amazonaws.com/media/88VqLDyQttwpa/giphy.gif")
+
+---
+
+## Reproducible research (RR) (or how to avoid "it works on my computer!")
+
+--
+
+**A major new issue in sciences (overall)**
+
+* Accessible Reproducible Research ([Mesirov, __Science__ 2010](http://science.sciencemag.org/content/327/5964/415))
+
+* Again, and Again, and Again, ... ([Jasny et al., __Science__ 2011](http://science.sciencemag.org/content/334/6060/1225))
+
+* Challenges in Irreproducible Research ([__nature__ topic](http://www.nature.com/news/reproducibility-1.17552))
+
+* Reproducibility of computational workflows is automated using continuous analysis ([Beaulieu-Jones &amp; Greene, __nature biotechnology__ 2017](https://www.nature.com/articles/nbt.3780?foxtrotcallback=true))
+
+--
+
+**A Major productivity problem for researchers**
+
+* It is not only a good idea for science, but also for saving you time!
+
+
+---
+
+# Reproducible research
+
+--
+
+**Polished paper**
+
+-  Ready to be submitted
+
+-  Written using your fav doc editor
+
+--
+
+**Intermediate report**
+
+-  Not ready to be published
+
+-  Not necesarily using your fav doc editor
+
+What do these two have in common?
+
+---
+background-image: url("http://www.phdcomics.com/comics/archive/phd012618s.gif")
+class: center, top, inverse
+
+... both should have pretty figures AND be
+reproducible
+
+
+---
+
+# The minimum
+
+**Data** people must have a way to get your data
+
+-  Include it with the paper.
+
+-  Put it on a repo online like [zenodo](https://zenodo.org) (see for example
+the [Gene Ontology's profile](https://zenodo.org/communities/gene-ontology/?page=1&amp;size=20)) .
+
+-  Include instructions about how to get the data (e.g. in an experimental
+   setting, how did you get the samples).
+
+--
+
+**Analysis** source code/steps of your analysis
+
+-  Include it with the paper
+
+-  Put it on a repo online like [Github](https://github.com) or [GitLab](https://gitlab.com)
+
+--
+
+**Pro tip:** *Avoid the "contact the corresponding author for..." lines.*
+
+---
+
+# Tiers of reproducibility
+
+### ~~minimum~~ Basic
+
+*  **Data** Use public dataset (or at least shareable), or publish your dataset.
+
+*  **Analysis** source code/steps of your analysis.
+
+
+### Plus
+
+
+*  **Tools** Use open source software (like R, python, etc.).
+
+*  **Decency** Write your code neatly (like Emil does)
+
+*  **Tidy** Organize your work in a structured way (folders+readme files,
+    [here](https://github.com/gvegayon/fctc) is one example)
+
+
+### Premium
+
+*  **plug-n-play** Use a container (like [docker](https://www.docker.com/) or
+[singularity](https://sylabs.io/))
+
+
+---
+class: center, middle
+
+# Research Pipeline
+
+![](fig/pipeline.svg)
+
+Source: Diagram by [문건웅](https://www.linkedin.com/in/%EA%B1%B4%EC%9B%85-%EB%AC%B8-5ab72599/?locale=en_US) showed [here](https://www.slideshare.net/ssuser7e30b2/reproducible-research1)
+
+---
+class: center, bottom, inverse
+background-image: url("https://media.giphy.com/media/wLtPSVuz0co5G/giphy.gif")
+
+Now, a lot of it has to do with automatization...
+---
+class: middle
+
+## Automatizing your research: automatic reports
+
+- For quick reports use tools like [**rmarkdown**](https://cran.r-project.org/package=rmarkdown) which is based on
+[**pandoc**](https://pandoc.org)
+
+- Automate tabular outputs using [**kableExtra**](https://cran.r-project.org/package=kableExtra) or
+[**pander**](https://cran.r-project.org/package=pander)
+
+- Automate tables: In R, you can use [**texreg**](https://cran.r-project.org/package=texreg), [**xtable**](https://cran.r-project.org/package=xtable)
+
+---
+
+## Automatizing your research: automatic reports (example) 
+
+.pull-left[
+
+```r
+data(anorexia, package = "MASS")
+
+anorex.1 &lt;- glm(
+  Postwt ~ Treat,
+  data = anorexia
+  )
+  
+anorex.2 &lt;- glm(
+  Postwt ~ Prewt + Treat,
+  data = anorexia
+  )
+
+library(texreg)
+htmlreg(
+  list(anorex.1, anorex.2),
+  doctype = FALSE
+  )
+```
+]
+
+&lt;div style="font-size: small;" class="pull-right"&gt;
+
+
+&lt;table cellspacing="0" align="center" style="border: none;"&gt;
+&lt;caption align="bottom" style="margin-top:0.3em;"&gt;Statistical models&lt;/caption&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"&gt;&lt;b&gt;&lt;/b&gt;&lt;/th&gt;
+&lt;th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"&gt;&lt;b&gt;Model 1&lt;/b&gt;&lt;/th&gt;
+&lt;th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"&gt;&lt;b&gt;Model 2&lt;/b&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;(Intercept)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;85.70&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;49.77&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;(1.35)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;(13.39)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;TreatCont&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-4.59&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-4.10&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;(1.97)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;(1.89)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;TreatFT&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;4.80&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;4.56&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;(2.23)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;(2.13)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Prewt&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.43&lt;sup style="vertical-align: 0px;"&gt;**&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;(0.16)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="border-top: 1px solid black;"&gt;AIC&lt;/td&gt;
+&lt;td style="border-top: 1px solid black;"&gt;495.28&lt;/td&gt;
+&lt;td style="border-top: 1px solid black;"&gt;489.97&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;BIC&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;504.39&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;501.36&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Log Likelihood&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-243.64&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-239.99&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Deviance&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;3665.06&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;3311.26&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="border-bottom: 2px solid black;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="border-bottom: 2px solid black;"&gt;72&lt;/td&gt;
+&lt;td style="border-bottom: 2px solid black;"&gt;72&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;" colspan="4"&gt;&lt;span style="font-size:0.8em"&gt;&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup style="vertical-align: 0px;"&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/span&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/div&gt;
+
+--
+
+Checkout the R CRAN Task View for [Reproducible Research](https://cran.r-project.org/web/views/ReproducibleResearch.html)
+
+---
+class: center, bottom, inverse
+background-image: url("http://www.phdcomics.com/comics/archive/phd101212s.gif")
+background-size: 40%
+
+&lt;!-- ![](http://www.phdcomics.com/comics/archive/phd101212s.gif){style="width:50%" } --&gt;
+
+Version control to the rescue...
+---
+class: center, middle
+
+# Git: The stupid version control system
+
+&lt;img src="fig/git.svg" width="600px" /&gt;
+
+(Live demo now)
+
+---
+class: center, middle, inverse
+
+# Thank you!
+
+
+
+## Some other resources
+
+ rOpenSci's ["Reproduciblity in Science"](https://ropensci.github.io/reproducibility-guide/)
+
+ Karl Broman's ["Tools for Reproducible Research Spring, 2016"](http://kbroman.org/Tools4RR/)
+
+ The [**workflowr**](https://github.com/jdblischak/workflowr) package
+
+Colin Fay's ["An introduction to Docker for R Users"](https://colinfay.me/docker-r-reproducibility/)
+
+ R packages that work with Docker/Singularity [**babelwhale**](https://cran.r-project.org/package=babelwhale) and 
+[**dockerfiler**](https://cran.r-project.org/package=dockerfiler)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
