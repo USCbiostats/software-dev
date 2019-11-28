@@ -32,18 +32,23 @@ List of past seminars with material can be found [here](/happy_scientist/).
 
 # USCbiostats R packages
 
-*  [amcmc](https://github.com/USCbiostats/amcmc) Adaptive and other Markov Chain Monte Carlo methods
 *  [aphylo](https://github.com/USCbiostats/aphylo) Statistical inference of genetic functions in phylogenetic trees
+*  [bayesnetworks](https://github.com/USCbiostats/bayesnetworks) C++ program to fit Bayesian networks, illustrated with simulated data
 *  [BinaryDosage](https://github.com/USCbiostats/BinaryDosage) Converts VCF files to a binary format
+*  [causnet](https://github.com/USCbiostats/causnet) What the Package Does (One Line, Title Case)
 *  [fdrci](https://github.com/USCbiostats/fdrci) Permutation-Based FDR Point and Confidence Interval Estimation
+*  [fmcmc](https://github.com/USCbiostats/fmcmc) A friendly MCMC framework
 *  [GxEScanR](https://github.com/USCbiostats/GxEScanR) R version of GxEScan
-*  [HiLDA](https://github.com/USCbiostats/HiLDA) R package to investigate differences in mutational signatures
+*  [HiLDA](https://github.com/USCbiostats/HiLDA) An R package for inferring the mutational exposures difference between groups
+*  [iMutSig](https://github.com/USCbiostats/iMutSig) A web application to identify the most similar mutational signature using shiny
 *  [jsPhyloSVG](https://github.com/USCbiostats/jsPhyloSVG) htmlwidgets for the jsPhyloSVG JavaScript library
-*  [LUCIDus](https://github.com/USCbiostats/LUCid) Latent and Unknown Cluster Analysis using Integrated Data
+*  [LUCIDus](https://github.com/USCbiostats/LUCIDus) Latent and Unknown Cluster Analysis using Integrated Data
 *  [MergeBinaryDosage](https://github.com/USCbiostats/MergeBinaryDosage) R package for merging binary dosage files
 *  [rphyloxml](https://github.com/USCbiostats/rphyloxml) Read and write phyloXML files in R
 *  [selectKSigs](https://github.com/USCbiostats/selectKSigs) Selection of K in finding the number of mutational signatures
-*  [sluRm](https://github.com/USCbiostats/sluRm) 
-*  [partition](https://github.com/USCbiostats/partition) 
+*  [slurmR](https://github.com/USCbiostats/slurmR) slurmR: A Lightweight Wrapper for Slurm
+*  [partition](https://github.com/USCbiostats/partition) A fast and flexible framework for agglomerative partitioning in R 
 *  [polygons](https://github.com/USCbiostats/polygons) Flexible functions for computing polygons coordinates in R 
-*  [xrnet](https://github.com/USCbiostats/xrnet) R Package for Hierarchical Regularized Regression
+*  [xtune](https://github.com/USCbiostats/xtune) An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge 
+*  [xrnet](https://github.com/USCbiostats/xrnet) R Package for Hierarchical Regularized Regression to Incorporate External Data
+
