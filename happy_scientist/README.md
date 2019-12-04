@@ -21,13 +21,13 @@ Happy Scientist Seminars, 2019: #2
 Title: Debugging and Profiling  
 Time: 12:00-1:00pm, Tuesday February 19th 2019  
 Location: Soto (SSB) 116  
-Materials can be found [here](seminars/2019_02_debugging-and-profiling/)
+Materials can be found [here](seminars/2019-02_debugging-and-profiling)
 
 Happy Scientist Seminars, 2019: #3  
 Title: Building R packages  
 Time: 12:00pm-1:00pm, Thursday March 28th.  
 Location: Soto (SSB) 116  
-Materials can be found [here](seminars/2019_03_building-r-packages/)
+Materials can be found [here](seminars/2019-03_building-r-packages)
 
 
 **HPC with Slurm, R, and the slurmR package**
