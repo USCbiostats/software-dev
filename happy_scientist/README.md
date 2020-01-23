@@ -5,6 +5,16 @@ The Happy Scientist Seminars are educational seminars sponsored by Cores C and D
 
 # Past Seminars
 
+## 2020
+
+**Git & Github**
+
+Happy Scientist Seminars, 2020: #1  
+Title: Git & Githubs  
+Time: 12:00pm-1:00pm, Thursday January 23nd 2020  
+Location: Soto SSB-115/116
+Materials can be found [here](seminars/2020_01_git-and-github/)  
+
 ## 2019
 
 **RStudio and R Resources**
