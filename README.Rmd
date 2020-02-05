@@ -60,7 +60,7 @@ pkgs <- c(
   )
 
 # Alphabetically ordered
-pkgs <- sort(pkgs)
+pkgs <- pkgs[order(names(pkgs))]
 
 dat <- data.frame(
   Name        = names(pkgs),
