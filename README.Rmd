@@ -55,8 +55,12 @@ pkgs <- c(
   "partition" = "A fast and flexible framework for agglomerative partitioning in R ",
   "polygons" = "Flexible functions for computing polygons coordinates in R ",
   "xtune" = "An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge ",
-  "xrnet" = "R Package for Hierarchical Regularized Regression to Incorporate External Data"
+  "xrnet" = "R Package for Hierarchical Regularized Regression to Incorporate External Data",
+  hJAM = "hJAM is a hierarchical model which unifies the framework of Mendelian Randomization and Transcriptome-wide association studies."
   )
+
+# Alphabetically ordered
+pkgs <- sort(pkgs)
 
 dat <- data.frame(
   Name        = names(pkgs),
