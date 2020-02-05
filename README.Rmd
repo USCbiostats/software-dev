@@ -1,9 +1,7 @@
 ---
-title: ''
+title: 'Software Development Standards'
 output: rmarkdown::github_document
 ---
-
-# Software Development Standards
 
 This project's main contents is located in the project's [Wiki](https://github.com/USCbiostats/CodingStandards/wiki):
 
@@ -62,20 +60,21 @@ pkgs <- c(
 
 dat <- data.frame(
   Name        = names(pkgs),
-  Description = pkgs,
-  CRAN        = sprintf(
-    "[![CRAN status](https://www.r-pkg.org/badges/version/%s)](https://CRAN.R-project.org/package=%1$s)",
-    names(pkgs)
+  Description = paste(
+    pkgs,
+    sprintf(
+      "[![CRAN status](https://www.r-pkg.org/badges/version/%s)](https://CRAN.R-project.org/package=%1$s)",
+      names(pkgs)
     ),
-  Downloads = sprintf(
-    "[![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/%s)](https://cran.r-project.org/package=%1$s)",
-    names(pkgs)
-  ),
-  Tinyverse = sprintf(
-    "[![status](https://tinyverse.netlify.com/badge/%s)](https://CRAN.R-project.org/package=%1$s)",
-    names(pkgs)
+    sprintf(
+      "[![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/%s)](https://cran.r-project.org/package=%1$s)",
+      names(pkgs)
+    ),
+    sprintf(
+      "[![status](https://tinyverse.netlify.com/badge/%s)](https://CRAN.R-project.org/package=%1$s)",
+      names(pkgs)
     )
-)
+))
 
 knitr::kable(dat, row.names = FALSE)
 ```
