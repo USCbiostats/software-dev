@@ -45,52 +45,6 @@ List of past seminars with material can be found
 
 # USCbiostats R packages
 
-[![CRAN
-status](https://www.r-pkg.org/badges/version/PKG)](https://CRAN.R-project.org/package=PKG)
-
-``` r
-pkgs <- c(
-  "aphylo" = "Statistical inference of genetic functions in phylogenetic trees",
-  "bayesnetworks" = "C++ program to fit Bayesian networks, illustrated with simulated data",
-  "BinaryDosage" = "Converts VCF files to a binary format",
-  "causnet" = "What the Package Does (One Line, Title Case)",
-  "fdrci" = "Permutation-Based FDR Point and Confidence Interval Estimation",
-  "fmcmc" = "A friendly MCMC framework",
-  "GxEScanR" = "R version of GxEScan",
-  "HiLDA" = "An R package for inferring the mutational exposures difference between groups",
-  "iMutSig" = "A web application to identify the most similar mutational signature using shiny",
-  "jsPhyloSVG" = "htmlwidgets for the jsPhyloSVG JavaScript library",
-  "LUCIDus" = "Latent and Unknown Cluster Analysis using Integrated Data",
-  "MergeBinaryDosage" = "R package for merging binary dosage files",
-  "rphyloxml" = "Read and write phyloXML files in R",
-  "selectKSigs" = "Selection of K in finding the number of mutational signatures",
-  "slurmR" = "slurmR: A Lightweight Wrapper for Slurm",
-  "partition" = "A fast and flexible framework for agglomerative partitioning in R ",
-  "polygons" = "Flexible functions for computing polygons coordinates in R ",
-  "xtune" = "An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge ",
-  "xrnet" = "R Package for Hierarchical Regularized Regression to Incorporate External Data"
-  )
-
-dat <- data.frame(
-  Name        = names(pkgs),
-  Description = pkgs,
-  CRAN        = sprintf(
-    "[![CRAN status](https://www.r-pkg.org/badges/version/%s)](https://CRAN.R-project.org/package=%1$s)",
-    names(pkgs)
-    ),
-  Downloads = sprintf(
-    "[![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/%s)](https://cran.r-project.org/package=%1$s)",
-    names(pkgs)
-  ),
-  Tinyverse = sprintf(
-    "[![status](https://tinyverse.netlify.com/badge/%s)](https://CRAN.R-project.org/package=%1$s)",
-    names(pkgs)
-    )
-)
-
-knitr::kable(dat, row.names = FALSE)
-```
-
 | Name              | Description                                                                                         | CRAN                                                                                                                           | Downloads                                                                                                                                 | Tinyverse                                                                                                                |
 | :---------------- | :-------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
 | aphylo            | Statistical inference of genetic functions in phylogenetic trees                                    | [![CRAN status](https://www.r-pkg.org/badges/version/aphylo)](https://CRAN.R-project.org/package=aphylo)                       | [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/aphylo)](https://cran.r-project.org/package=aphylo)                       | [![status](https://tinyverse.netlify.com/badge/aphylo)](https://CRAN.R-project.org/package=aphylo)                       |
@@ -112,43 +66,3 @@ knitr::kable(dat, row.names = FALSE)
 | polygons          | Flexible functions for computing polygons coordinates in R                                          | [![CRAN status](https://www.r-pkg.org/badges/version/polygons)](https://CRAN.R-project.org/package=polygons)                   | [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/polygons)](https://cran.r-project.org/package=polygons)                   | [![status](https://tinyverse.netlify.com/badge/polygons)](https://CRAN.R-project.org/package=polygons)                   |
 | xtune             | An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge | [![CRAN status](https://www.r-pkg.org/badges/version/xtune)](https://CRAN.R-project.org/package=xtune)                         | [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/xtune)](https://cran.r-project.org/package=xtune)                         | [![status](https://tinyverse.netlify.com/badge/xtune)](https://CRAN.R-project.org/package=xtune)                         |
 | xrnet             | R Package for Hierarchical Regularized Regression to Incorporate External Data                      | [![CRAN status](https://www.r-pkg.org/badges/version/xrnet)](https://CRAN.R-project.org/package=xrnet)                         | [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/xrnet)](https://cran.r-project.org/package=xrnet)                         | [![status](https://tinyverse.netlify.com/badge/xrnet)](https://CRAN.R-project.org/package=xrnet)                         |
-
-  - [aphylo](https://github.com/USCbiostats/aphylo) Statistical
-    inference of genetic functions in phylogenetic trees
-  - [bayesnetworks](https://github.com/USCbiostats/bayesnetworks) C++
-    program to fit Bayesian networks, illustrated with simulated data
-  - [BinaryDosage](https://github.com/USCbiostats/BinaryDosage) Converts
-    VCF files to a binary format
-  - [causnet](https://github.com/USCbiostats/causnet) What the Package
-    Does (One Line, Title Case)
-  - [fdrci](https://github.com/USCbiostats/fdrci) Permutation-Based FDR
-    Point and Confidence Interval Estimation
-  - [fmcmc](https://github.com/USCbiostats/fmcmc) A friendly MCMC
-    framework
-  - [GxEScanR](https://github.com/USCbiostats/GxEScanR) R version of
-    GxEScan
-  - [HiLDA](https://github.com/USCbiostats/HiLDA) An R package for
-    inferring the mutational exposures difference between groups
-  - [iMutSig](https://github.com/USCbiostats/iMutSig) A web application
-    to identify the most similar mutational signature using shiny
-  - [jsPhyloSVG](https://github.com/USCbiostats/jsPhyloSVG) htmlwidgets
-    for the jsPhyloSVG JavaScript library
-  - [LUCIDus](https://github.com/USCbiostats/LUCIDus) Latent and Unknown
-    Cluster Analysis using Integrated Data
-  - [MergeBinaryDosage](https://github.com/USCbiostats/MergeBinaryDosage)
-    R package for merging binary dosage files
-  - [rphyloxml](https://github.com/USCbiostats/rphyloxml) Read and write
-    phyloXML files in R
-  - [selectKSigs](https://github.com/USCbiostats/selectKSigs) Selection
-    of K in finding the number of mutational signatures
-  - [slurmR](https://github.com/USCbiostats/slurmR) slurmR: A
-    Lightweight Wrapper for Slurm
-  - [partition](https://github.com/USCbiostats/partition) A fast and
-    flexible framework for agglomerative partitioning in R
-  - [polygons](https://github.com/USCbiostats/polygons) Flexible
-    functions for computing polygons coordinates in R
-  - [xtune](https://github.com/USCbiostats/xtune) An R package for Lasso
-    and Ridge Regression with differential penalization based on prior
-    knowledge
-  - [xrnet](https://github.com/USCbiostats/xrnet) R Package for
-    Hierarchical Regularized Regression to Incorporate External Data
