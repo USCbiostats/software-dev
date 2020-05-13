@@ -78,7 +78,19 @@ dat <- data.frame(
       "[![status](https://tinyverse.netlify.com/badge/%s)](https://CRAN.R-project.org/package=%1$s)",
       names(pkgs)
     )
-))
+), stringsAsFactors = FALSE)
+
+dat[which(names(pkgs)=="HiLDA"), "Description"] <- paste(
+  pkgs["HiLDA"],
+  "[![](https://img.shields.io/badge/release%20version-1.0.0-green.svg)](https://www.bioconductor.org/packages/HiLDA)",
+  "[![](https://img.shields.io/badge/download-718/total-blue.svg)](https://bioconductor.org/packages/stats/bioc/HiLDA)"
+)
+
+dat[which(names(pkgs)=="selectKSigs"), "Description"] <- paste(
+  pkgs["selectKSigs"],
+  "[![](https://img.shields.io/badge/release%20version-1.0.0-green.svg)](https://www.bioconductor.org/packages/selectKSigs)",
+  "[![](https://img.shields.io/badge/download-182/total-blue.svg)](https://bioconductor.org/packages/stats/bioc/selectKSigs)"
+)
 
 knitr::kable(dat, row.names = FALSE)
 ```
