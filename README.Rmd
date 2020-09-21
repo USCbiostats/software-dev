@@ -56,7 +56,8 @@ pkgs <- c(
   "polygons" = "Flexible functions for computing polygons coordinates in R ",
   "xtune" = "An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge ",
   "xrnet" = "R Package for Hierarchical Regularized Regression to Incorporate External Data",
-  hJAM = "hJAM is a hierarchical model which unifies the framework of Mendelian Randomization and Transcriptome-wide association studies."
+  hJAM = "hJAM is a hierarchical model which unifies the framework of Mendelian Randomization and Transcriptome-wide association studies.",
+  "AnnoQR" = "R client wrap for AnnoQ API (https://github.com/blueOwl/AnnoQR)"
   )
 
 # Alphabetically ordered
