@@ -93,6 +93,26 @@ dat[which(names(pkgs)=="selectKSigs"), "Description"] <- paste(
   "[![](https://img.shields.io/badge/release%20version-1.0.0-green.svg)](https://www.bioconductor.org/packages/selectKSigs)",
   "[![](https://img.shields.io/badge/download-182/total-blue.svg)](https://bioconductor.org/packages/stats/bioc/selectKSigs)"
 )
+```
 
+
+```{r checking-urls, echo = FALSE, eval = FALSE}
+http_status <- sapply(dat$Name, function(n) {
+  message("Checking ", n)
+  web <- httr::GET(
+    sprintf("https://github.com/USCbiostats/%s", n),
+    httr::config(connecttimeout = 60)
+    )
+  
+  httr::status_code(web)
+})
+
+table(http_status) # 22
+dat$Name <- sprintf("[**%s**](https://github.com/USCbiostats/%s)", dat$Name, dat$Name)
+```
+
+
+```{r printing}
+dat$Name <- sprintf("[**%s**](https://github.com/USCbiostats/%s)", dat$Name, dat$Name)
 knitr::kable(dat, row.names = FALSE)
 ```
