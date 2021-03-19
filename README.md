@@ -1,3 +1,5 @@
+[![](https://raw.githubusercontent.com/USCbiostats/badges/master/tommy-image-badge.svg)](https://image.usc.edu)
+
 Software Development Standards
 ================
 
