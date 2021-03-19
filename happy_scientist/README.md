@@ -7,18 +7,18 @@ The Happy Scientist Seminars are educational seminars sponsored by Cores C and D
 
 ## 2021
 
-Happy Scientist Seminars, 2021: #2
-Title: A git crash course
-Time: 12:00pm-1:00pm, Thursday March 18th 2021
-Recording: https://youtu.be/6gc8VyZJeNM
-Location: Zoom
+Happy Scientist Seminars, 2021: #2  
+Title: A git crash course  
+Time: 12:00pm-1:00pm, Thursday March 18th 2021  
+Recording: https://youtu.be/6gc8VyZJeNM   
+Location: Zoom   
 Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2021-03-18-git-crash/)  
 
 Happy Scientist Seminars, 2021: #1  
-Title: HPC with slurmR
-Time: 12:00pm-1:00pm, Thursday February 18th 2021
-Recording: https://youtu.be/ChPGJ7ECVGk
-Location: Zoom
+Title: HPC with slurmR  
+Time: 12:00pm-1:00pm, Thursday February 18th 2021   
+Recording: https://youtu.be/ChPGJ7ECVGk   
+Location: Zoom   
 Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2021-02-18-slurmr-workshop/)  
 
 
