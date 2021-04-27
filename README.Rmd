@@ -1,9 +1,13 @@
 ---
 title: 'Software Development Standards'
-output: rmarkdown::github_document
+output:
+  rmarkdown::github_document:
+    html_preview: false
 ---
 
-This project's main contents is located in the project's [Wiki](https://github.com/USCbiostats/CodingStandards/wiki):
+This project's main contents is located in the project's [Wiki](https://github.com/USCbiostats/CodingStandards/wiki).
+
+If you want an account on **Bioghost**, fillout the form [here](https://forms.gle/GLKGfydPj5LmfHWq6) (USC accout required).
 
 ## Coding Standards
 
@@ -108,7 +112,7 @@ dat$Name <- sprintf("[**%s**](https://github.com/USCbiostats/%s)", dat$Name, dat
 ```
 
 
-```{r printing}
+```{r printing, echo = FALSE}
 dat$Name <- sprintf("[**%s**](https://github.com/USCbiostats/%s)", dat$Name, dat$Name)
 knitr::kable(dat, row.names = FALSE)
 ```
