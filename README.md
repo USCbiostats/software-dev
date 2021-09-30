@@ -19,9 +19,9 @@ We do have some direct guidelines developed as issue templates
 
 ## Bioghost Server
 
-1.  [Introduction](../../wiki/Biogohst-server#introduction)
-2.  [Setup](../../wiki/Biogohst-server#setup)
-3.  [Cheat Sheet](../../wiki/Biogohst-server#cheat-sheet)
+1.  [Introduction](../../wiki/Bioghost-server#introduction)
+2.  [Setup](../../wiki/Bioghost-server#setup)
+3.  [Cheat Sheet](../../wiki/Bioghost-server#cheat-sheet)
 
 ## HPC in R
 
