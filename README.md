@@ -1,7 +1,7 @@
 Software Development Standards
 ================
 
-This project’s main contents is located in the project’s
+This project’s main contents are located in the project’s
 [Wiki](https://github.com/USCbiostats/CodingStandards/wiki).
 
 If you want an account on **Bioghost**, fillout the form
@@ -35,7 +35,7 @@ We do have some direct guidelines developed as issue templates
 # Happy Scientist Seminars
 
 The Happy Scientist Seminars are educational seminars sponsored by Cores
-C and D of the Biostats Program Project award. This series, the “Happy
+C and D of "IMAGE", the Biostats Program Project award. This series, the “Happy
 Scientist” seminar series, is aimed at providing educational material
 for members of Biostats, both students and faculty, about a variety of
 tools and methods that might prove useful to them. If you have any
