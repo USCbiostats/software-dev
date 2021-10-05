@@ -157,7 +157,7 @@ Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/m
 
 # File structure
 
-New seminars should be includes in the following folder and naming structure.
+New seminars should be included in the following folder using the indicated naming structure.
 
 ```
 seminars/
