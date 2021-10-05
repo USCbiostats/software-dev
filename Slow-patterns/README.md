@@ -1,5 +1,5 @@
 
-# Slow R patterns
+# Dealing with slow R code 
 
 ``` r
 library(magrittr)
