@@ -83,27 +83,13 @@ for (i in seq_len(nrow(pkgs))) {
   dat$Citations[i] <- sprintf("[%i](%s)", as.integer(citations), address)
   
 }
-```
 
-
-```{r checking-urls, echo = FALSE, eval = FALSE}
-http_status <- sapply(dat$Name, function(n) {
-  message("Checking ", n)
-  web <- httr::GET(
-    sprintf("https://github.com/USCbiostats/%s", n),
-    httr::config(connecttimeout = 60)
-    )
-  
-  httr::status_code(web)
-})
-
-table(http_status) # 22
-dat$Name <- sprintf("[**%s**](https://github.com/USCbiostats/%s)", dat$Name, dat$Name)
+if (tot_citations == 0L)
+  stop("There can't be 0 citations! Make sure things are running as expected!")
 ```
 
 As of `r Sys.Date()`, the packages listed here have been cited **`r tot_citations`** times
 (source: Google Scholar).
-
 
 ```{r printing, echo = FALSE}
 knitr::kable(dat, row.names = FALSE)
