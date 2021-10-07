@@ -28,7 +28,7 @@ jobs:
 
       - name: Compilar
         run:  |
-          docker run -v$(pwd):/home/report -w/home/report uscbiostats/software-dev:latests \
+          docker run -v$(pwd):/home/report -w/home/report uscbiostats/software-dev:latest \
             Rscript -e 'rmarkdown::render("README.Rmd")'
 
       - name: Commit results

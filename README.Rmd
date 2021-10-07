@@ -40,7 +40,7 @@ List of past seminars with material can be found [here](/happy_scientist/).
 # USCbiostats R packages
 
 ```{r listing-pkgs, echo = FALSE}
-pkgs <- read.csv("packages.csv", comment.char = "#")
+pkgs <- read.csv("packages.csv", comment.char = "#", stringsAsFactors = FALSE)
 
 # Alphabetically ordered
 pkgs <- pkgs[order(pkgs$name),,drop=FALSE]
@@ -65,7 +65,7 @@ dat <- with(pkgs, data.frame(
     )
 ), stringsAsFactors = FALSE))
 
-for (pkg in c("HiLDA", "selectKSigs")){
+for (pkg in pkgs$name[which(pkgs$on_bioc)]) {
   dat[which(pkgs$name == pkg), "Description"] <- 
   paste0(pkgs$description[pkgs$name == pkg], 
   sprintf("[![](https://img.shields.io/badge/Bioconductor%%20version-1.0.0-green.svg)](https://www.bioconductor.org/packages/%s)", pkg), 
