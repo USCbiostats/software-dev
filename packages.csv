@@ -6,28 +6,31 @@
 # The "on_bioc" column only needs to be specified with "TRUE" if the package
 # is in BioConductor.
 #
+# The "google_scholar" column can be included if the package has a link to
+# citations in Google scholar, the "Cited by" section.
+#
 name,repo,on_bioc,google_scholar,description
 "aphylo",,,,"Statistical inference of genetic functions in phylogenetic trees"
 "bayesnetworks",,,,"C++ program to fit Bayesian networks, illustrated with simulated data"
 "BinaryDosage",,,,"Converts VCF files to a binary format"
 "causnet",,,,"What the Package Does (One Line, Title Case)"
-"fdrci",,,,"Permutation-Based FDR Point and Confidence Interval Estimation"
-"fmcmc",,,,"A friendly MCMC framework"
+"fdrci",,,"https://scholar.google.com/scholar?hl=en&cites=6606625444967735035","Permutation-Based FDR Point and Confidence Interval Estimation"
+"fmcmc",,,"https://scholar.google.com/scholar?cites=18235425292318567621&hl=en","A friendly MCMC framework"
 "GxEScanR",,,,"R version of GxEScan"
-"HiLDA",,"TRUE",,"An R package for inferring the mutational exposures difference between groups"
-"iMutSig",,,,"A web application to identify the most similar mutational signature using shiny"
+"HiLDA",,"TRUE","https://scholar.google.com/scholar?cites=2767354745053140554&hl=en","An R package for inferring the mutational exposures difference between groups"
+"iMutSig",,,"https://scholar.google.com/scholar?cites=16599818872657505515&hl=en","A web application to identify the most similar mutational signature using shiny"
 "jsPhyloSVG",,,,"htmlwidgets for the jsPhyloSVG JavaScript library"
-"LUCIDus",,,,"Latent and Unknown Cluster Analysis using Integrated Data"
+"LUCIDus",,,"https://scholar.google.com/scholar?cites=17993227897179669521&hl=en","Latent and Unknown Cluster Analysis using Integrated Data"
 "MergeBinaryDosage",,,,"R package for merging binary dosage files"
 "rphyloxml",,,,"Read and write phyloXML files in R"
 "selectKSigs",,"TRUE",,"Selection of K in finding the number of mutational signatures"
-"slurmR",,,,"slurmR: A Lightweight Wrapper for Slurm"
-"partition",,,,"A fast and flexible framework for agglomerative partitioning in R "
+"slurmR",,,"https://scholar.google.com/scholar?cites=2044081763350723149&hl=en","slurmR: A Lightweight Wrapper for Slurm"
+"partition",,,"https://scholar.google.com/scholar?cites=5586649186160622454&hl=en","A fast and flexible framework for agglomerative partitioning in R "
 "polygons",,,,"Flexible functions for computing polygons coordinates in R "
 "xtune",,,,"An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge "
-"xrnet",,,,"R Package for Hierarchical Regularized Regression to Incorporate External Data"
+"xrnet",,,"https://scholar.google.com/scholar?cites=12362903479655163477&hl=en","R Package for Hierarchical Regularized Regression to Incorporate External Data"
 "hJAM",,,,"hJAM is a hierarchical model which unifies the framework of Mendelian Randomization and Transcriptome-wide association studies."
 "AnnoQR",,,,"R client wrap for AnnoQ API (https://github.com/blueOwl/AnnoQR)"
 "pfamscanr",,,,"An R client for EMBL-EBI's PfamScan API"
-"methcon5",https://github.com/USCbiostats/MethCon5,,,"R package to identify and rank CpG DNA methylation conservation along the human genome"
-"cit",,,"https://scholar.google.com/scholar?cites=5374415288333388896&as_sdt=2005&sciodt=0,5&hl=en","Causal Inference Test"
+"methcon5",https://github.com/USCbiostats/MethCon5,,"https://scholar.google.com/scholar?cites=13818868965517630908&hl=en","R package to identify and rank CpG DNA methylation conservation along the human genome"
+"cit",,,"https://scholar.google.com/scholar?cites=2897292192206854993&hl=en","Causal Inference Test"

@@ -1,41 +1,14 @@
 ---
-title: 'Software Development Standards'
 output:
   rmarkdown::github_document:
     html_preview: false
 ---
 
+# Software Development Standards ![GitHub last commit](https://img.shields.io/github/last-commit/USCbiostats/software-dev)
+
 This project's main contents are located in the project's [Wiki](https://github.com/USCbiostats/CodingStandards/wiki).
 
 If you want an account on **Bioghost**, fillout the form [here](https://forms.gle/GLKGfydPj5LmfHWq6) (USC accout required).
-
-## Coding Standards
-
-1.  [Coding Standards](../../wiki/Home#coding-standards)
-2.  [Software Thinking](../../wiki/Home#software-thinking)
-3.  [Development Workflow](../../wiki/Home#development-workflow)
-4.  [Misc](../../wiki/Home#misc)
-
-We do have some direct guidelines developed as issue templates [here](templates). 
-
-## Bioghost Server
-
-1.  [Introduction](../../wiki/Biogohst-server#introduction)
-2.  [Setup](../../wiki/Biogohst-server#setup)
-3.  [Cheat Sheet](../../wiki/Biogohst-server#cheat-sheet)
-
-## HPC in R
-    
-*   [Parallel computing in R](../../wiki/HPC-in-R#parallel-computing-in-r)  
-*   [parallel](../../wiki/HPC-in-R#parallel)
-*   [iterators+foreach](../../wiki/HPC-in-R#foreach)
-*   [RcppArmadillo + OpenMP](../../wiki/HPC-in-R#rcpparmadillo-and-openmp)
-
-# Happy Scientist Seminars
-
-The Happy Scientist Seminars are educational seminars sponsored by Cores C and D of IMAGE, the Biostats Program Project award. This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Paul Marjoram at (pmarjora@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
-
-List of past seminars with material can be found [here](/happy_scientist/).
 
 # USCbiostats R packages
 
@@ -52,7 +25,7 @@ pkgs <- pkgs[order(pkgs$name),,drop=FALSE]
 
 dat <- with(pkgs, data.frame(
   Name        = sprintf(
-    "[**%s**](%s)", name, ifelse(!is.na(repo), repo, paste0("https://github.com/USCbiostats/", name))
+    "[**%s**](%s)", name, ifelse(!is.na(repo) & repo != "", repo, paste0("https://github.com/USCbiostats/", name))
     ),
   Description = paste(
     description,
@@ -79,41 +52,38 @@ for (pkg in pkgs$name[which(pkgs$on_bioc)]) {
 
 ```
 
-```{r citations, include=TRUE, warning=TRUE, message=TRUE}
-library(RSelenium)
-
-# Setting up the server
-ps <- system("docker run -d -p 4445:4444 selenium/standalone-firefox:2.53.1")
-remDr <- remoteDriver(
-  remoteServerAddr = "localhost",
-  port = 4445L,
-  browserName = "firefox"
-)
-remDr$open()
-
-print(remDr)
-
+```{r citations, include=FALSE}
+regex <- "([0-9,]+)[\\s\\n]+results?[\\s\\n]+\\([\\s\\n]*[0-9]+" #[\\s\\n]+[(][0-9]*[.]?[0-9]+\\s+secs?
+dat$Citations <- ""
+tot_citations <- 0L
 for (i in seq_len(nrow(pkgs))) {
   
   # If no URL, then continue
-  if (nchar(pkgs$google_scholar[i]) == 0)
+  if (nchar(pkgs$google_scholar[i]) == 0) {
     next
+  }
   
   # Otherwise, take a look at the cictations
   address <- pkgs$google_scholar[i]
   
-  remDr$navigate(address)
-  results <- remDr$findElements(using = "class", "gs_ab_mdw")
-  results <- sapply(results, function(r) r$getElementText())
-  results <- results[which(grepl(".+About\\s*([0-9,]+)\\*results", results))]
+  page      <- tryCatch(readLines(address, warn = FALSE), error = function(e) e)
+
+  if (inherits(page, "error"))
+    next
   
-  if (length(results))
-    print(results)
+  # Removing blocks of bold, italic, etc
+  page <- gsub("\\<[[:alnum:]_/-]+\\>", "",page, perl = TRUE)
+  
+  citations <- which(grepl(regex, page, perl = TRUE))
+  if (!length(citations))
+    next
+  
+  citations <- stringr::str_extract(page[citations], "[0-9,]+(?=[\\s\\n]+results?)")
+  citations <- as.integer(gsub("[,.]", "", citations, perl = TRUE))
+  tot_citations <- tot_citations + citations
+  dat$Citations[i] <- sprintf("[%i](%s)", as.integer(citations), address)
   
 }
-
-remDr$close()
-system(paste("docker stop", ps))
 ```
 
 
@@ -139,5 +109,34 @@ knitr::kable(dat, row.names = FALSE)
 
 To update this list, modify the file [packages.csv](packages.csv). The
 `README.md` file is updated automatically using GitHub Actions, so there's no
-need to "manually" recompile the README file after updating the list.
+need to "manually" recompile the README file after updating the list. As of
+`r Sys.Date()`, the packages listed here have been cited `r tot_citations` times
+(source: Google Scholar)
 
+# Coding Standards
+
+1.  [Coding Standards](../../wiki/Home#coding-standards)
+2.  [Software Thinking](../../wiki/Home#software-thinking)
+3.  [Development Workflow](../../wiki/Home#development-workflow)
+4.  [Misc](../../wiki/Home#misc)
+
+We do have some direct guidelines developed as issue templates [here](templates). 
+
+# Bioghost Server
+
+1.  [Introduction](../../wiki/Biogohst-server#introduction)
+2.  [Setup](../../wiki/Biogohst-server#setup)
+3.  [Cheat Sheet](../../wiki/Biogohst-server#cheat-sheet)
+
+# HPC in R
+    
+*   [Parallel computing in R](../../wiki/HPC-in-R#parallel-computing-in-r)  
+*   [parallel](../../wiki/HPC-in-R#parallel)
+*   [iterators+foreach](../../wiki/HPC-in-R#foreach)
+*   [RcppArmadillo + OpenMP](../../wiki/HPC-in-R#rcpparmadillo-and-openmp)
+
+# Happy Scientist Seminars
+
+The Happy Scientist Seminars are educational seminars sponsored by Cores C and D of IMAGE, the Biostats Program Project award. This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Paul Marjoram at (pmarjora@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
+
+List of past seminars with material can be found [here](/happy_scientist/).
