@@ -39,6 +39,11 @@ List of past seminars with material can be found [here](/happy_scientist/).
 
 # USCbiostats R packages
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+
 ```{r listing-pkgs, echo = FALSE}
 pkgs <- read.csv("packages.csv", comment.char = "#", stringsAsFactors = FALSE)
 
@@ -72,6 +77,43 @@ for (pkg in pkgs$name[which(pkgs$on_bioc)]) {
   badger::badge_bioc_download(pkg, "total", "blue", "total"))
 }
 
+```
+
+```{r citations, include=TRUE, warning=TRUE, message=TRUE}
+library(RSelenium)
+
+# Setting up the server
+ps <- system("docker run -d -p 4445:4444 selenium/standalone-firefox:2.53.1")
+remDr <- remoteDriver(
+  remoteServerAddr = "localhost",
+  port = 4445L,
+  browserName = "firefox"
+)
+remDr$open()
+
+print(remDr)
+
+for (i in seq_len(nrow(pkgs))) {
+  
+  # If no URL, then continue
+  if (nchar(pkgs$google_scholar[i]) == 0)
+    next
+  
+  # Otherwise, take a look at the cictations
+  address <- pkgs$google_scholar[i]
+  
+  remDr$navigate(address)
+  results <- remDr$findElements(using = "class", "gs_ab_mdw")
+  results <- sapply(results, function(r) r$getElementText())
+  results <- results[which(grepl(".+About\\s*([0-9,]+)\\*results", results))]
+  
+  if (length(results))
+    print(results)
+  
+}
+
+remDr$close()
+system(paste("docker stop", ps))
 ```
 
 

@@ -48,6 +48,69 @@ List of past seminars with material can be found
 
 # USCbiostats R packages
 
+``` r
+library(RSelenium)
+
+# Setting up the server
+ps <- system("docker run --name=rselenium -d -p 4445:4444 selenium/standalone-firefox:2.53.1")
+remDr <- remoteDriver(
+  remoteServerAddr = "localhost",
+  port = 4445L,
+  browserName = "firefox"
+)
+
+print(remDr)
+```
+
+    ## $remoteServerAddr
+    ## [1] "localhost"
+    ## 
+    ## $port
+    ## [1] 4445
+    ## 
+    ## $browserName
+    ## [1] "firefox"
+    ## 
+    ## $version
+    ## [1] ""
+    ## 
+    ## $platform
+    ## [1] "ANY"
+    ## 
+    ## $javascript
+    ## [1] TRUE
+    ## 
+    ## $nativeEvents
+    ## [1] TRUE
+    ## 
+    ## $extraCapabilities
+    ## list()
+
+``` r
+for (i in seq_len(nrow(pkgs))) {
+  
+  # If no URL, then continue
+  if (nchar(pkgs$google_scholar[i]) == 0)
+    next
+  
+  # Otherwise, take a look at the cictations
+  address <- pkgs$google_scholar[i]
+  
+  page <- readLines(address)
+  
+  results_line <- which(grepl(".+About\\s*([0-9,]+)\\*results", page))
+
+}
+```
+
+    ## Warning in readLines(address): incomplete final
+    ## line found on 'https://scholar.google.com/scholar?
+    ## cites=5374415288333388896&as_sdt=2005&sciodt=0,5&hl=en'
+
+``` r
+system("docker stop rselenium")
+```
+
 | Name                                                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 |:--------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [**AnnoQR**]()                                          | R client wrap for AnnoQ API (<https://github.com/blueOwl/AnnoQR>) [![CRAN status](https://www.r-pkg.org/badges/version/AnnoQR)](https://CRAN.R-project.org/package=AnnoQR) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/AnnoQR)](https://cran.r-project.org/package=AnnoQR) [![status](https://tinyverse.netlify.com/badge/AnnoQR)](https://CRAN.R-project.org/package=AnnoQR)                                                   |
