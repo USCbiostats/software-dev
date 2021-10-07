@@ -33,7 +33,7 @@ jobs:
 
       - name: Commit results
         run: |
-          git add README_files/figure-gfm/* 
+          git add README* 
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git commit -a -m 'Re-build Rmarkdown files' || echo Nothing has changed
