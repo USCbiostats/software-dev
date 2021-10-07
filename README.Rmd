@@ -40,55 +40,34 @@ List of past seminars with material can be found [here](/happy_scientist/).
 # USCbiostats R packages
 
 ```{r listing-pkgs, echo = FALSE}
-pkgs <- c(
-  "aphylo" = "Statistical inference of genetic functions in phylogenetic trees",
-  "bayesnetworks" = "C++ program to fit Bayesian networks, illustrated with simulated data",
-  "BinaryDosage" = "Converts VCF files to a binary format",
-  "causnet" = "What the Package Does (One Line, Title Case)",
-  "fdrci" = "Permutation-Based FDR Point and Confidence Interval Estimation",
-  "fmcmc" = "A friendly MCMC framework",
-  "GxEScanR" = "R version of GxEScan",
-  "HiLDA" = "An R package for inferring the mutational exposures difference between groups",
-  "iMutSig" = "A web application to identify the most similar mutational signature using shiny",
-  "jsPhyloSVG" = "htmlwidgets for the jsPhyloSVG JavaScript library",
-  "LUCIDus" = "Latent and Unknown Cluster Analysis using Integrated Data",
-  "MergeBinaryDosage" = "R package for merging binary dosage files",
-  "rphyloxml" = "Read and write phyloXML files in R",
-  "selectKSigs" = "Selection of K in finding the number of mutational signatures",
-  "slurmR" = "slurmR: A Lightweight Wrapper for Slurm",
-  "partition" = "A fast and flexible framework for agglomerative partitioning in R ",
-  "polygons" = "Flexible functions for computing polygons coordinates in R ",
-  "xtune" = "An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge ",
-  "xrnet" = "R Package for Hierarchical Regularized Regression to Incorporate External Data",
-  hJAM = "hJAM is a hierarchical model which unifies the framework of Mendelian Randomization and Transcriptome-wide association studies.",
-  "AnnoQR" = "R client wrap for AnnoQ API (https://github.com/blueOwl/AnnoQR)",
-  "pfamscanr" = "An R client for EMBL-EBI's PfamScan API"
-  )
+pkgs <- read.csv("packages.csv", comment.char = "#")
 
 # Alphabetically ordered
-pkgs <- pkgs[order(names(pkgs))]
+pkgs <- pkgs[order(pkgs$name),,drop=FALSE]
 
-dat <- data.frame(
-  Name        = names(pkgs),
+dat <- with(pkgs, data.frame(
+  Name        = sprintf(
+    "[**%s**](%s)", name, ifelse(!is.na(repo), repo, paste0("https://github.com/USCbiostats/", name))
+    ),
   Description = paste(
-    pkgs,
+    description,
     sprintf(
       "[![CRAN status](https://www.r-pkg.org/badges/version/%s)](https://CRAN.R-project.org/package=%1$s)",
-      names(pkgs)
+      name
     ),
     sprintf(
       "[![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/%s)](https://cran.r-project.org/package=%1$s)",
-      names(pkgs)
+      name
     ),
     sprintf(
       "[![status](https://tinyverse.netlify.com/badge/%s)](https://CRAN.R-project.org/package=%1$s)",
-      names(pkgs)
+      name
     )
-), stringsAsFactors = FALSE)
+), stringsAsFactors = FALSE))
 
 for (pkg in c("HiLDA", "selectKSigs")){
-  dat[which(names(pkgs)==pkg), "Description"] <- 
-  paste0(pkgs[pkg], 
+  dat[which(pkgs$name == pkg), "Description"] <- 
+  paste0(pkgs$description[pkgs$name == pkg], 
   sprintf("[![](https://img.shields.io/badge/Bioconductor%%20version-1.0.0-green.svg)](https://www.bioconductor.org/packages/%s)", pkg), 
   badger::badge_bioc_download(pkg, "total", "blue", "total"))
 }
@@ -113,6 +92,10 @@ dat$Name <- sprintf("[**%s**](https://github.com/USCbiostats/%s)", dat$Name, dat
 
 
 ```{r printing, echo = FALSE}
-dat$Name <- sprintf("[**%s**](https://github.com/USCbiostats/%s)", dat$Name, dat$Name)
 knitr::kable(dat, row.names = FALSE)
 ```
+
+To update this list, modify the file [packages.csv](packages.csv). The
+`README.md` file is updated automatically using GitHub Actions, so there's no
+need to "manually" recompile the README file after updating the list.
+

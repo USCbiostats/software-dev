@@ -1,0 +1,32 @@
+# List of Scientific software developed by the P01
+#
+# The "repo" column only needs to be added if the repository is located in a
+# place other than the USCBiostats GitHub organization.
+#
+# The "on_bioc" column only needs to be specified with "TRUE" if the package
+# is in BioConductor.
+#
+name,repo,on_bioc,description
+"aphylo",,,"Statistical inference of genetic functions in phylogenetic trees"
+"bayesnetworks",,,"C++ program to fit Bayesian networks, illustrated with simulated data"
+"BinaryDosage",,,"Converts VCF files to a binary format"
+"causnet",,,"What the Package Does (One Line, Title Case)"
+"fdrci",,,"Permutation-Based FDR Point and Confidence Interval Estimation"
+"fmcmc",,,"A friendly MCMC framework"
+"GxEScanR",,,"R version of GxEScan"
+"HiLDA",,"TRUE","An R package for inferring the mutational exposures difference between groups"
+"iMutSig",,,"A web application to identify the most similar mutational signature using shiny"
+"jsPhyloSVG",,,"htmlwidgets for the jsPhyloSVG JavaScript library"
+"LUCIDus",,,"Latent and Unknown Cluster Analysis using Integrated Data"
+"MergeBinaryDosage",,,"R package for merging binary dosage files"
+"rphyloxml",,,"Read and write phyloXML files in R"
+"selectKSigs",,"TRUE","Selection of K in finding the number of mutational signatures"
+"slurmR",,,"slurmR: A Lightweight Wrapper for Slurm"
+"partition",,,"A fast and flexible framework for agglomerative partitioning in R "
+"polygons",,,"Flexible functions for computing polygons coordinates in R "
+"xtune",,,"An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge "
+"xrnet",,,"R Package for Hierarchical Regularized Regression to Incorporate External Data"
+"hJAM",,,"hJAM is a hierarchical model which unifies the framework of Mendelian Randomization and Transcriptome-wide association studies."
+"AnnoQR",,,"R client wrap for AnnoQ API (https://github.com/blueOwl/AnnoQR)"
+"pfamscanr",,,"An R client for EMBL-EBI's PfamScan API"
+"MethCon5",,,"R package to identify and rank CpG DNA methylation conservation along the human genome"
