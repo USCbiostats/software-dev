@@ -16,10 +16,6 @@ If you want an account on **Bioghost**, fillout the form [here](https://forms.gl
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
-As of `r Sys.Date()`, the packages listed here have been cited `r tot_citations` times
-(source: Google Scholar).
-
-
 ```{r listing-pkgs, echo = FALSE}
 pkgs <- read.csv("packages.csv", comment.char = "#", stringsAsFactors = FALSE)
 
@@ -104,6 +100,9 @@ http_status <- sapply(dat$Name, function(n) {
 table(http_status) # 22
 dat$Name <- sprintf("[**%s**](https://github.com/USCbiostats/%s)", dat$Name, dat$Name)
 ```
+
+As of `r Sys.Date()`, the packages listed here have been cited **`r tot_citations`** times
+(source: Google Scholar).
 
 
 ```{r printing, echo = FALSE}
