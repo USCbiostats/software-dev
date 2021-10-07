@@ -29,5 +29,5 @@ name,repo,on_bioc,description
 "hJAM",,,"hJAM is a hierarchical model which unifies the framework of Mendelian Randomization and Transcriptome-wide association studies."
 "AnnoQR",,,"R client wrap for AnnoQ API (https://github.com/blueOwl/AnnoQR)"
 "pfamscanr",,,"An R client for EMBL-EBI's PfamScan API"
-"MethCon5",,,"R package to identify and rank CpG DNA methylation conservation along the human genome"
+"methcon5",https://github.com/USCbiostats/MethCon5,,"R package to identify and rank CpG DNA methylation conservation along the human genome"
 "cit",,,"Causal Inference Test"
