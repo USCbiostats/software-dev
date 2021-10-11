@@ -9,7 +9,7 @@ If you want an account on **Bioghost**, fillout the form
 
 # USCbiostats R packages
 
-As of 2021-10-09, the packages listed here have been cited **63** times
+As of 2021-10-11, the packages listed here have been cited **63** times
 (source: Google Scholar).
 
 | Name                                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                         | Citations                                                                |
