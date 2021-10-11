@@ -5,7 +5,7 @@ This project’s main contents are located in the project’s
 [Wiki](https://github.com/USCbiostats/CodingStandards/wiki).
 
 If you want an account on **Bioghost**, fillout the form
-[here](https://forms.gle/GLKGfydPj5LmfHWq6) (USC accout required).
+[here](https://forms.gle/GLKGfydPj5LmfHWq6) (Must be logged into your USC account).
 
 # USCbiostats R packages
 
