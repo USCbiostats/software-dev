@@ -5,7 +5,7 @@ This project’s main contents are located in the project’s
 [Wiki](https://github.com/USCbiostats/CodingStandards/wiki).
 
 If you want an account on **Bioghost**, fillout the form
-[here](https://forms.gle/GLKGfydPj5LmfHWq6) (Must be logged into your USC account).
+[here](https://forms.gle/GLKGfydPj5LmfHWq6) (USC accout required).
 
 # USCbiostats R packages
 
@@ -13,7 +13,7 @@ As of 2021-10-11, the packages listed here have been cited **67** times
 (source: Google Scholar).
 
 | Name                                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                         | Citations                                                                |
-| :------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------- |
+|:--------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------|
 | [**AnnoQR**](https://github.com/USCbiostats/AnnoQR)                       | R client wrap for AnnoQ API (<https://github.com/blueOwl/AnnoQR>) [![CRAN status](https://www.r-pkg.org/badges/version/AnnoQR)](https://CRAN.R-project.org/package=AnnoQR) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/AnnoQR)](https://cran.r-project.org/package=AnnoQR) [![status](https://tinyverse.netlify.com/badge/AnnoQR)](https://CRAN.R-project.org/package=AnnoQR)                                                   |                                                                          |
 | [**aphylo**](https://github.com/USCbiostats/aphylo)                       | Statistical inference of genetic functions in phylogenetic trees [![CRAN status](https://www.r-pkg.org/badges/version/aphylo)](https://CRAN.R-project.org/package=aphylo) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/aphylo)](https://cran.r-project.org/package=aphylo) [![status](https://tinyverse.netlify.com/badge/aphylo)](https://CRAN.R-project.org/package=aphylo)                                                    |                                                                          |
 | [**bayesnetworks**](https://github.com/USCbiostats/bayesnetworks)         | C++ program to fit Bayesian networks, illustrated with simulated data [![CRAN status](https://www.r-pkg.org/badges/version/bayesnetworks)](https://CRAN.R-project.org/package=bayesnetworks) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/bayesnetworks)](https://cran.r-project.org/package=bayesnetworks) [![status](https://tinyverse.netlify.com/badge/bayesnetworks)](https://CRAN.R-project.org/package=bayesnetworks)     |                                                                          |
@@ -62,11 +62,11 @@ We do have some direct guidelines developed as issue templates
 
 # HPC in R
 
-  - [Parallel computing in
+-   [Parallel computing in
     R](../../wiki/HPC-in-R#parallel-computing-in-r)  
-  - [parallel](../../wiki/HPC-in-R#parallel)
-  - [iterators+foreach](../../wiki/HPC-in-R#foreach)
-  - [RcppArmadillo +
+-   [parallel](../../wiki/HPC-in-R#parallel)
+-   [iterators+foreach](../../wiki/HPC-in-R#foreach)
+-   [RcppArmadillo +
     OpenMP](../../wiki/HPC-in-R#rcpparmadillo-and-openmp)
 
 # Happy Scientist Seminars
