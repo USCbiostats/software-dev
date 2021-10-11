@@ -9,11 +9,11 @@ If you want an account on **Bioghost**, fillout the form
 
 # USCbiostats R packages
 
-As of 2021-10-11, the packages listed here have been cited **63** times
+As of 2021-10-11, the packages listed here have been cited **67** times
 (source: Google Scholar).
 
 | Name                                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                         | Citations                                                                |
-|:--------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------|
+| :------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------- |
 | [**AnnoQR**](https://github.com/USCbiostats/AnnoQR)                       | R client wrap for AnnoQ API (<https://github.com/blueOwl/AnnoQR>) [![CRAN status](https://www.r-pkg.org/badges/version/AnnoQR)](https://CRAN.R-project.org/package=AnnoQR) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/AnnoQR)](https://cran.r-project.org/package=AnnoQR) [![status](https://tinyverse.netlify.com/badge/AnnoQR)](https://CRAN.R-project.org/package=AnnoQR)                                                   |                                                                          |
 | [**aphylo**](https://github.com/USCbiostats/aphylo)                       | Statistical inference of genetic functions in phylogenetic trees [![CRAN status](https://www.r-pkg.org/badges/version/aphylo)](https://CRAN.R-project.org/package=aphylo) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/aphylo)](https://cran.r-project.org/package=aphylo) [![status](https://tinyverse.netlify.com/badge/aphylo)](https://CRAN.R-project.org/package=aphylo)                                                    |                                                                          |
 | [**bayesnetworks**](https://github.com/USCbiostats/bayesnetworks)         | C++ program to fit Bayesian networks, illustrated with simulated data [![CRAN status](https://www.r-pkg.org/badges/version/bayesnetworks)](https://CRAN.R-project.org/package=bayesnetworks) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/bayesnetworks)](https://cran.r-project.org/package=bayesnetworks) [![status](https://tinyverse.netlify.com/badge/bayesnetworks)](https://CRAN.R-project.org/package=bayesnetworks)     |                                                                          |
@@ -37,7 +37,7 @@ As of 2021-10-11, the packages listed here have been cited **63** times
 | [**selectKSigs**](https://github.com/USCbiostats/selectKSigs)             | Selection of K in finding the number of mutational signatures[![](https://img.shields.io/badge/Bioconductor%20version-1.0.0-green.svg)](https://www.bioconductor.org/packages/selectKSigs)[![](https://img.shields.io/badge/download-1840/total-blue.svg)](https://bioconductor.org/packages/stats/bioc/selectKSigs)                                                                                                                                |                                                                          |
 | [**slurmR**](https://github.com/USCbiostats/slurmR)                       | slurmR: A Lightweight Wrapper for Slurm [![CRAN status](https://www.r-pkg.org/badges/version/slurmR)](https://CRAN.R-project.org/package=slurmR) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/slurmR)](https://cran.r-project.org/package=slurmR) [![status](https://tinyverse.netlify.com/badge/slurmR)](https://CRAN.R-project.org/package=slurmR)                                                                             | [2](https://scholar.google.com/scholar?cites=2044081763350723149&hl=en)  |
 | [**xrnet**](https://github.com/USCbiostats/xrnet)                         | R Package for Hierarchical Regularized Regression to Incorporate External Data [![CRAN status](https://www.r-pkg.org/badges/version/xrnet)](https://CRAN.R-project.org/package=xrnet) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/xrnet)](https://cran.r-project.org/package=xrnet) [![status](https://tinyverse.netlify.com/badge/xrnet)](https://CRAN.R-project.org/package=xrnet)                                            | [1](https://scholar.google.com/scholar?cites=12362903479655163477&hl=en) |
-| [**xtune**](https://github.com/USCbiostats/xtune)                         | An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge [![CRAN status](https://www.r-pkg.org/badges/version/xtune)](https://CRAN.R-project.org/package=xtune) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/xtune)](https://cran.r-project.org/package=xtune) [![status](https://tinyverse.netlify.com/badge/xtune)](https://CRAN.R-project.org/package=xtune)                       |                                                                          |
+| [**xtune**](https://github.com/USCbiostats/xtune)                         | An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge [![CRAN status](https://www.r-pkg.org/badges/version/xtune)](https://CRAN.R-project.org/package=xtune) [![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/xtune)](https://cran.r-project.org/package=xtune) [![status](https://tinyverse.netlify.com/badge/xtune)](https://CRAN.R-project.org/package=xtune)                       | [4](https://scholar.google.com/scholar?cites=12002990865154112222&hl=en) |
 
 To update this list, modify the file [packages.csv](packages.csv). The
 `README.md` file is updated automatically using GitHub Actions, so
@@ -62,11 +62,11 @@ We do have some direct guidelines developed as issue templates
 
 # HPC in R
 
--   [Parallel computing in
+  - [Parallel computing in
     R](../../wiki/HPC-in-R#parallel-computing-in-r)  
--   [parallel](../../wiki/HPC-in-R#parallel)
--   [iterators+foreach](../../wiki/HPC-in-R#foreach)
--   [RcppArmadillo +
+  - [parallel](../../wiki/HPC-in-R#parallel)
+  - [iterators+foreach](../../wiki/HPC-in-R#foreach)
+  - [RcppArmadillo +
     OpenMP](../../wiki/HPC-in-R#rcpparmadillo-and-openmp)
 
 # Happy Scientist Seminars
