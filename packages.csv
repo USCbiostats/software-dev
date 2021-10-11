@@ -1,13 +1,13 @@
 # List of Scientific software developed by the P01
 #
-# The "repo" column only needs to be added if the repository is located in a
+# The 'repo' column only needs to be added if the repository is located in a
 # place other than the USCBiostats GitHub organization.
 #
-# The "on_bioc" column only needs to be specified with "TRUE" if the package
+# The 'on_bioc' column only needs to be specified with 'TRUE' if the package
 # is in BioConductor.
 #
-# The "google_scholar" column can be included if the package has a link to
-# citations in Google scholar, the "Cited by" section.
+# The 'google_scholar' column can be included if the package has a link to
+# citations in Google scholar, the 'Cited by' section.
 #
 name,repo,on_bioc,google_scholar,description
 "aphylo",,,,"Statistical inference of genetic functions in phylogenetic trees"
