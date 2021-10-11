@@ -22,6 +22,27 @@ pkgs <- read.csv("packages.csv", comment.char = "#", stringsAsFactors = FALSE)
 # Alphabetically ordered
 pkgs <- pkgs[order(pkgs$name),,drop=FALSE]
 
+# Checking cran status
+pkgs$on_cran <- TRUE
+for (i in seq_len(nrow(pkgs))) {
+  pkg_status <- tryCatch(
+    httr::GET(sprintf("https://cran.r-project.org/package=%s", pkgs$name[i])),
+    error = function(e) e
+    )
+  
+  # Error fetching a status
+  if (inherits(pkg_status, "error")) {
+    pkgs$on_cran[i] <- FALSE
+    next
+  }
+  
+  if (httr::status_code(pkg_status) != 200) {
+    pkgs$on_cran[i] <- FALSE
+    next
+  }
+
+}
+
 dat <- with(pkgs, data.frame(
   Name        = sprintf(
     "[**%s**](%s)", name, ifelse(!is.na(repo) & repo != "", repo, paste0("https://github.com/USCbiostats/", name))
@@ -41,6 +62,9 @@ dat <- with(pkgs, data.frame(
       name
     )
 ), stringsAsFactors = FALSE))
+
+test <- with(pkgs, !on_cran & is.na(on_bioc))
+dat$Description[!pkgs$on_cran] <- pkgs$description[!pkgs$on_cran]
 
 for (pkg in pkgs$name[which(pkgs$on_bioc)]) {
   dat[which(pkgs$name == pkg), "Description"] <- 

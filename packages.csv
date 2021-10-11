@@ -34,3 +34,4 @@ name,repo,on_bioc,google_scholar,description
 "pfamscanr",,,,"An R client for EMBL-EBI's PfamScan API"
 "methcon5",https://github.com/USCbiostats/MethCon5,,"https://scholar.google.com/scholar?cites=13818868965517630908&hl=en","R package to identify and rank CpG DNA methylation conservation along the human genome"
 "cit",,,"https://scholar.google.com/scholar?cites=2897292192206854993&hl=en","Causal Inference Test"
+"gesso",,,"https://scholar.google.com/scholar?cites=PbkWjCSETP0J&hl=en","Hierarchical GxE Interactions in a Regularized Regression Model"
