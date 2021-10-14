@@ -37,15 +37,15 @@ how to install and setup Unix software _[here](Bioghost-server)_.
 
 # HPC in R
     
-*   [Parallel computing in R](HPC-in-R#parallel-computing-in-r)  
-*   [parallel](HPC-in-R#parallel)
-*   [iterators+foreach](HPC-in-R#foreach)
-*   [RcppArmadillo + OpenMP](HPC-in-R#rcpparmadillo-and-openmp)
-*   [Setting up optional OpenMP support in R packages](Setting-up-optional-OpenMP-support)
+*   [Parallel computing in R](HPC-in-R.md#parallel-computing-in-r)  
+*   [parallel](HPC-in-R.md#parallel)
+*   [iterators+foreach](HPC-in-R.md#foreach)
+*   [RcppArmadillo + OpenMP](HPC-in-R.md#rcpparmadillo-and-openmp)
+*   [Setting up optional OpenMP support in R packages](Setting-up-optional-OpenMP-support.md)
 
 # USC's HPCC
 
-*   [Running R on the HPC](Running-R-on-HPC)
-*   [Running RStudio on the HPC](Running-RStudio-on-the-HPC)
+*   [Running R on the HPC](Running-R-on-HPC.md)
+*   [Running RStudio on the HPC](Running-RStudio-on-the-HPC.md)
 
 
