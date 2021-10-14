@@ -21,18 +21,18 @@ how to install and setup Unix software _[here](Bioghost-server)_.
 
 # Coding Standards
 
-1.  [Coding Standards](coding-standards)
-2.  [Software Thinking](coding-standards#software-thinking)
-3.  [Development Workflow](coding-standards#development-workflow)
-4.  [Misc](coding-standards#misc)
+1.  [Coding Standards](coding-standards.md)
+2.  [Software Thinking](coding-standards.md#software-thinking)
+3.  [Development Workflow](coding-standards.md#development-workflow)
+4.  [Misc](coding-standards.md#misc)
 
 # Bioghost Server
 
-*   [Introduction](Bioghost-server#introduction)
-*   [Setup](Bioghost-server#setup)
-*   [User management](Bioghost-server#User-management)
-*   [Cheat Sheet](Bioghost-server#cheat-sheet)
-*   [Transferring Files](Bioghost-server#Transferring-Files-among-Users)
+*   [Introduction](Bioghost-server.md#introduction)
+*   [Setup](Bioghost-server.md#setup)
+*   [User management](Bioghost-server.md#User-management)
+*   [Cheat Sheet](Bioghost-server.md#cheat-sheet)
+*   [Transferring Files](Bioghost-server.md#Transferring-Files-among-Users)
 
 
 # HPC in R
