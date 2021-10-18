@@ -1,4 +1,10 @@
-
+<!---
+#########################################################################
+#########################################################################
+NOTE: DO NOT EDIT THE README.md BY HAND. ONLY EDIT THE README.Rmd BY HAND
+#########################################################################
+#########################################################################
+--->
 # Software Development Standards ![GitHub last commit](https://img.shields.io/github/last-commit/USCbiostats/software-dev)
 
 This project’s main contents are located in the project’s
