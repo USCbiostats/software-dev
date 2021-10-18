@@ -1,11 +1,7 @@
 
 # Software Development Standards ![GitHub last commit](https://img.shields.io/github/last-commit/USCbiostats/software-dev)
 
-This project’s main contents are located in the project’s
-[Wiki](https://github.com/USCbiostats/CodingStandards/wiki).
-
-If you want an account on **Bioghost**, fillout the form
-[here](https://forms.gle/GLKGfydPj5LmfHWq6) (USC accout required).
+This project's main contents are located in the project's [Wiki](wiki#welcome-to-the-software-development-wiki).
 
 # USCbiostats R packages
 
