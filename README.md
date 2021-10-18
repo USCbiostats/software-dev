@@ -1,11 +1,12 @@
 
 # Software Development Standards ![GitHub last commit](https://img.shields.io/github/last-commit/USCbiostats/software-dev)
 
-This project's main contents are located in the project's [Wiki](wiki#welcome-to-the-software-development-wiki).
+This project’s main contents are located in the project’s
+[Wiki](wiki#welcome-to-the-software-development-wiki).
 
 # USCbiostats R packages
 
-As of 2021-10-17, the packages listed here have been cited **67** times
+As of 2021-10-18, the packages listed here have been cited **67** times
 (source: Google Scholar).
 
 | Name                                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                         | Citations                                                                |
