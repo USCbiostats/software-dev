@@ -50,28 +50,27 @@ the list.
 
 # Coding Standards
 
-1.  [Coding Standards](../../wiki/Home#coding-standards)
-2.  [Software Thinking](../../wiki/Home#software-thinking)
-3.  [Development Workflow](../../wiki/Home#development-workflow)
-4.  [Misc](../../wiki/Home#misc)
+1.  [Coding Standards](wiki#coding-standards)
+2.  [Software Thinking](wiki#software-thinking)
+3.  [Development Workflow](wiki#development-workflow)
+4.  [Misc](/wiki#misc)
 
 We do have some direct guidelines developed as issue templates
 [here](templates).
 
 # Bioghost Server
 
-1.  [Introduction](../../wiki/Biogohst-server#introduction)
-2.  [Setup](../../wiki/Biogohst-server#setup)
-3.  [Cheat Sheet](../../wiki/Biogohst-server#cheat-sheet)
+1.  [Introduction](wiki/Biogohst-server.md#introduction)
+2.  [Setup](wiki/Biogohst-server.md#setup)
+3.  [Cheat Sheet](wiki/Biogohst-server.md#cheat-sheet)
 
 # HPC in R
 
 -   [Parallel computing in
-    R](../../wiki/HPC-in-R#parallel-computing-in-r)  
--   [parallel](../../wiki/HPC-in-R#parallel)
--   [iterators+foreach](../../wiki/HPC-in-R#foreach)
--   [RcppArmadillo +
-    OpenMP](../../wiki/HPC-in-R#rcpparmadillo-and-openmp)
+    R](wiki/HPC-in-R.md#parallel-computing-in-r)  
+-   [parallel](wiki/HPC-in-R.md#parallel)
+-   [iterators+foreach](wiki/HPC-in-R.md#foreach)
+-   [RcppArmadillo + OpenMP](wiki/HPC-in-R.md#rcpparmadillo-and-openmp)
 
 # Happy Scientist Seminars
 
