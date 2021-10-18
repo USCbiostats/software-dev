@@ -30,6 +30,7 @@ jobs:
         run:  |
           docker run -v$(pwd):/home/report -w/home/report uscbiostats/software-dev:latest \
             Rscript -e 'rmarkdown::render("README.Rmd")'
+          ./docker/print_warning.sh
 
       - name: Commit results
         run: |
