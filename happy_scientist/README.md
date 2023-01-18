@@ -1,7 +1,7 @@
 
 # Happy Scientist Seminars
 
-The Happy Scientist Seminars are educational seminars sponsored by Core D of the Biostats Program Project award. This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Kim Siegmund at (kims@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
+The Happy Scientist Seminars are educational seminars sponsored by Core D of the Biostats Program Project award (P01 CA196569). This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Kim Siegmund at (kims@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
 
 # Upcoming Seminars
 
@@ -9,7 +9,6 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 
 
 # Past Seminars
-Sponsored by P01 CA196569
 
 ## 2021
 
