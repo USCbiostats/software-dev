@@ -5,7 +5,7 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 
 # Upcoming Seminars
 
-## 2021
+## 2023
 
 
 # Past Seminars
