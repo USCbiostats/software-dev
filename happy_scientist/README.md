@@ -5,6 +5,11 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 
 # 2023 Seminar Schedule
 
+Happy Scientist Seminars, 2023: #1  
+Title:  Introduction to STAN
+Time: 12:00pm-12:45pm, Thursday January 26th 2023  
+Location: Soto (SSB) 114  
+
 # Past Seminars
 
 ## 2021
