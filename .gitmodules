@@ -1,0 +1,3 @@
+[submodule "happy_scientist/seminars/2023-01-26_Getting-Started-with-Stan"]
+	path = happy_scientist/seminars/2023-01-26_Getting-Started-with-Stan
+	url = https://github.com/LuZhangstat/Getting-Started-with-Stan.git
