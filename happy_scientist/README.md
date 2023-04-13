@@ -7,8 +7,9 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 
 Happy Scientist Seminars, 2023: #3  
 Title: R Package Basics   
-Time: 12:00pm-12:45pm, Thursday April 12th 2023   
+Time: 12:00pm-12:45pm, Thursday April 13th 2023   
 Location: Soto (SSB) 114  
+Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2023-04-13-r-package-basics/README.md)
 
 Happy Scientist Seminars, 2023: #2  
 Title: Annotation Query (AnnoQ): An integrated and interactive platform for large-scale genetic variant annotation  
