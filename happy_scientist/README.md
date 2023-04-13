@@ -6,7 +6,7 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 # 2023 Seminar Schedule
 
 Happy Scientist Seminars, 2023: #3  
-Title: Building an R package from scratch 
+Title: Building an R package from scratch   
 Time: 12:00pm-12:50pm, Thursday April 13th 2023   
 Location: Soto (SSB) 114  
 Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2023-04-13-building-an-r-package-from-scratch/README.md)
