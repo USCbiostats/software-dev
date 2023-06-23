@@ -1,12 +1,12 @@
 # Welcome to the Software Development Wiki!
 
-The idea of this wiki is to document the Software Development practices that we consider as standards. To contribute, please respect the following guidelines:
+This wiki seeks to document the Software Development practices that we consider as standards. To contribute, please respect the following guidelines:
 
 1.  **Keep it simple**: The home page (this page) is for general guidelines. More elaborate recommendations or examples should be provided in the specific page for each topic.
 
-2.  Unless previously agreed, **don't overwrite content**.
+2.  Unless previously agreed, **don't overwrite content**. If in doubt, please contact either Paul Marjoram or Nick Mancuso.
 
-And that's it! The wiki is organized in the following sections:
+The wiki is organized in the following sections:
  
 # Coding Standards
 
