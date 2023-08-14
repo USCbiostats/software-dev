@@ -81,7 +81,7 @@ C and D of IMAGE, the Biostats Program Project award. This series, the
 material for members of Biostats, both students and faculty, about a
 variety of tools and methods that might prove useful to them. If you
 have any suggestions for subjects that you would like to learn about in
-future, please send email to Paul Marjoram at (<pmarjora@usc.edu>). Our
+future, please send email to Kim Siegmund at (<kims@usc.edu>). Our
 agenda will be driven by your specific interests as far as is possible.
 
 List of past seminars with material can be found
