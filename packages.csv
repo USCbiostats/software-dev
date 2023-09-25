@@ -10,7 +10,7 @@
 # citations in Google scholar, the 'Cited by' section.
 #
 name,repo,on_bioc,google_scholar,description
-"aphylo",,,,"Statistical inference of genetic functions in phylogenetic trees"
+"aphylo",,,"https://scholar.google.com/scholar?oi=bibs&hl=en&cites=31698742435768054,3381716696595820644&as_sdt=5","Statistical inference of genetic functions in phylogenetic trees"
 "bayesnetworks",,,,"C++ program to fit Bayesian networks, illustrated with simulated data"
 "BinaryDosage",,,,"Converts VCF files to a binary format"
 "causnet",,,,"What the Package Does (One Line, Title Case)"
