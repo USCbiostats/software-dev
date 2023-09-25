@@ -5,6 +5,18 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 
 # 2023 Seminar Schedule
 
+Happy Scientist Seminars, 2023: #5  
+Title: Python coding and JAX        
+Time: 12:00pm-12:50pm, Thursday October 26th 2023   
+Location: Soto (SSB) 114  
+Materials will be shared [here]
+
+Happy Scientist Seminars, 2023: #4  
+Title: Unlocking the Power of AI: Copilot for R        
+Time: 12:00pm-12:50pm, Thursday October 12th 2023   
+Location: Soto (SSB) 114  
+Materials will be shared [here]
+
 Happy Scientist Seminars, 2023: #3  
 Title: Building an R package from scratch        
 Time: 12:00pm-12:50pm, Thursday April 13th 2023   
