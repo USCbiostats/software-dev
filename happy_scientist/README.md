@@ -26,14 +26,14 @@ Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/m
 Happy Scientist Seminars, 2023: #2  
 Title: Annotation Query (AnnoQ): An integrated and interactive platform for large-scale genetic variant annotation  
 Time: 12:00pm-1:00pm, Thursday March 9th 2023
-Recording: https://www.youtube.com/watch?v=6RuDnUBja5A
+Recording: https://www.youtube.com/watch?v=6RuDnUBja5A  
 Location: Soto (SSB) 114  
 Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2023-03-09-annotation-query/README.md)  
 
 Happy Scientist Seminars, 2023: #1  
 Title:  Getting Started with Stan        
 Time: 12:00pm-12:45pm, Thursday January 26th 2023  
-Recording: https://www.youtube.com/watch?v=8ReBMTIeeYU
+Recording: https://www.youtube.com/watch?v=8ReBMTIeeYU  
 Location: Soto (SSB) 114  
 Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2023-01-26-getting-started-with-stan/README.md)  
 
