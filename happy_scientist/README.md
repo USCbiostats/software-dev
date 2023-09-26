@@ -33,7 +33,7 @@ Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/m
 Happy Scientist Seminars, 2023: #1  
 Title:  Getting Started with Stan        
 Time: 12:00pm-12:45pm, Thursday January 26th 2023  
-Recording: https://www.youtube.com/watch?v=8ReBMTIeeYU  
+Recording: https://youtu.be/8ReBMTIeeYU  
 Location: Soto (SSB) 114  
 Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2023-01-26-getting-started-with-stan/README.md)  
 
