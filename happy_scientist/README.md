@@ -15,7 +15,7 @@ Happy Scientist Seminars, 2023: #4
 Title: Unlocking the Power of AI: Copilot for R        
 Time: 12:00pm-12:50pm, Thursday October 12th 2023   
 Location: Soto (SSB) 114  
-Materials can be found [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2023-10-12-Copilot-with-R)
+Materials can be found [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2023-10-12-Copilot-with-R/)
 
 Happy Scientist Seminars, 2023: #3  
 Title: Building an R package from scratch        
