@@ -13,7 +13,8 @@ The wiki is organized in the following sections:
 1.  [Coding Standards](coding-standards.md)
 2.  [Software Thinking](coding-standards.md#software-thinking)
 3.  [Development Workflow](coding-standards.md#development-workflow)
-4.  [Misc](coding-standards.md#misc)
+4.  [Dealing with slow  Rcode](https://github.com/USCbiostats/software-dev/tree/master/wiki/Slow-patterns)
+5.  [Misc](coding-standards.md#misc)
 
 # Bioghost Server
 
