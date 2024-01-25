@@ -3,13 +3,20 @@
 
 The Happy Scientist Seminars are educational seminars sponsored by Core D of the Biostats Program Project award (P01 CA196569). This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Kim Siegmund at (kims@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
 
-# 2023 Seminar Schedule
+# 2024 Seminar Schedule
 
-Happy Scientist Seminars, 2023: #5  
+Happy Scientist Seminars, 2024: #2  
+Title: Machine Learning        
+Time: 12:00pm-12:50pm, Thursday February 29th 2024   
+Location: Soto (SSB) 114  
+
+Happy Scientist Seminars, 2024: #1  
 Title: Python coding and JAX        
-Time: 12:00pm-12:50pm, Thursday October 26th 2023   
+Time: 12:00pm-12:50pm, Thursday February 8th 2024   
 Location: Soto (SSB) 114  
 Materials will be shared [here]
+
+# 2023 Seminar Schedule
 
 Happy Scientist Seminars, 2023: #4  
 Title: Unlocking the Power of AI: Copilot for R        
