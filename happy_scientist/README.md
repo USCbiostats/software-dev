@@ -16,7 +16,9 @@ Time: 12:00pm-12:50pm, Thursday February 8th 2024
 Location: Soto (SSB) 114  
 Materials will be shared [here]
 
-# 2023 Seminar Schedule
+# Past Seminars
+
+## 2023 
 
 Happy Scientist Seminars, 2023: #4  
 Title: Unlocking the Power of AI: Copilot for R        
@@ -44,7 +46,6 @@ Recording: https://youtu.be/8ReBMTIeeYU
 Location: Soto (SSB) 114  
 Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2023-01-26-getting-started-with-stan/)  
 
-# Past Seminars
 
 ## 2021
 
