@@ -11,7 +11,7 @@ Time: 12:00pm-12:50pm, Thursday February 29th 2024
 Location: Soto (SSB) 114  
 
 Happy Scientist Seminars, 2024: #1  
-Title: How I learned to stop worrying and love autodiff
+Title: How I learned to stop worrying and love autodiff   
 Time: 12:00pm-12:50pm, Thursday February 8th 2024   
 Location: Soto (SSB) 114  
 Materials will be shared [here]
