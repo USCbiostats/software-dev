@@ -22,14 +22,14 @@ Materials will be shared [here]
 
 Happy Scientist Seminars, 2023: #4  
 Title: Unlocking the Power of AI: Copilot for R        
-Time: 12:00pm-12:50pm, Thursday October 12th 2023 
+Time: 12:00pm-12:50pm, Thursday October 12th 2023   
 Recording: https://youtu.be/ue9A58Gwxn8    
 Location: Soto (SSB) 114  
 Materials can be found [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2023-10-12-Copilot-with-R/)
 
 Happy Scientist Seminars, 2023: #3  
 Title: Building an R package from scratch        
-Time: 12:00pm-12:50pm, Thursday April 13th 2023 
+Time: 12:00pm-12:50pm, Thursday April 13th 2023   
 Location: Soto (SSB) 114  
 Materials can be found [here](https://github.com/USCbiostats/software-dev/blob/master/happy_scientist/seminars/2023-04-13-building-an-r-package-from-scratch/)
 
