@@ -6,7 +6,7 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 # 2024 Seminar Schedule
 
 Happy Scientist Seminars, 2024: #2  
-Title: Machine Learning        
+Title: Introduction to Machine Learning and PyTorch: A Guide to Getting Started with AI          
 Time: 12:00pm-12:50pm, Thursday February 29th 2024  
 Recording: https://youtu.be/85y1gE_2_P4  
 Location: Soto (SSB) 114   
