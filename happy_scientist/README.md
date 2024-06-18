@@ -8,14 +8,14 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 Happy Scientist Seminars, 2024: #2  
 Title: Machine Learning        
 Time: 12:00pm-12:50pm, Thursday February 29th 2024  
-Recording: https://youtu.be/85y1gE_2_P4
-Location: Soto (SSB) 114 
+Recording: https://youtu.be/85y1gE_2_P4  
+Location: Soto (SSB) 114   
 Materials will be shared [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2024-02-29-intro-to-pytorch)
 
 Happy Scientist Seminars, 2024: #1  
 Title: How I learned to stop worrying and love autodiff   
-Time: 12:00pm-12:50pm, Thursday February 8th 2024
-Recording: https://youtu.be/HNA2wiXqJgc
+Time: 12:00pm-12:50pm, Thursday February 8th 2024  
+Recording: https://youtu.be/HNA2wiXqJgc  
 Location: Soto (SSB) 114  
 Materials will be shared [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2024-02-08-autodiff-lib)
 
