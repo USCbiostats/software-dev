@@ -3,7 +3,25 @@
 
 The Happy Scientist Seminars are educational seminars sponsored by Core D of the Biostats Program Project award (P01 CA196569). This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Kim Siegmund at (kims@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
 
-# 2024 Seminar Schedule
+# 2025 Seminar Schedule
+
+Happy Scientist Seminars, 2025: #2  
+Title: Building an R package from scratch        
+Time: 12:00pm-12:50pm, Thursday February 27th 2025  
+Recording: (coming) 
+Location: Soto (SSB) 114   
+Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2025-02-27-building-an-r-package-from-scratch)
+
+Happy Scientist Seminars, 2025: #1  
+Title: TBD   
+Time: 12:00pm-12:50pm, Thursday January 30th 2025  
+Recording: (coming)
+Location: Soto (SSB) 114  
+Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2025-01-30-hs)
+
+# Past Seminars
+
+## 2024 
 
 Happy Scientist Seminars, 2024: #2  
 Title: Introduction to Machine Learning and PyTorch: A Guide to Getting Started with AI          
@@ -18,8 +36,6 @@ Time: 12:00pm-12:50pm, Thursday February 8th 2024
 Recording: https://youtu.be/HNA2wiXqJgc  
 Location: Soto (SSB) 114  
 Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2024-02-08-autodiff-lib)
-
-# Past Seminars
 
 ## 2023 
 
