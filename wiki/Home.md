@@ -1,3 +1,7 @@
+
+![IMAGE Logo_horiz](https://github.com/user-attachments/assets/e0593669-fc84-421f-926f-4863a7370233)
+
+
 # Welcome to the Software Development Wiki!
 
 This wiki seeks to document the Software Development practices that we consider as standards. To contribute, please respect the following guidelines:
