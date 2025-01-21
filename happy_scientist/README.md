@@ -1,3 +1,4 @@
+![IMAGE Logo_horiz](https://github.com/user-attachments/assets/0e0f4ee9-ae4d-42db-8091-f9528c5c44d3)
 
 # Happy Scientist Seminars
 
