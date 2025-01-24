@@ -1,2 +1,2 @@
-# JAX Lecture 2: Transformable Programs and MoreI
+# JAX Lecture 2: Transformable Programs and More
 
