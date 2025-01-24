@@ -13,7 +13,7 @@ name,repo,on_bioc,google_scholar,description
 "aphylo",,,"https://scholar.google.com/scholar?oi=bibs&hl=en&cites=31698742435768054,3381716696595820644&as_sdt=5","Statistical inference of genetic functions in phylogenetic trees"
 "bayesnetworks",,,,"C++ program to fit Bayesian networks, illustrated with simulated data"
 "BinaryDosage",,,,"Converts VCF files to a binary format"
-"causnet",,,,"What the Package Does (One Line, Title Case)"
+"causnet",,,,"Finds a globally optimal causal network given some data as input."
 "fdrci",,,"https://scholar.google.com/scholar?hl=en&cites=6606625444967735035","Permutation-Based FDR Point and Confidence Interval Estimation"
 "fmcmc",,,"https://scholar.google.com/scholar?cites=18235425292318567621&hl=en","A friendly MCMC framework"
 "GxEScanR",,,,"R version of GxEScan"
