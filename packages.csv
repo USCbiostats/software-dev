@@ -1,0 +1,37 @@
+# List of Scientific software developed by the P01,,,,,,
+#,,,,,,
+# The 'repo' column only needs to be added if the repository is located in a,,,,,,
+# place other than the USCBiostats GitHub organization.,,,,,,
+#,,,,,,
+# The 'on_bioc' column only needs to be specified with 'TRUE' if the package,,,,,,
+# is in BioConductor.,,,,,,
+#,,,,,,
+# The 'google_scholar' column can be included if the package has a link to,,,,,,
+# citations in Google scholar, the 'Cited by' section.,,,,,
+#,,,,,,
+name,repo,on_bioc,scholar_id,pubid,google_scholar,description
+aphylo,,,,,"https://scholar.google.com/scholar?oi=bibs&hl=en&cites=31698742435768054,3381716696595820644&as_sdt=5",Statistical inference of genetic functions in phylogenetic trees
+bayesnetworks,,,,,,"C++ program to fit Bayesian networks, illustrated with simulated data"
+BinaryDosage,,,,,,Converts VCF files to a binary format
+causnet,,,,,,Finds a globally optimal causal network given some data as input.
+fdrci,,,DD7aE9sAAAAJ,eQOLeE2rZwMC,https://scholar.google.com/scholar?hl=en&cites=6606625444967735035,Permutation-Based FDR Point and Confidence Interval Estimation
+fmcmc,,,34E1yTAAAAAJ,hMod-77fHWUC,https://scholar.google.com/scholar?cites=18235425292318567621&hl=en,A friendly MCMC framework
+GxEScanR,,,,,,R version of GxEScan
+HiLDA,,TRUE,w9iE6jQAAAAJ,Y0pCki6q_DkC,https://scholar.google.com/scholar?cites=2767354745053140554&hl=en,An R package for inferring the mutational exposures difference between groups
+iMutSig,,,w9iE6jQAAAAJ,YsMSGLbcyi4C,https://scholar.google.com/scholar?cites=16599818872657505515&hl=en,A web application to identify the most similar mutational signature using shiny
+jsPhyloSVG,,,,,,htmlwidgets for the jsPhyloSVG JavaScript library
+LUCIDus,,,WLyOHhEAAAAJ,u5HHmVD_uO8C,https://scholar.google.com/scholar?cites=17993227897179669521&hl=en,Latent and Unknown Cluster Analysis using Integrated Data
+MergeBinaryDosage,,,,,,R package for merging binary dosage files
+rphyloxml,,,,,,Read and write phyloXML files in R
+selectKSigs,,TRUE,,,,Selection of K in finding the number of mutational signatures
+slurmR,,,34E1yTAAAAAJ,NMxIlDl6LWMC,https://scholar.google.com/scholar?cites=2044081763350723149&hl=en,slurmR: A Lightweight Wrapper for Slurm
+partition,,,DD7aE9sAAAAJ,J_g5lzvAfSwC,https://scholar.google.com/scholar?cites=5586649186160622454&hl=en,A fast and flexible framework for agglomerative partitioning in R 
+polygons,,,,,,Flexible functions for computing polygons coordinates in R 
+xtune,,,ErJ7SmEAAAAJ,TaaCk18tZOkC,https://scholar.google.com/scholar?cites=12002990865154112222&hl=en,An R package for Lasso and Ridge Regression with differential penalization based on prior knowledge 
+xrnet,,,,,https://scholar.google.com/scholar?cites=12362903479655163477&hl=en,R Package for Hierarchical Regularized Regression to Incorporate External Data
+hJAM,,,GhsMHqYAAAAJ,9yKSN-GCB0IC,https://scholar.google.com/scholar?cites=5_2ea7Z8nBIJ&hl=en,hJAM is a hierarchical model which unifies the framework of Mendelian Randomization and Transcriptome-wide association studies.
+AnnoQR,,,,,,R client wrap for AnnoQ API (https://github.com/blueOwl/AnnoQR)
+pfamscanr,,,,,,An R client for EMBL-EBI's PfamScan API
+methcon5,https://github.com/USCbiostats/MethCon5,,n7hjOCIAAAAJ,tuHXwOkdijsC,https://scholar.google.com/scholar?cites=13818868965517630908&hl=en,R package to identify and rank CpG DNA methylation conservation along the human genome
+cit,,,DD7aE9sAAAAJ,hqOjcs7Dif8C,https://scholar.google.com/scholar?cites=2897292192206854993&hl=en,Causal Inference Test
+gesso,,,oLriDxQAAAAJ,HIFyuExEbWQC,https://scholar.google.com/scholar?cites=PbkWjCSETP0J&hl=en,Hierarchical GxE Interactions in a Regularized Regression Model
