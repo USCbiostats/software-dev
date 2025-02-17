@@ -1,7 +1,7 @@
 ---
 output:
-  rmarkdown::github_document:
-    html_preview: false
+    rmarkdown::github_document:
+#      html_preview: false
 ---
 
 # Software Development Standards ![GitHub last commit](https://img.shields.io/github/last-commit/USCbiostats/software-dev)
@@ -11,115 +11,253 @@ This project's main contents are located in the project's [Wiki](wiki#welcome-to
 # USCbiostats R packages
 
 ```{r setup, include=FALSE}
+library(httr)
+library(stringr)
+library(knitr)
+library(scholar)   # <--- The key difference
+```
+
+
+```{r, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
-```{r listing-pkgs, echo = FALSE}
+```{r, include=FALSE}
+# We'll assume `packages.csv` has columns:
+# name, repo, on_bioc, scholar_id, pubid, google_scholar, description
+# Lines starting with '#' in CSV are ignored.
+
 pkgs <- read.csv("packages.csv", comment.char = "#", stringsAsFactors = FALSE)
 
-# Alphabetically ordered
-pkgs <- pkgs[order(pkgs$name),,drop=FALSE]
+# If on_bioc does not exist, create it
+if (!"on_bioc" %in% names(pkgs)) {
+  pkgs$on_bioc <- FALSE
+} else {
+  # Convert text "TRUE"/"FALSE" to logical
+  pkgs$on_bioc <- ifelse(pkgs$on_bioc %in% c("TRUE","True","true"), TRUE, FALSE)
+}
 
-# Checking cran status
+# Check CRAN status
 pkgs$on_cran <- TRUE
 for (i in seq_len(nrow(pkgs))) {
-  pkg_status <- tryCatch(
-    httr::GET(sprintf("https://cran.r-project.org/package=%s", pkgs$name[i])),
-    error = function(e) e
-    )
-  
-  # Error fetching a status
-  if (inherits(pkg_status, "error")) {
+  nm <- pkgs$name[i]
+  url <- sprintf("https://cran.r-project.org/package=%s", nm)
+  resp <- tryCatch(GET(url), error = function(e) e)
+  if (inherits(resp,"error") || status_code(resp) != 200) {
     pkgs$on_cran[i] <- FALSE
-    next
   }
-  
-  if (httr::status_code(pkg_status) != 200) {
-    pkgs$on_cran[i] <- FALSE
-    next
-  }
-
 }
 
-dat <- with(pkgs, data.frame(
-  Name        = sprintf(
-    "[**%s**](%s)", name, ifelse(!is.na(repo) & repo != "", repo, paste0("https://github.com/USCbiostats/", name))
-    ),
-  Description = paste(
-    description,
-    sprintf(
-      "[![CRAN status](https://www.r-pkg.org/badges/version/%s)](https://CRAN.R-project.org/package=%1$s)",
-      name
-    ),
-    sprintf(
-      "[![CRAN downloads](http://cranlogs.r-pkg.org/badges/grand-total/%s)](https://cran.r-project.org/package=%1$s)",
-      name
-    ),
-    sprintf(
-      "[![status](https://tinyverse.netlify.com/badge/%s)](https://CRAN.R-project.org/package=%1$s)",
-      name
+# Sort packages by name
+pkgs <- pkgs[order(pkgs$name), , drop=FALSE]
+pkgs <- pkgs[!(is.na(pkgs$name) | pkgs$name == ""), ]
+
+# Build the data frame that will become our final table
+dat <- data.frame(
+  Name        = character(nrow(pkgs)),
+  Description = character(nrow(pkgs)),
+  Citations   = character(nrow(pkgs)),  # will fill in
+  stringsAsFactors = FALSE
+)
+
+for (i in seq_len(nrow(pkgs))) {
+  nm       <- pkgs$name[i]
+  repo_url <- if (!is.na(pkgs$repo[i]) && nzchar(pkgs$repo[i])) {
+    pkgs$repo[i]
+  } else {
+    paste0("https://github.com/USCbiostats/", nm)
+  }
+  # The clickable package name
+  dat$Name[i] <- sprintf("[**%s**](%s)", nm, repo_url)
+  
+  desc_txt <- pkgs$description[i]  # base description
+  
+  # If on CRAN, add badges
+  if (pkgs$on_cran[i]) {
+    desc_txt <- paste(
+      desc_txt,
+      sprintf("[![CRAN status](https://www.r-pkg.org/badges/version/%1$s)](https://CRAN.R-project.org/package=%1$s)", nm),
+      sprintf("[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/%1$s)](https://CRAN.R-project.org/package=%1$s)", nm)
     )
-), stringsAsFactors = FALSE))
-
-test <- with(pkgs, !on_cran & is.na(on_bioc))
-dat$Description[!pkgs$on_cran] <- pkgs$description[!pkgs$on_cran]
-
-for (pkg in pkgs$name[which(pkgs$on_bioc)]) {
-  dat[which(pkgs$name == pkg), "Description"] <- 
-  paste0(pkgs$description[pkgs$name == pkg], 
-  sprintf("[![](https://img.shields.io/badge/Bioconductor%%20version-1.0.0-green.svg)](https://www.bioconductor.org/packages/%s)", pkg), 
-  badger::badge_bioc_download(pkg, "total", "blue", "total"))
+  }
+  
+  # If on Bioc, add a badge
+  if (pkgs$on_bioc[i]) {
+  desc_txt <- paste(
+    desc_txt,
+    # Build status shield
+    sprintf(
+      "[![BioC build status](https://bioconductor.org/shields/build/release/bioc/%s.svg)](https://bioconductor.org/packages/release/bioc/html/%1$s.html)",
+      nm
+    ),
+    # Downloads rank shield
+    sprintf(
+      "[![BioC downloads](https://bioconductor.org/shields/downloads/release/%s.svg)](https://bioconductor.org/packages/release/bioc/html/%1$s.html)",
+      nm)
+    )
+  }
+  
+  dat$Description[i] <- desc_txt
 }
 
+# Initialize Citations
+dat$Citations <- ""
 ```
 
-```{r citations, include=FALSE}
-regex <- "([0-9,]+)[\\s\\n]+results?[\\s\\n]+\\([\\s\\n]*[0-9]+" #[\\s\\n]+[(][0-9]*[.]?[0-9]+\\s+secs?
-dat$Citations <- ""
+```{r, include=FALSE}
+# -----------------------------
+# 1) Scholar approach:
+# -----------------------------
+get_scholar_citation_count <- function(sid, pubid, pkg_name) {
+  # If there's a specific publication ID
+  if (!is.na(pubid) && nzchar(pubid)) {
+    # Use get_article_cite_history() + sum the 'cites'
+    article_hist <- tryCatch(
+      get_article_cite_history(sid, pubid),
+      error = function(e) NULL
+    )
+    if (is.data.frame(article_hist) && nrow(article_hist) > 0 && "cites" %in% names(article_hist)) {
+      return(sum(article_hist$cites))
+    } else {
+      return(NA_integer_)
+    }
+  } else {
+    # Otherwise, fallback to the fuzzy match on package name in get_publications()
+    pubs <- tryCatch(
+      get_publications(sid),
+      error = function(e) NULL
+    )
+    if (!is.null(pubs) && is.data.frame(pubs) && nrow(pubs) > 0) {
+      idx <- which(grepl(pkg_name, pubs$title, ignore.case=TRUE))
+      if (length(idx) > 0) {
+        # Return the first match's total cites
+        return(pubs$cites[idx[1]])
+      }
+    }
+    return(NA_integer_)
+  }
+}
+
+# -----------------------------
+# 2) Old HTML scraping approach:
+# -----------------------------
+# We'll define a function that tries to parse a Google Scholar URL (like ?cites=...)
+# using readLines or GET+iconv, then run a regex to find "XXX results" lines. 
+# If found, return XXX as integer. Otherwise NA.
+get_html_scrape_citation_count <- function(gs_url) {
+  
+  if (is.na(gs_url) || !nzchar(gs_url)) {
+    return(NA_integer_)
+  }
+  
+  # We'll fetch as raw and convert. 
+  page_txt <- tryCatch({
+    resp <- httr::GET(gs_url)
+    if (httr::status_code(resp) != 200) {
+      stop("HTTP status not 200")
+    }
+    raw_ct <- httr::content(resp, as="raw")
+    txt    <- iconv(rawToChar(raw_ct, multiple=TRUE), from="UTF-8", to="UTF-8", sub="byte")
+    txt
+  }, error = function(e) {
+    return(NULL)
+  })
+  
+  if (is.null(page_txt)) {
+    return(NA_integer_)
+  }
+  
+  # We'll split into lines
+  lines <- strsplit(page_txt, "\n", fixed=TRUE)[[1]]
+  
+  # Remove some tags. (Might or might not help.)
+  lines <- gsub("\\<[[:alnum:]_/-]+\\>", "", lines, perl=TRUE)
+  
+  # The old code used a regex looking for something like "123 results (0.23 sec)"
+  # e.g. "([0-9,]+)[\\s\\n]+results?[\\s\\n]+\\([\\s\\n]*[0-9]+" 
+  # But Scholar might say "About 123 results..."
+  # So we can attempt a simpler approach:
+  # "About X results" or "X results"
+  re <- "About\\s+([0-9,]+)\\s+results\\s*(\\([^)]*\\))?|
+       ([0-9,]+)\\s+results\\s*(\\([^)]*\\))?"
+  # We'll try both capturing groups
+  m  <- regexpr(re, lines, perl=TRUE, ignore.case=TRUE)
+  # Find the first line that matches
+  line_idx <- which(m != -1)
+  if (length(line_idx) == 0) {
+    return(NA_integer_)
+  }
+  # We'll just pick the first match
+  line_of_interest <- lines[line_idx[1]]
+  
+  # Extract the numeric portion
+  # We'll do two sub captures, so:
+  match_txt <- regmatches(line_of_interest, m[1])
+  
+  # We'll use a simpler approach with stringr if you prefer:
+  library(stringr)
+  # This pattern tries to find numbers in the text
+  nums_found <- str_extract_all(line_of_interest, "[0-9,]+")[[1]]
+  if (length(nums_found) == 0) {
+    return(NA_integer_)
+  }
+  
+  # Convert e.g. "1,234" -> 1234
+  cites_int <- as.integer(gsub("[^0-9]", "", nums_found[1]))
+  cites_int
+}
+
 tot_citations <- 0L
+
+# Now we loop over each package row
 for (i in seq_len(nrow(pkgs))) {
   
-  # If no URL, then continue
-  if (nchar(pkgs$google_scholar[i]) == 0) {
-    next
+  pkg_name  <- pkgs$name[i]
+  sid       <- if ("scholar_id" %in% names(pkgs)) pkgs$scholar_id[i] else NA_character_
+  pubid     <- if ("pubid"      %in% names(pkgs)) pkgs$pubid[i]      else NA_character_
+  old_link  <- if ("google_scholar" %in% names(pkgs)) pkgs$google_scholar[i] else NA_character_
+  
+  cval <- NA_integer_
+  
+  # 1) Try scholar approach if sid is not empty
+  if (!is.na(sid) && nzchar(sid)) {
+    cval <- get_scholar_citation_count(sid, pubid, pkg_name)
+    if (!is.na(cval) && cval >= 0) {
+      # If we got a valid integer from Scholar
+      if (!is.na(pubid) && nzchar(pubid)) {
+        # We have a link to the actual publication
+      dat$Citations[i] <- sprintf("[%d](%s)", cval, old_link)
+
+      } else {
+        # We only have the count, no direct pub link
+        dat$Citations[i] <- as.character(cval)
+      }
+      tot_citations <- tot_citations + cval
+      next  # Done with this package
+    }
   }
   
-  # Otherwise, take a look at the cictations
-  address <- pkgs$google_scholar[i]
-  
-  page      <- tryCatch(readLines(address, warn = FALSE), error = function(e) e)
-
-  if (inherits(page, "error"))
-    next
-  
-  # Removing blocks of bold, italic, etc
-  page <- gsub("\\<[[:alnum:]_/-]+\\>", "",page, perl = TRUE)
-  
-  citations <- which(grepl(regex, page, perl = TRUE))
-  if (!length(citations))
-    next
-  
-  citations <- stringr::str_extract(page[citations], "[0-9,]+(?=[\\s\\n]+results?)")
-  citations <- as.integer(gsub("[,.]", "", citations, perl = TRUE))
-  tot_citations <- tot_citations + citations
-  dat$Citations[i] <- sprintf("[%i](%s)", as.integer(citations), address)
-  
+  # 2) Fallback: old HTML approach using google_scholar column
+  cval_html <- get_html_scrape_citation_count(old_link)
+  if (!is.na(cval_html) && cval_html >= 0) {
+    dat$Citations[i] <- sprintf("[%d](%s)", cval_html, old_link)
+    tot_citations <- tot_citations + cval_html
+  }
 }
-
-if (tot_citations == 0L)
-  stop("There can't be 0 citations! Make sure things are running as expected!")
 ```
 
-As of `r Sys.Date()`, the packages listed here have been cited **`r tot_citations`** times
-(source: Google Scholar).
 
 ```{r printing, echo = FALSE}
 knitr::kable(dat, row.names = FALSE)
 ```
 
+As of `r Sys.Date()`, the packages listed here have been cited **`r tot_citations`** times
+(source: Google Scholar).
+
 To update this list, modify the file [packages.csv](packages.csv). The
 `README.md` file is updated automatically using GitHub Actions, so there's no
 need to "manually" recompile the README file after updating the list. 
+
 
 # Coding Standards
 
