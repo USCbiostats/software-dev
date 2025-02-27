@@ -40,6 +40,14 @@ This project’s main contents are located in the project’s
 As of 2025-02-16, the packages listed here have been cited **183** times
 (source: Google Scholar).
 
+![IMAGE Logo_horiz](https://github.com/user-attachments/assets/c6c8ce78-1759-4b29-8c5b-e9c5e444d4e9)
+
+Many of the software in the above list are products of our "IMAGE" P01 award, "Integrative Methods of Analysis for Genetic Epidemiology", as part of our Center for Statistical Genomics. More details of this can be found [here.]( https://pphs.usc.edu/center/center-for-statistical-genomics/)
+
+
+
+
+
 To update this list, modify the file [packages.csv](packages.csv). The
 `README.md` file is updated automatically using GitHub Actions, so
 there’s no need to “manually” recompile the README file after updating
