@@ -55,13 +55,15 @@ the list.
 
 # Coding Standards
 
+Here we have the coding stadards that we ask the group to follow:
+
 1.  [Coding Standards](wiki#coding-standards)
 2.  [Software Thinking](wiki/coding-standards.md#software-thinking)
 3.  [Development
     Workflow](wiki/coding-standards.md#development-workflow)
 4.  [Misc](wiki/coding-standards.md#misc)
 
-We do have some direct guidelines developed as issue templates
+We also have some direct guidelines developed as issue templates
 [here](templates).
 
 # Bioghost Server
