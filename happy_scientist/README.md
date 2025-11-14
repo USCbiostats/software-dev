@@ -6,17 +6,22 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 
 # 2025 Seminar Schedule
 
+Happy Scientist Seminars, 2025: #3  
+Title: Perspectives from a biostats PhD student in the AI era        
+Time: 12:00pm-12:50pm, Thursday November 20th 2025  
+Recording: (coming) 
+Location: Soto (SSB) 114   
+Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2025-11-20-Perspectives-from-a-PhD-student-in-the-AI-era)
+
 Happy Scientist Seminars, 2025: #2  
 Title: Building an R package from scratch        
 Time: 12:00pm-12:50pm, Thursday February 27th 2025  
-Recording: (coming) 
 Location: Soto (SSB) 114   
 Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2025-02-27-building-an-r-package-from-scratch)
 
 Happy Scientist Seminars, 2025: #1  
 Title: JAX Lecture 2: Transformable Programs and More!  
 Time: 12:00pm-12:50pm, Thursday January 30th 2025  
-Recording: (coming)
 Location: Soto (SSB) 114  
 Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2025-01-30-jax-part2)
 
