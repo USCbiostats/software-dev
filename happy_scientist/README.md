@@ -4,12 +4,22 @@
 
 The Happy Scientist Seminars are educational seminars sponsored by Core D of the Biostats Program Project award (P01 CA196569). This series, the "Happy Scientist" seminar series, is aimed at providing educational material for members of Biostats, both students and faculty, about a variety of tools and methods that might prove useful to them. If you have any suggestions for subjects that you would like to learn about in future, please send email to Kim Siegmund at (kims@usc.edu). Our agenda will be driven by your specific interests as far as is possible. 
 
-# 2025 Seminar Schedule
+# 2026 Seminar Schedule
+
+Happy Scientist Seminars, 2026: #1  
+Title: AI co-working
+Time: 1:00pm-2:30pm, Tuesday February 17, 2026 
+Location: Soto (SSB) 115  
+Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2026-02-17-AI-coworking)
+
+# Past Seminars
+
+## 2025
 
 Happy Scientist Seminars, 2025: #3  
 Title: Perspectives from a biostats PhD student in the AI era        
 Time: 12:00pm-12:50pm, Thursday November 20th 2025  
-Recording: (coming)   
+Recording: https://youtu.be/qfaUTfV4dOY  
 Location: Soto (SSB) 114   
 Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2025-11-20-Perspectives-from-a-PhD-student-in-the-AI-era)
 
@@ -25,7 +35,6 @@ Time: 12:00pm-12:50pm, Thursday January 30th 2025
 Location: Soto (SSB) 114  
 Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2025-01-30-jax-part2)
 
-# Past Seminars
 
 ## 2024 
 
