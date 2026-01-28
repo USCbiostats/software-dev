@@ -7,9 +7,9 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 # 2026 Seminar Schedule
 
 Happy Scientist Seminars, 2026: #1  
-Title: AI co-working
-Time: 1:00pm-2:30pm, Tuesday February 17, 2026 
-Location: Soto (SSB) 115  
+Title: AI co-working  
+Time: 1:00pm-2:30pm, Tuesday February 17, 2026   
+Location: Soto (SSB) 115    
 Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2026-02-17-AI-coworking)
 
 # Past Seminars
