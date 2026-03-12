@@ -6,6 +6,13 @@ The Happy Scientist Seminars are educational seminars sponsored by Core D of the
 
 # 2026 Seminar Schedule
 
+Happy Scientist Seminars, 2026: #2  
+Title: Beyond the Chatbot: Using GRAIL as an Agentic Workflow for Complex Scientific Writing  
+Time: 12:00pm-1pm, Thursday March 12, 2026   
+Location: Soto (SSB) 114    
+Materials can be found  [here](https://github.com/USCbiostats/software-dev/tree/master/happy_scientist/seminars/2026-03-12-Beyond-the-Chatbot)
+
+
 Happy Scientist Seminars, 2026: #1  
 Title: AI co-working  
 Time: 1:00pm-2:30pm, Tuesday February 17, 2026   
