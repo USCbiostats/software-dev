@@ -38,4 +38,4 @@ pfamscanr,,,,,,An R client for EMBL-EBI's PfamScan API
 methcon5,https://github.com/USCbiostats/MethCon5,,n7hjOCIAAAAJ,tuHXwOkdijsC,https://scholar.google.com/scholar?cites=13818868965517630908&hl=en,R package to identify and rank CpG DNA methylation conservation along the human genome
 cit,,,DD7aE9sAAAAJ,hqOjcs7Dif8C,https://scholar.google.com/scholar?cites=2897292192206854993&hl=en,Causal Inference Test
 gesso,,,oLriDxQAAAAJ,HIFyuExEbWQC,https://scholar.google.com/scholar?cites=PbkWjCSETP0J&hl=en,Hierarchical GxE Interactions in a Regularized Regression Model
-mJAM,,,2ydgZ0oAAAAJ,cdwqcPQS8ssC,https://scholar.google.com/scholar?oi=bibs&hl=en&cites=13495476923987659212&as_sdt=5,Hierarchical joint analysis of marginal summary statistics - Part 1: Multipopulation fine mapping (mJAM)
+mJAM,https://github.com/USCbiostats/hJAM,,2ydgZ0oAAAAJ,cdwqcPQS8ssC,https://scholar.google.com/scholar?oi=bibs&hl=en&cites=13495476923987659212&as_sdt=5,Hierarchical joint analysis of marginal summary statistics - Part 1: Multipopulation fine mapping (mJAM)
